@@ -1,0 +1,9 @@
+# Earth Odyssey - URL rewrites and routing
+RewriteEngine On
+
+# Clean article URLs: /articles/slug/ -> article.php?slug=slug
+RewriteRule ^articles/([a-z0-9-]+)/?$ articles/article.php?slug=$1 [L,QSA]
+
+# Galleries and services: all paths -> coming soon placeholder
+RewriteRule ^galleries(/.*)?$ galleries/index.php [L,QSA]
+RewriteRule ^services(/.*)?$ services/index.php [L,QSA]

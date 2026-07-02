@@ -1,0 +1,9 @@
+<!-- camping.svg - Category placeholder: camping -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+  <rect width="400" height="300" fill="#1a2e22"/>
+  <path d="M0 220 L400 220 L400 300 L0 300 Z" fill="#243d2e"/>
+  <path d="M200 60 L120 200 L280 200 Z" fill="#6b4c32"/>
+  <path d="M200 60 L200 200" stroke="#a88620" stroke-width="3"/>
+  <circle cx="320" cy="80" r="30" fill="#c9a227" opacity="0.8"/>
+  <text x="200" y="260" text-anchor="middle" fill="#ece6d9" font-family="Georgia, serif" font-size="28" font-weight="bold">Camping</text>
+</svg>

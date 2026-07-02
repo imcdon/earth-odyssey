@@ -1,0 +1,7 @@
+<!-- pillar-stories.svg -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+  <rect width="400" height="300" fill="#243d2e"/>
+  <path d="M0 200 L120 120 L240 160 L400 100 L400 300 L0 300 Z" fill="#1a2e22"/>
+  <path d="M200 90 L188 130 L212 130 Z" fill="#a88620"/>
+  <text x="200" y="260" text-anchor="middle" fill="#ece6d9" font-family="Georgia, serif" font-size="22" font-weight="bold">Stories</text>
+</svg>

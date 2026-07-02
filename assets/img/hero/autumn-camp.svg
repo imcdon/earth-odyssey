@@ -1,0 +1,18 @@
+<!-- autumn-camp.svg - Placeholder hero image: autumn camping scene. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="dusk" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5c4030"/>
+      <stop offset="60%" stop-color="#8b5a3c"/>
+      <stop offset="100%" stop-color="#2c3e2f"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#dusk)"/>
+  <ellipse cx="600" cy="520" rx="400" ry="80" fill="#1a2e1f" opacity="0.6"/>
+  <path d="M520 420 L600 300 L680 420 Z" fill="#7a5c3e"/>
+  <rect x="575" y="420" width="50" height="60" fill="#5c4030"/>
+  <circle cx="560" cy="380" r="30" fill="#c45c26" opacity="0.8"/>
+  <circle cx="640" cy="390" r="25" fill="#d4722a" opacity="0.7"/>
+  <path d="M100 350 Q200 280 320 340 T540 320" stroke="#a0522d" stroke-width="8" fill="none" opacity="0.6"/>
+  <path d="M700 330 Q850 260 1000 310 T1200 290" stroke="#8b4513" stroke-width="6" fill="none" opacity="0.5"/>
+</svg>

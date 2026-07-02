@@ -1,0 +1,7 @@
+<!-- gallery-landscapes.svg - Gallery category placeholder -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+  <rect width="400" height="300" fill="#4a5c4a"/>
+  <path d="M0 180 L120 100 L240 140 L360 80 L400 120 L400 300 L0 300 Z" fill="#243d2e"/>
+  <circle cx="300" cy="70" r="35" fill="#c9a227" opacity="0.85"/>
+  <text x="200" y="260" text-anchor="middle" fill="#ece6d9" font-family="Georgia, serif" font-size="24" font-weight="bold">Landscapes</text>
+</svg>

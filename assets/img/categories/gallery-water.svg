@@ -1,0 +1,8 @@
+<!-- gallery-water.svg - Gallery category placeholder -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+  <rect width="400" height="300" fill="#2a4a5e"/>
+  <path d="M0 160 Q100 140 200 155 T400 150 L400 300 L0 300 Z" fill="#1e3a4a"/>
+  <path d="M80 120 L120 120 L100 80 Z" fill="#4a7a8a"/>
+  <ellipse cx="280" cy="170" rx="50" ry="15" fill="#4a7a8a" opacity="0.5"/>
+  <text x="200" y="260" text-anchor="middle" fill="#ece6d9" font-family="Georgia, serif" font-size="22" font-weight="bold">On the Water</text>
+</svg>

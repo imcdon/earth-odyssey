@@ -1,0 +1,8 @@
+<!-- hunting.svg - Category placeholder: hunting -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+  <rect width="400" height="300" fill="#3d3028"/>
+  <path d="M0 190 L80 150 L160 170 L240 130 L320 160 L400 140 L400 300 L0 300 Z" fill="#2a2218"/>
+  <path d="M60 100 L100 100 L80 60 Z" fill="#6b4c32"/>
+  <path d="M300 90 L340 90 L320 50 Z" fill="#4a3525"/>
+  <text x="200" y="260" text-anchor="middle" fill="#ece6d9" font-family="Georgia, serif" font-size="28" font-weight="bold">Hunting</text>
+</svg>

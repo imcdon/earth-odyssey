@@ -1,0 +1,8 @@
+<!-- gallery-campsite.svg - Gallery category placeholder -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+  <rect width="400" height="300" fill="#1a2e22"/>
+  <path d="M0 210 L400 210 L400 300 L0 300 Z" fill="#243d2e"/>
+  <path d="M200 70 L130 190 L270 190 Z" fill="#6b4c32"/>
+  <circle cx="320" cy="90" r="25" fill="#f7e8a0" opacity="0.8"/>
+  <text x="200" y="260" text-anchor="middle" fill="#ece6d9" font-family="Georgia, serif" font-size="24" font-weight="bold">Campsite</text>
+</svg>

@@ -1,0 +1,19 @@
+<!-- services.svg - Placeholder hero image: outdoor tech / services scene. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="techBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1f3f2b"/>
+      <stop offset="100%" stop-color="#2d5a3d"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#techBg)"/>
+  <circle cx="600" cy="280" r="100" fill="none" stroke="#7a5c3e" stroke-width="4" opacity="0.6"/>
+  <circle cx="600" cy="280" r="60" fill="none" stroke="#a08060" stroke-width="2" opacity="0.5"/>
+  <line x1="600" y1="180" x2="600" y2="220" stroke="#f7f4ef" stroke-width="3"/>
+  <line x1="600" y1="340" x2="600" y2="380" stroke="#f7f4ef" stroke-width="3"/>
+  <line x1="500" y1="280" x2="540" y2="280" stroke="#f7f4ef" stroke-width="3"/>
+  <line x1="660" y1="280" x2="700" y2="280" stroke="#f7f4ef" stroke-width="3"/>
+  <path d="M0 480 L400 400 L700 450 L1200 420 L1200 675 L0 675 Z" fill="#152a1c" opacity="0.8"/>
+  <rect x="480" y="420" width="240" height="8" rx="4" fill="#7a5c3e" opacity="0.7"/>
+  <rect x="520" y="440" width="160" height="6" rx="3" fill="#5c6b5e" opacity="0.5"/>
+</svg>

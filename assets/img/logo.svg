@@ -1,0 +1,7 @@
+<!-- logo.svg - Earth Odyssey site logo: simple mountain and tree mark. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+  <rect width="40" height="40" rx="8" fill="#1f3f2b"/>
+  <path d="M6 28 L14 14 L20 22 L26 12 L34 28 Z" fill="#7a5c3e"/>
+  <path d="M20 10 C20 10 16 14 16 18 C16 20 18 22 20 22 C22 22 24 20 24 18 C24 14 20 10 20 10 Z" fill="#2d5a3d"/>
+  <circle cx="30" cy="10" r="3" fill="#f7f4ef"/>
+</svg>

@@ -1,0 +1,9 @@
+<!-- gallery-wildlife.svg - Gallery category placeholder -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+  <rect width="400" height="300" fill="#3d3028"/>
+  <ellipse cx="200" cy="160" rx="60" ry="40" fill="#6b4c32"/>
+  <circle cx="175" cy="145" r="8" fill="#1e2a1f"/>
+  <circle cx="225" cy="145" r="8" fill="#1e2a1f"/>
+  <path d="M185 175 Q200 185 215 175" stroke="#1e2a1f" stroke-width="3" fill="none"/>
+  <text x="200" y="260" text-anchor="middle" fill="#ece6d9" font-family="Georgia, serif" font-size="24" font-weight="bold">Wildlife</text>
+</svg>

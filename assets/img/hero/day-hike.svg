@@ -1,0 +1,14 @@
+<!-- day-hike.svg - Placeholder hero image: day hike trail scene. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#87a8b8"/>
+      <stop offset="100%" stop-color="#c8d8c0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#sky)"/>
+  <path d="M0 420 L280 280 L520 380 L780 220 L1200 400 L1200 675 L0 675 Z" fill="#2d5a3d"/>
+  <path d="M0 480 L200 400 L420 460 L680 340 L960 420 L1200 380 L1200 675 L0 675 Z" fill="#1f3f2b"/>
+  <path d="M600 200 L580 260 L620 260 Z" fill="#7a5c3e"/>
+  <circle cx="950" cy="120" r="50" fill="#f7e8a0" opacity="0.9"/>
+</svg>

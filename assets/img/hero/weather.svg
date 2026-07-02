@@ -1,0 +1,16 @@
+<!-- weather.svg - Placeholder hero image: weather and clouds scene. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="weatherSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4a6fa5"/>
+      <stop offset="100%" stop-color="#8ba4b8"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#weatherSky)"/>
+  <ellipse cx="350" cy="180" rx="120" ry="50" fill="#e8eef2" opacity="0.9"/>
+  <ellipse cx="450" cy="200" rx="100" ry="45" fill="#dde5ea" opacity="0.85"/>
+  <ellipse cx="800" cy="150" rx="140" ry="55" fill="#f0f4f7" opacity="0.9"/>
+  <ellipse cx="920" cy="175" rx="90" ry="40" fill="#e8eef2" opacity="0.8"/>
+  <path d="M0 500 L300 420 L600 480 L900 400 L1200 460 L1200 675 L0 675 Z" fill="#2d5a3d"/>
+  <path d="M0 550 L250 500 L550 540 L850 480 L1200 520 L1200 675 L0 675 Z" fill="#1f3f2b"/>
+</svg>

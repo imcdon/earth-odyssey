@@ -1,0 +1,8 @@
+includes/db.config.php
+
+# IDE / editor
+.cursor/
+
+# OS junk
+.DS_Store
+Thumbs.db

@@ -1,0 +1,6 @@
+<!-- favicon.svg - Small favicon matching the Earth Odyssey logo. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+  <rect width="32" height="32" rx="6" fill="#1f3f2b"/>
+  <path d="M4 24 L12 12 L16 18 L22 10 L28 24 Z" fill="#7a5c3e"/>
+  <path d="M16 8 C16 8 13 11 13 14 C13 16 14 17 16 17 C18 17 19 16 19 14 C19 11 16 8 16 8 Z" fill="#2d5a3d"/>
+</svg>
