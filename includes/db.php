@@ -22,10 +22,27 @@ function get_db(): PDO
         $config['charset']
     );
 
-    $pdo = new PDO($dsn, $config['user'], $config['pass'], [
-        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]);
+    try {
+        $pdo = new PDO($dsn, $config['user'], $config['pass'], [
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        ]);
+    } catch (PDOException $e) {
+        if (
+            str_contains($e->getMessage(), '1045')
+            && ($config['user'] ?? '') === 'root'
+            && ($config['pass'] ?? '') === ''
+        ) {
+            throw new RuntimeException(
+                'Database login failed: includes/db.config.php is using local XAMPP credentials (root, no password). '
+                . 'On cPanel, create a MySQL database and user, then edit includes/db.config.php on the server with those credentials. '
+                . 'Do not upload your local db.config.php.',
+                0,
+                $e
+            );
+        }
+        throw $e;
+    }
 
     return $pdo;
 }
