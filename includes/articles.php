@@ -4,7 +4,7 @@
  */
 require_once __DIR__ . '/db.php';
 
-const DEFAULT_ARTICLE_THUMBNAIL = '/assets/img/hero/day-hike.svg';
+const DEFAULT_ARTICLE_THUMBNAIL = '/assets/img/hero/day-hike.webp';
 
 function article_thumbnail(?string $path): string
 {
@@ -251,4 +251,12 @@ function save_article(array $data, ?int $id = null): int
     ]);
 
     return (int) get_db()->lastInsertId();
+}
+
+function delete_article(int $id): bool
+{
+    $stmt = get_db()->prepare('DELETE FROM articles WHERE id = ?');
+    $stmt->execute([$id]);
+
+    return $stmt->rowCount() > 0;
 }

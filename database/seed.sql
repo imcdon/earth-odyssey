@@ -7,16 +7,16 @@ INSERT INTO users (username, password_hash, role) VALUES
 
 -- Accounts start with login disabled; set passwords with database/set-password.php
 
-INSERT INTO categories (type, slug, name, image_path, sort_order) VALUES
-('article', 'hiking', 'Hiking', '/assets/img/categories/hiking.svg', 1),
-('article', 'camping', 'Camping', '/assets/img/categories/camping.svg', 2),
-('article', 'fishing', 'Fishing', '/assets/img/categories/fishing.svg', 3),
-('article', 'hunting', 'Hunting', '/assets/img/categories/hunting.svg', 4),
-('article', 'weather', 'Weather', '/assets/img/categories/weather.svg', 5),
-('gallery', 'landscapes', 'Landscapes', '/assets/img/categories/gallery-landscapes.svg', 1),
-('gallery', 'wildlife', 'Wildlife', '/assets/img/categories/gallery-wildlife.svg', 2),
-('gallery', 'campsite', 'Campsite', '/assets/img/categories/gallery-campsite.svg', 3),
-('gallery', 'on-the-water', 'On the Water', '/assets/img/categories/gallery-water.svg', 4);
+INSERT INTO categories (type, slug, name, image_path, sort_order, is_featured) VALUES
+('article', 'hiking', 'Hiking', '/assets/img/categories/hiking.webp', 1, 0),
+('article', 'camping', 'Camping', '/assets/img/categories/camping.webp', 2, 0),
+('article', 'fishing', 'Fishing', '/assets/img/categories/fishing.webp', 3, 0),
+('article', 'hunting', 'Hunting', '/assets/img/categories/hunting.webp', 4, 0),
+('article', 'weather', 'Weather', '/assets/img/categories/weather.webp', 5, 0),
+('gallery', 'landscapes', 'Landscapes', '/assets/img/categories/gallery-landscapes.webp', 1, 0),
+('gallery', 'wildlife', 'Wildlife', '/assets/img/categories/gallery-wildlife.webp', 2, 0),
+('gallery', 'campsite', 'Campsite', '/assets/img/hero/autumn-camp.webp', 3, 1),
+('gallery', 'on-the-water', 'On the Water', '/assets/img/categories/gallery-water.webp', 4, 0);
 
 INSERT INTO articles (slug, title, blurb, body, status, author_id, editor_id, published_at, category_id, thumbnail, is_featured) VALUES
 (
@@ -40,7 +40,7 @@ A light rain shell weighs little and saves the day when the forecast wrong-foots
     1,
     NOW(),
     1,
-    '/assets/img/hero/day-hike.svg',
+    '/assets/img/hero/day-hike.webp',
     1
 ),
 (
@@ -55,7 +55,7 @@ We are building a home for articles, photo galleries, and free outdoor tools. Th
     1,
     NOW(),
     2,
-    '/assets/img/hero/autumn-camp.svg',
+    '/assets/img/hero/autumn-camp.webp',
     0
 ),
 (
@@ -76,6 +76,6 @@ If skies look uncertain, have a turn-around time and stick to it. The best trip 
     1,
     NOW(),
     5,
-    '/assets/img/hero/weather.svg',
+    '/assets/img/hero/weather.webp',
     0
 );

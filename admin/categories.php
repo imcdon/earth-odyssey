@@ -41,6 +41,9 @@ function render_category_list(array $categories): void
                     <span class="category-admin-meta">
                         <?= htmlspecialchars($cat['slug']) ?>
                         &middot; order <?= (int) $cat['sort_order'] ?>
+                        <?php if (!empty($cat['is_featured'])): ?>
+                            &middot; Featured
+                        <?php endif; ?>
                         &middot; <?= htmlspecialchars($cat['image_path']) ?>
                     </span>
                 </div>

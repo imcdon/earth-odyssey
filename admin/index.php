@@ -17,6 +17,10 @@ require __DIR__ . '/../includes/header.php';
     <h1 class="section-title">Admin</h1>
     <p class="section-intro">Logged in as <?= htmlspecialchars($user['username']) ?> (<?= htmlspecialchars($user['role']) ?>).</p>
 
+    <?php if (isset($_GET['deleted'])): ?>
+        <p class="form-success">Article deleted.</p>
+    <?php endif; ?>
+
     <div class="admin-actions">
         <a class="btn-primary" href="<?= htmlspecialchars(url('admin/edit.php')) ?>">New article</a>
         <?php if ($user['role'] === 'editor'): ?>

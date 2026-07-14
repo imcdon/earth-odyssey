@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS categories (
     name VARCHAR(100) NOT NULL,
     image_path VARCHAR(255) NOT NULL,
     sort_order INT NOT NULL DEFAULT 0,
+    is_featured TINYINT(1) NOT NULL DEFAULT 0,
     UNIQUE KEY unique_type_slug (type, slug)
 );
 

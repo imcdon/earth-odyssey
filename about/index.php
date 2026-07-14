@@ -1,43 +1,49 @@
 <?php
 /*
- * index.php - About Earth Odyssey: hero and four pillars.
+ * index.php - About Earth Odyssey: hero and editor.
  */
 require __DIR__ . '/../includes/config.php';
-require __DIR__ . '/../includes/categories.php';
 
 $page_title = 'About | ' . $site_name;
 require __DIR__ . '/../includes/header.php';
 ?>
 
-<section
-    class="about-hero"
-    style="background-image: url('<?= htmlspecialchars(url($about_hero_image)) ?>')"
-    aria-label="<?= htmlspecialchars($about_hero_title) ?>"
->
+<section class="about-hero" aria-label="<?= htmlspecialchars($about_hero_title) ?>">
+    <img
+        class="about-hero-image"
+        src="<?= htmlspecialchars(url($about_hero_image)) ?>"
+        alt=""
+        width="1600"
+        height="500"
+        decoding="async"
+        fetchpriority="high"
+    >
     <div class="about-hero-overlay">
-        <h1 class="about-hero-title"><?= htmlspecialchars($about_hero_title) ?></h1>
-        <p class="about-intro"><?= htmlspecialchars($about_intro) ?></p>
+        <div class="about-hero-copy">
+            <p class="about-hero-role"><?= htmlspecialchars($about_hero_role) ?></p>
+            <h1 class="about-hero-title"><?= htmlspecialchars($about_hero_title) ?></h1>
+            <p class="about-intro"><?= htmlspecialchars($about_intro) ?></p>
+        </div>
     </div>
 </section>
 
-<section class="container about-pillars-section">
-    <h2 class="section-title about-pillars-heading">The Pillars of Earth Odyssey</h2>
-    <div class="about-pillars-grid">
-        <?php foreach ($about_pillars as $pillar): ?>
-            <article class="about-pillar" id="pillar-<?= htmlspecialchars(slugify_category($pillar['title'])) ?>">
-                <img
-                    src="<?= htmlspecialchars(url($pillar['image'])) ?>"
-                    alt=""
-                    width="400"
-                    height="300"
-                    loading="lazy"
-                >
-                <div class="about-pillar-body">
-                    <h3 class="about-pillar-title"><?= htmlspecialchars($pillar['title']) ?></h3>
-                    <p class="about-pillar-description"><?= htmlspecialchars($pillar['description']) ?></p>
-                </div>
-            </article>
-        <?php endforeach; ?>
+<section class="container about-editor-section" id="editor">
+    <div class="about-editor">
+        <div class="about-editor-media">
+            <img
+                class="about-editor-image"
+                src="<?= htmlspecialchars(url($about_editor['image'])) ?>"
+                alt="<?= htmlspecialchars($about_editor['name']) ?>"
+                width="480"
+                height="640"
+                loading="lazy"
+            >
+        </div>
+        <div class="about-editor-body">
+            <p class="about-editor-role"><?= htmlspecialchars($about_editor['role']) ?></p>
+            <h2 class="about-editor-name"><?= htmlspecialchars($about_editor['name']) ?></h2>
+            <p class="about-editor-bio"><?= htmlspecialchars($about_editor['bio']) ?></p>
+        </div>
     </div>
 </section>
 

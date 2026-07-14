@@ -1,0 +1,15 @@
+{
+  "name": "earth-odyssey",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "media:images": "node scripts/process-images.mjs"
+  },
+  "devDependencies": {
+    "heic-convert": "^2.1.0",
+    "sharp": "^0.33.5"
+  }
+}

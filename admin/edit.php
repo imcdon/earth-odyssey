@@ -26,6 +26,21 @@ if ($article && $user['role'] === 'author' && $article['status'] === 'published'
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action = $_POST['action'] ?? 'draft';
+
+    if ($action === 'delete' && $id && $article) {
+        $canDelete = $user['role'] === 'editor'
+            || ((int) $article['author_id'] === (int) $user['id'] && $article['status'] !== 'published');
+        if (!$canDelete) {
+            http_response_code(403);
+            echo 'Access denied.';
+            exit;
+        }
+        delete_article($id);
+        header('Location: ' . url('admin/index.php') . '?deleted=1');
+        exit;
+    }
+
     $title = trim($_POST['title'] ?? '');
     $slug = trim($_POST['slug'] ?? '');
     $blurb = trim($_POST['blurb'] ?? '');
@@ -33,7 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $categoryId = ($_POST['category_id'] ?? '') !== '' ? (int) $_POST['category_id'] : null;
     $thumbnail = trim($_POST['thumbnail'] ?? '');
     $isFeatured = !empty($_POST['is_featured']);
-    $action = $_POST['action'] ?? 'draft';
 
     if ($slug === '') {
         $slug = slugify($title);
@@ -137,7 +151,7 @@ require __DIR__ . '/../includes/header.php';
         </select>
 
         <label for="thumbnail">Thumbnail (image path or URL)</label>
-        <input type="text" id="thumbnail" name="thumbnail" value="<?= htmlspecialchars($form['thumbnail'] ?? '') ?>" placeholder="/assets/img/hero/day-hike.svg">
+        <input type="text" id="thumbnail" name="thumbnail" value="<?= htmlspecialchars($form['thumbnail'] ?? '') ?>" placeholder="/assets/img/hero/day-hike.webp">
 
         <?php if ($user['role'] === 'editor'): ?>
             <label class="checkbox-label">
@@ -156,7 +170,10 @@ require __DIR__ . '/../includes/header.php';
                 <button type="submit" name="action" value="publish" class="btn-primary">Publish</button>
                 <?php if ($id): ?>
                     <button type="submit" name="action" value="reject" class="btn-secondary">Reject</button>
+                    <button type="submit" name="action" value="delete" class="btn-secondary" formnovalidate onclick="return confirm('Permanently delete this article?');">Delete</button>
                 <?php endif; ?>
+            <?php elseif ($id && $article && $article['status'] !== 'published'): ?>
+                <button type="submit" name="action" value="delete" class="btn-secondary" formnovalidate onclick="return confirm('Permanently delete this article?');">Delete</button>
             <?php endif; ?>
         </div>
     </form>

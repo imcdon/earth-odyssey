@@ -8,7 +8,7 @@ require_once __DIR__ . '/paths.php';
 $site_name = 'Earth Odyssey';
 $site_tagline = 'Articles, galleries, and outdoor tech';
 $company_name = 'Earth Odyssey LLC';
-$header_bg_image = '/assets/img/header-bg.svg';
+$header_bg_image = '/assets/img/hero/header-bg.webp';
 
 $nav_links = [
     'Home'      => '/',
@@ -24,28 +24,28 @@ $hero_slides = [
         'title' => 'Packing for a Day Hike',
         'blurb' => 'What to bring, what to leave behind, and how to keep your load light.',
         'url'   => '/articles/packing-day-hike/',
-        'image' => '/assets/img/hero/day-hike.svg',
+        'image' => '/assets/img/hero/day-hike.webp',
     ],
     [
         'type'  => 'gallery',
-        'title' => 'Autumn Camp Gallery',
-        'blurb' => 'Photos from a fall camping trip — fire, forest, and early morning mist.',
-        'url'   => '/galleries/autumn-camp/',
-        'image' => '/assets/img/hero/autumn-camp.svg',
+        'title' => 'Campsite',
+        'blurb' => 'Photos from the trail, camp, and field — featured in Campsite.',
+        'url'   => '/galleries/',
+        'image' => '/assets/img/hero/autumn-camp.webp',
     ],
     [
         'type'  => 'article',
         'title' => 'Reading the Weather Before You Go',
         'blurb' => 'Simple checks that help you plan a safer day outdoors.',
         'url'   => '/articles/reading-weather/',
-        'image' => '/assets/img/hero/weather.svg',
+        'image' => '/assets/img/hero/weather.webp',
     ],
     [
         'type'  => 'services',
         'title' => 'Free Outdoor Tech Tools',
         'blurb' => 'Weather, streams, buoys — free tools for your next trip.',
         'url'   => '/services/',
-        'image' => '/assets/img/hero/services.svg',
+        'image' => '/assets/img/hero/services.webp',
     ],
 ];
 
@@ -97,31 +97,17 @@ $latest_articles = [
     ],
 ];
 
-$about_text = 'Earth Odyssey LLC shares outdoor stories, photography, and free tech tools for campers, hunters, and anglers. We build simple resources that help you plan trips, learn from the field, and enjoy time outside.';
+// Panel 1 — hero banner (image + hero copy)
+$about_hero_image = '/assets/img/about/hero.webp';
+$about_hero_role = 'About';
+$about_hero_title = 'Earth Odyssey';
+$about_intro = 'Outdoor stories, photography, and free tech tools for campers, hunters, and anglers. Built for anyone who wants more time outside.';
+$about_text = $about_intro;
 
-$about_hero_image = '/assets/img/about/hero.svg';
-$about_hero_title = 'About Earth Odyssey';
-$about_intro = $about_text;
-
-$about_pillars = [
-    [
-        'title'       => 'Economy of Words',
-        'description' => 'Think about the before time. People were limited by how much paint they could put on a wall, or how much carvings they can make in stone, then ink and paper, and now we\'re basically unlimited on how many words we can write. We\'ll do our best to do as much as we can with as little as we can.',
-        'image'       => '/assets/img/about/pillar-stories.svg',
-    ],
-    [
-        'title'       => 'No Logins or Subscriptions',
-        'description' => 'No logins or subscriptions, no B.S. Everyone gets access to the content, free for everyone.',
-        'image'       => '/assets/img/about/pillar-photography.svg',
-    ],
-    [
-        'title'       => 'We Do Not Sell Information',
-        'description' => 'We are against the practice of selling user information. Any metrics (if collected at all) are anonymized and used for our own operations. Metrics that we collect are page views, likes, dislikes, and information from article submissions. Nothing else.',
-        'image'       => '/assets/img/about/pillar-knowledge.svg',
-    ],
-    [
-        'title'       => 'Free Tools & Services',
-        'description' => 'Weather, streams, and other outdoor tech — simple tools that cost nothing and respect your time.',
-        'image'       => '/assets/img/about/pillar-tools.svg',
-    ],
+// Panel 2 — editor (portrait + editor copy)
+$about_editor = [
+    'name'  => 'Ian McDonnell',
+    'role'  => 'Editor/Writer',
+    'bio'   => 'Always in search of the next adventure. The founder and developer of Earth Odyssey, also the editor and writer. Every year the adventures get bigger, the stories crazier, and my hunts for big fish and game across North America continue.',
+    'image' => '/assets/img/about/editor.webp',
 ];

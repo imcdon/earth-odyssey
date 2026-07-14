@@ -372,25 +372,23 @@ function search_about(string $query, array $aboutConfig): array
         ];
     }
 
-    foreach ($aboutConfig['about_pillars'] ?? [] as $pillar) {
-        $title = $pillar['title'] ?? '';
-        $description = $pillar['description'] ?? '';
-        if (!query_matches_text($title, $terms) && !query_matches_text($description, $terms)) {
-            continue;
+    $editor = $aboutConfig['about_editor'] ?? null;
+    if (is_array($editor)) {
+        $name = $editor['name'] ?? '';
+        $role = $editor['role'] ?? '';
+        $bio = $editor['bio'] ?? '';
+        if (query_matches_text($name, $terms) || query_matches_text($role, $terms) || query_matches_text($bio, $terms)) {
+            $excerptSource = query_matches_text($bio, $terms) ? $bio : ($name !== '' ? $name : $role);
+            $results[] = [
+                'kind'        => 'about',
+                'title'       => $name !== '' ? $name : 'Editor',
+                'description' => build_search_excerpt($excerptSource, $terms),
+                'url'         => '/about/#editor',
+                'meta'        => 'About · Editor',
+                'thumbnail'   => $editor['image'] ?? null,
+                'score'       => query_matches_text($name, $terms) ? 1.5 : 1.0,
+            ];
         }
-
-        $excerptSource = query_matches_text($description, $terms) ? $description : $title;
-        $pillarSlug = slugify_category($title);
-
-        $results[] = [
-            'kind'        => 'about',
-            'title'       => $title,
-            'description' => build_search_excerpt($excerptSource, $terms),
-            'url'         => '/about/#pillar-' . $pillarSlug,
-            'meta'        => 'About · Pillar',
-            'thumbnail'   => $pillar['image'] ?? null,
-            'score'       => query_matches_text($title, $terms) ? 1.5 : 1.0,
-        ];
     }
 
     return $results;

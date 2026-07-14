@@ -20,7 +20,7 @@ if ($query !== null) {
         'about_hero_title' => $about_hero_title,
         'about_intro'      => $about_intro,
         'about_hero_image' => $about_hero_image,
-        'about_pillars'    => $about_pillars,
+        'about_editor'     => $about_editor,
     ]);
     if ($page > $searchResults['total_pages']) {
         $page = $searchResults['total_pages'];
@@ -28,7 +28,7 @@ if ($query !== null) {
             'about_hero_title' => $about_hero_title,
             'about_intro'      => $about_intro,
             'about_hero_image' => $about_hero_image,
-            'about_pillars'    => $about_pillars,
+            'about_editor'     => $about_editor,
         ]);
     }
 }

@@ -6,3 +6,8 @@ includes/db.config.php
 # OS junk
 .DS_Store
 Thumbs.db
+
+# Media pipeline (Soldotna-style)
+/_raw/*
+!/_raw/README.md
+/node_modules/

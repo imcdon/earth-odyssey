@@ -25,6 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'author_id'    => (int) $article['author_id'],
                 'editor_id'    => (int) $user['id'],
                 'published_at' => date('Y-m-d H:i:s'),
+                'category_id'  => $article['category_id'] !== null ? (int) $article['category_id'] : null,
+                'thumbnail'    => $article['thumbnail'] ?? null,
             ], $id);
         } elseif ($action === 'reject') {
             save_article([
@@ -36,7 +38,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'author_id'    => (int) $article['author_id'],
                 'editor_id'    => (int) $user['id'],
                 'published_at' => null,
+                'category_id'  => $article['category_id'] !== null ? (int) $article['category_id'] : null,
+                'thumbnail'    => $article['thumbnail'] ?? null,
             ], $id);
+        } elseif ($action === 'delete') {
+            delete_article($id);
         }
     }
 
@@ -67,6 +73,7 @@ require __DIR__ . '/../includes/header.php';
                         <input type="hidden" name="id" value="<?= (int) $article['id'] ?>">
                         <button type="submit" name="action" value="publish" class="btn-primary">Publish</button>
                         <button type="submit" name="action" value="reject" class="btn-secondary">Reject</button>
+                        <button type="submit" name="action" value="delete" class="btn-secondary" onclick="return confirm('Permanently delete this article?');">Delete</button>
                     </form>
                 </li>
             <?php endforeach; ?>

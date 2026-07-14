@@ -6,26 +6,40 @@ require __DIR__ . '/includes/config.php';
 
 try {
     require_once __DIR__ . '/includes/articles.php';
+    require_once __DIR__ . '/includes/categories.php';
     $featured = get_featured_article();
     $excludeId = $featured ? (int) $featured['id'] : null;
     $latest_articles = get_published_articles_page(1, 3, null, $excludeId);
 
     $published_for_hero = get_published_articles(2);
     $hero_articles = [];
-    $hero_images = ['/assets/img/hero/day-hike.svg', '/assets/img/hero/weather.svg'];
-    foreach ($published_for_hero as $i => $row) {
+    foreach ($published_for_hero as $row) {
         $hero_articles[] = [
             'type'  => 'article',
             'title' => $row['title'],
             'blurb' => $row['blurb'],
             'url'   => $row['url'],
-            'image' => $hero_images[$i] ?? '/assets/img/hero/day-hike.svg',
+            'image' => $row['thumbnail'],
         ];
     }
+
+    $gallery_for_hero = get_random_gallery_category();
+    $hero_gallery = [];
+    if ($gallery_for_hero) {
+        $hero_gallery[] = [
+            'type'  => 'gallery',
+            'title' => $gallery_for_hero['name'],
+            'blurb' => $gallery_for_hero['blurb'],
+            'url'   => $gallery_for_hero['url'],
+            'image' => $gallery_for_hero['image_path'],
+        ];
+    }
+
     $hero_slides = array_merge(
         $hero_articles,
+        $hero_gallery,
         array_values(array_filter($hero_slides, function ($slide) {
-            return $slide['type'] !== 'article';
+            return $slide['type'] !== 'article' && $slide['type'] !== 'gallery';
         }))
     );
 } catch (Throwable $e) {
@@ -90,7 +104,7 @@ require __DIR__ . '/includes/hero-carousel.php';
                 <article class="article-row">
                     <a href="<?= htmlspecialchars(url($article['url'])) ?>" class="article-row-thumb">
                         <img
-                            src="<?= htmlspecialchars(url($article['thumbnail'] ?? '/assets/img/hero/day-hike.svg')) ?>"
+                            src="<?= htmlspecialchars(url($article['thumbnail'] ?? '/assets/img/hero/day-hike.webp')) ?>"
                             alt=""
                             width="160"
                             height="90"
