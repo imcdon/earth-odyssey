@@ -1,7 +1,7 @@
--- schema.sql - Earth Odyssey articles database tables.
--- Local/XAMPP only. On cPanel use schema-cpanel.sql (select your DB first; no CREATE DATABASE).
-CREATE DATABASE IF NOT EXISTS earth_odyssey CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE earth_odyssey;
+-- schema-cpanel.sql - Tables only for cPanel/phpMyAdmin import.
+-- 1. Create the database in cPanel → MySQL Databases (e.g. cpaneluser_dbname).
+-- 2. In phpMyAdmin, click that database in the left sidebar (must be selected).
+-- 3. Import this file. Do NOT use schema.sql on cPanel (it runs CREATE DATABASE).
 
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
