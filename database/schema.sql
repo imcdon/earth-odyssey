@@ -42,3 +42,15 @@ CREATE TABLE IF NOT EXISTS articles (
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
     FULLTEXT INDEX ft_articles_search (title, blurb, body)
 );
+
+CREATE TABLE IF NOT EXISTS river_api_log (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    endpoint VARCHAR(40) NOT NULL,
+    status SMALLINT NOT NULL DEFAULT 0,
+    cache_hit TINYINT(1) NOT NULL DEFAULT 0,
+    stale TINYINT(1) NOT NULL DEFAULT 0,
+    ms INT NOT NULL DEFAULT 0,
+    bytes INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_created (created_at)
+);

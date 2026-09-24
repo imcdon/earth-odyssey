@@ -28,6 +28,8 @@ RewriteRule ^(includes|database|storage|cron|scripts|_raw|node_modules|\.git|\.c
 # Clean article URLs: /articles/slug/ -> article.php?slug=slug
 RewriteRule ^articles/([a-z0-9-]+)/?$ articles/article.php?slug=$1 [L,QSA]
 
-# Galleries and services: all paths -> coming soon placeholder
+# Galleries and services: unknown paths -> placeholder page (real files like services/rivers/ are served directly)
 RewriteRule ^galleries(/.*)?$ galleries/index.php [L,QSA]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^services(/.*)?$ services/index.php [L,QSA]
