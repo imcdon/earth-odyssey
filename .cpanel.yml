@@ -1,0 +1,9 @@
+---
+# cPanel → Git Version Control → Manage → Pull or Deploy → "Deploy HEAD Commit" runs these tasks.
+# Copies the repo into public_html. No --delete: server-only files (includes/db.config.php,
+# includes/usgs.config.php, uploads/, storage/) are never touched, and files removed from the
+# repo must be deleted on the server by hand.
+deployment:
+  tasks:
+    - export DEPLOYPATH=$HOME/public_html/
+    - /usr/bin/rsync -rlt --chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r --exclude='.git/' --exclude='.gitignore' --exclude='.cpanel.yml' --exclude='.cursor/' --exclude='README.md' --exclude='package.json' --exclude='package-lock.json' --exclude='node_modules/' --exclude='scripts/' --exclude='_raw/' --exclude='includes/db.config.php' --exclude='includes/usgs.config.php' --exclude='assets/css/style.min.css' --exclude='uploads/' --exclude='storage/' ./ $DEPLOYPATH
