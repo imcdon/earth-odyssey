@@ -56,7 +56,7 @@ require __DIR__ . '/../includes/header.php';
                     <a
                         href="<?= htmlspecialchars(url('/galleries/?category=' . rawurlencode($cat['slug']))) ?>"
                         class="category-tile"
-                        style="background-image: url('<?= htmlspecialchars(url($cat['image_path'])) ?>')"
+                        style="background-image: url('<?= htmlspecialchars(img_fit($cat['image_path'], 960)) ?>')"
                     >
                         <span class="category-tile-label"><?= htmlspecialchars($cat['name']) ?></span>
                     </a>

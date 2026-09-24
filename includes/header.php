@@ -17,8 +17,8 @@ $page_theme = preg_replace('/[^a-z]/', '', strtolower((string) ($page_theme ?? '
     <link rel="icon" href="<?= htmlspecialchars(url('assets/img/favicon.svg')) ?>" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Newsreader:opsz,wght@6..72,400;6..72,600;6..72,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?= htmlspecialchars(url('assets/css/style.css')) ?>">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Newsreader:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="<?= htmlspecialchars(css_bundle_url()) ?>">
 </head>
 <body class="theme-<?= htmlspecialchars($page_theme) ?>">
     <header class="site-header">
@@ -51,5 +51,5 @@ $page_theme = preg_replace('/[^a-z]/', '', strtolower((string) ($page_theme ?? '
             </form>
         </div>
     </header>
-    <script src="<?= htmlspecialchars(url('assets/js/nav.js')) ?>" defer></script>
+    <script src="<?= htmlspecialchars(asset_url('assets/js/nav.js')) ?>" defer></script>
     <main>

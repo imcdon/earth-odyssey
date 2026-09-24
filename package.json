@@ -6,7 +6,8 @@
     "node": ">=20"
   },
   "scripts": {
-    "media:images": "node scripts/process-images.mjs"
+    "media:images": "node scripts/process-images.mjs && node scripts/make-variants.mjs",
+    "media:variants": "node scripts/make-variants.mjs"
   },
   "devDependencies": {
     "heic-convert": "^2.1.0",

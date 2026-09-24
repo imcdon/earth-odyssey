@@ -100,7 +100,7 @@ require __DIR__ . '/../includes/header.php';
                 <a
                     href="<?= htmlspecialchars(articles_page_url($cat['slug'])) ?>"
                     class="category-tile<?= $categorySlug === $cat['slug'] ? ' is-active' : '' ?>"
-                    style="background-image: url('<?= htmlspecialchars(url($cat['image_path'])) ?>')"
+                    style="background-image: url('<?= htmlspecialchars(img_fit($cat['image_path'], 960)) ?>')"
                 >
                     <span class="category-tile-label"><?= htmlspecialchars($cat['name']) ?></span>
                 </a>
@@ -142,11 +142,12 @@ require __DIR__ . '/../includes/header.php';
             <a href="<?= htmlspecialchars(url($featured['url'])) ?>" class="featured-article-link">
                 <div class="featured-article-media">
                     <img
-                        src="<?= htmlspecialchars(url($featured['thumbnail'])) ?>"
+                        src="<?= htmlspecialchars(url($featured['thumbnail'])) ?>"<?= img_srcset($featured['thumbnail'], '(max-width: 800px) 100vw, 50vw') ?>
                         alt=""
                         width="480"
                         height="270"
-                        loading="eager"
+                        decoding="async"
+                        fetchpriority="high"
                     >
                 </div>
                 <div class="featured-article-body">
@@ -175,11 +176,12 @@ require __DIR__ . '/../includes/header.php';
                     <article class="article-row">
                         <a href="<?= htmlspecialchars(url($article['url'])) ?>" class="article-row-thumb">
                             <img
-                                src="<?= htmlspecialchars(url($article['thumbnail'])) ?>"
+                                src="<?= htmlspecialchars(url($article['thumbnail'])) ?>"<?= img_srcset($article['thumbnail'], '160px') ?>
                                 alt=""
                                 width="160"
                                 height="90"
                                 loading="lazy"
+                                decoding="async"
                             >
                         </a>
                         <div class="article-row-body">

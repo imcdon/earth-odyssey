@@ -14,11 +14,12 @@
                     aria-hidden="<?= $index === 0 ? 'false' : 'true' ?>"
                 >
                     <img
-                        src="<?= htmlspecialchars(url($slide['image'])) ?>"
+                        src="<?= htmlspecialchars(url($slide['image'])) ?>"<?= img_srcset($slide['image'], '100vw') ?>
                         alt=""
                         width="1200"
                         height="675"
-                        loading="<?= $index === 0 ? 'eager' : 'lazy' ?>"
+                        decoding="async"
+                        <?= $index === 0 ? 'fetchpriority="high"' : 'loading="lazy"' ?>
                     >
                     <div class="hero-overlay">
                         <span class="hero-badge"><?= htmlspecialchars($hero_type_labels[$slide['type']]) ?></span>
@@ -43,4 +44,4 @@
         <?php endforeach; ?>
     </div>
 </section>
-<script src="<?= htmlspecialchars(url('assets/js/carousel.js')) ?>" defer></script>
+<script src="<?= htmlspecialchars(asset_url('assets/js/carousel.js')) ?>" defer></script>

@@ -6,6 +6,9 @@ includes/usgs.config.php
 /uploads/
 *.log
 
+# Built on first request by includes/assets.php
+/assets/css/style.min.css
+
 # Archives and deploy bundles
 *.zip
 

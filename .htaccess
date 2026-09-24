@@ -9,6 +9,22 @@ RewriteRule ^(includes|database|storage|cron|scripts|_raw|node_modules|\.git|\.c
     Require all denied
 </FilesMatch>
 
+# Compression (enabled on hosts that load mod_deflate, e.g. cPanel)
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css text/plain text/javascript application/javascript application/json image/svg+xml
+</IfModule>
+
+# Browser caching: versioned CSS/JS (?v=) are immutable for a year; images for 30 days
+<IfModule mod_headers.c>
+    <FilesMatch "\.(css|js)$">
+        Header set Cache-Control "public, max-age=31536000, immutable" "expr=%{QUERY_STRING} =~ /(^|&)v=/"
+        Header set Cache-Control "public, max-age=3600" "expr=%{QUERY_STRING} !~ /(^|&)v=/"
+    </FilesMatch>
+    <FilesMatch "\.(webp|jpe?g|png|gif|svg|ico|woff2?)$">
+        Header set Cache-Control "public, max-age=2592000"
+    </FilesMatch>
+</IfModule>
+
 # Clean article URLs: /articles/slug/ -> article.php?slug=slug
 RewriteRule ^articles/([a-z0-9-]+)/?$ articles/article.php?slug=$1 [L,QSA]
 

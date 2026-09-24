@@ -13,7 +13,7 @@ require __DIR__ . '/../includes/header.php';
 <section class="services-page">
     <div
         class="services-hero"
-        style="background-image: url('<?= htmlspecialchars(url('/assets/img/hero/services.webp')) ?>')"
+        style="background-image: url('<?= htmlspecialchars(img_fit('/assets/img/hero/services.webp', 1600)) ?>')"
     >
         <div class="services-hero-inner">
             <h1>Tools &amp; Services</h1>

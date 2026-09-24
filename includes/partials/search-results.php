@@ -13,11 +13,12 @@
                     <?php if (!empty($result['thumbnail'])): ?>
                         <a href="<?= htmlspecialchars(url($result['url'])) ?>" class="search-result-thumb">
                             <img
-                                src="<?= htmlspecialchars(url($result['thumbnail'])) ?>"
+                                src="<?= htmlspecialchars(url($result['thumbnail'])) ?>"<?= img_srcset($result['thumbnail'], '120px') ?>
                                 alt=""
                                 width="120"
                                 height="68"
                                 loading="lazy"
+                                decoding="async"
                             >
                         </a>
                     <?php endif; ?>
@@ -43,11 +44,12 @@
                     <?php if (!empty($result['thumbnail'])): ?>
                         <a href="<?= htmlspecialchars(url($result['url'])) ?>" class="article-row-thumb">
                             <img
-                                src="<?= htmlspecialchars(url($result['thumbnail'])) ?>"
+                                src="<?= htmlspecialchars(url($result['thumbnail'])) ?>"<?= img_srcset($result['thumbnail'], '160px') ?>
                                 alt=""
                                 width="160"
                                 height="90"
                                 loading="lazy"
+                                decoding="async"
                             >
                         </a>
                     <?php endif; ?>
@@ -83,11 +85,12 @@
                     <?php if (!empty($result['thumbnail'])): ?>
                         <a href="<?= htmlspecialchars(url($result['url'])) ?>" class="search-result-thumb">
                             <img
-                                src="<?= htmlspecialchars(url($result['thumbnail'])) ?>"
+                                src="<?= htmlspecialchars(url($result['thumbnail'])) ?>"<?= img_srcset($result['thumbnail'], '120px') ?>
                                 alt=""
                                 width="120"
                                 height="68"
                                 loading="lazy"
+                                decoding="async"
                             >
                         </a>
                     <?php endif; ?>

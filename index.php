@@ -62,7 +62,7 @@ require __DIR__ . '/includes/hero-carousel.php';
     <?php foreach ($home_sections as $section): ?>
         <article
             class="home-destination"
-            style="background-image: url('<?= htmlspecialchars(url($section['image'])) ?>')"
+            style="background-image: url('<?= htmlspecialchars(img_fit($section['image'], 1600)) ?>')"
         >
             <div class="home-destination-inner">
                 <p class="home-destination-label"><?= htmlspecialchars($section['label']) ?></p>
@@ -101,11 +101,12 @@ if (!empty($latest_articles)) {
             <?php foreach ($teaser_items as $article): ?>
                 <a class="home-teaser-card" href="<?= htmlspecialchars(url($article['url'])) ?>">
                     <img
-                        src="<?= htmlspecialchars(url($article['thumbnail'] ?? '/assets/img/hero/day-hike.webp')) ?>"
+                        src="<?= htmlspecialchars(url($article['thumbnail'] ?? '/assets/img/hero/day-hike.webp')) ?>"<?= img_srcset($article['thumbnail'] ?? '/assets/img/hero/day-hike.webp', '(max-width: 700px) 100vw, 33vw') ?>
                         alt=""
                         width="480"
                         height="300"
                         loading="lazy"
+                        decoding="async"
                     >
                     <div class="home-teaser-card-body">
                         <h3 class="home-teaser-card-title"><?= htmlspecialchars($article['title']) ?></h3>

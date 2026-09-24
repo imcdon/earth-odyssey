@@ -11,7 +11,7 @@ $coming_soon_cta_url = $coming_soon_cta_url ?? null;
 ?>
 <section
     class="coming-soon-hero"
-    style="background-image: url('<?= htmlspecialchars(url($coming_soon_image)) ?>')"
+    style="background-image: url('<?= htmlspecialchars(img_fit($coming_soon_image, 1600)) ?>')"
     aria-label="<?= htmlspecialchars($coming_soon_title) ?>"
 >
     <div class="coming-soon-overlay">

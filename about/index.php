@@ -12,7 +12,7 @@ require __DIR__ . '/../includes/header.php';
 <section class="about-hero" aria-label="<?= htmlspecialchars($about_hero_title) ?>">
     <img
         class="about-hero-image"
-        src="<?= htmlspecialchars(url($about_hero_image)) ?>"
+        src="<?= htmlspecialchars(url($about_hero_image)) ?>"<?= img_srcset($about_hero_image, '100vw') ?>
         alt=""
         width="1600"
         height="500"
@@ -33,11 +33,12 @@ require __DIR__ . '/../includes/header.php';
         <div class="about-editor-media">
             <img
                 class="about-editor-image"
-                src="<?= htmlspecialchars(url($about_editor['image'])) ?>"
+                src="<?= htmlspecialchars(url($about_editor['image'])) ?>"<?= img_srcset($about_editor['image'], '(max-width: 700px) 100vw, 480px') ?>
                 alt="<?= htmlspecialchars($about_editor['name']) ?>"
                 width="480"
                 height="640"
                 loading="lazy"
+                decoding="async"
             >
         </div>
         <div class="about-editor-body">
