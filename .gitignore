@@ -1,4 +1,13 @@
 includes/db.config.php
+includes/usgs.config.php
+
+# Runtime data (cache, uploads, logs)
+/storage/
+/uploads/
+*.log
+
+# Archives and deploy bundles
+*.zip
 
 # IDE / editor
 .cursor/

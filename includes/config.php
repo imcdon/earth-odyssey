@@ -1,14 +1,12 @@
 <?php
 /*
- * config.php - Site-wide settings: name, navigation, and sample data.
- * Edit this file to change values used across every page.
+ * config.php - Site-wide settings: name, navigation, themes, and sample data.
  */
 require_once __DIR__ . '/paths.php';
 
 $site_name = 'Earth Odyssey';
 $site_tagline = 'Articles, galleries, and outdoor tech';
 $company_name = 'Earth Odyssey LLC';
-$header_bg_image = '/assets/img/hero/header-bg.webp';
 
 $nav_links = [
     'Home'      => '/',
@@ -59,6 +57,76 @@ $hero_type_labels = [
     'article'  => 'Article',
     'gallery'  => 'Gallery',
     'services' => 'Services',
+];
+
+$home_sections = [
+    [
+        'label' => 'Articles',
+        'title' => 'Stories from the trail',
+        'blurb' => 'Guides, field notes, and tips for campers, hunters, and anglers.',
+        'url'   => '/articles/',
+        'cta'   => 'Browse articles',
+        'image' => '/assets/img/hero/day-hike.webp',
+    ],
+    [
+        'label' => 'Galleries',
+        'title' => 'Places worth seeing',
+        'blurb' => 'Landscapes, wildlife, campsites, and water — photos from the field.',
+        'url'   => '/galleries/',
+        'cta'   => 'Open galleries',
+        'image' => '/assets/img/hero/autumn-camp.webp',
+    ],
+    [
+        'label' => 'Tools',
+        'title' => 'Outdoor tech, free to use',
+        'blurb' => 'Weather, streams, buoys, and more — tools for planning your next trip.',
+        'url'   => '/services/',
+        'cta'   => 'Explore tools',
+        'image' => '/assets/img/hero/services.webp',
+    ],
+];
+
+$service_tool_groups = [
+    [
+        'title' => 'Weather & conditions',
+        'tools' => [
+            [
+                'title' => 'Regional forecast',
+                'description' => 'Quick look at temperature, wind, and precipitation for your area.',
+                'status' => 'soon',
+                'url' => null,
+            ],
+            [
+                'title' => 'Stream gauges',
+                'description' => 'Check flow levels before you fish or ford a creek.',
+                'status' => 'soon',
+                'url' => null,
+            ],
+            [
+                'title' => 'Buoy & marine',
+                'description' => 'Coastal and lake conditions for boaters and anglers.',
+                'status' => 'soon',
+                'url' => null,
+            ],
+        ],
+    ],
+    [
+        'title' => 'Trip helpers',
+        'tools' => [
+            [
+                'title' => 'Pack checklist',
+                'description' => 'Build a day-hike or overnight kit without overpacking.',
+                'status' => 'soon',
+                'url' => null,
+            ],
+            [
+                'title' => 'Sunrise / sunset',
+                'description' => 'Daylight windows for hunting, fishing, and trail time.',
+                'status' => 'soon',
+                'url' => null,
+            ],
+        ],
+    ],
 ];
 
 $features = [

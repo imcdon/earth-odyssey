@@ -25,3 +25,22 @@ if (!function_exists('url')) {
         return $base_path . '/' . $path;
     }
 }
+
+if (!function_exists('nav_is_active')) {
+    function nav_is_active(string $navUrl): bool
+    {
+        global $base_path;
+        $request = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+        $request = rtrim($request, '/') ?: '/';
+
+        $target = url($navUrl);
+        $target = rtrim(parse_url($target, PHP_URL_PATH) ?: $target, '/') ?: '/';
+
+        $home = $base_path === '' ? '/' : (rtrim($base_path, '/') ?: '/');
+        if ($target === $home) {
+            return $request === $target;
+        }
+
+        return $request === $target || str_starts_with($request, $target . '/');
+    }
+}

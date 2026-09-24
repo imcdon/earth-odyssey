@@ -13,6 +13,7 @@ if (current_user()) {
 
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_check();
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
     if (login_user($username, $password)) {
@@ -22,6 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $error = 'Invalid username or password.';
 }
 
+$page_theme = 'admin';
 $page_title = 'Admin Login | ' . $site_name;
 require __DIR__ . '/../includes/header.php';
 ?>
@@ -32,6 +34,7 @@ require __DIR__ . '/../includes/header.php';
         <p class="form-error"><?= htmlspecialchars($error) ?></p>
     <?php endif; ?>
     <form class="admin-form" method="post" action="">
+        <?= csrf_field() ?>
         <label for="username">Username</label>
         <input type="text" id="username" name="username" required autocomplete="username">
 

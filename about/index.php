@@ -4,6 +4,7 @@
  */
 require __DIR__ . '/../includes/config.php';
 
+$page_theme = 'about';
 $page_title = 'About | ' . $site_name;
 require __DIR__ . '/../includes/header.php';
 ?>

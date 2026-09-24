@@ -10,6 +10,7 @@ $query = normalize_search_query($_GET['q'] ?? '');
 $page = max(1, (int) ($_GET['page'] ?? 1));
 $search_query = $query ?? '';
 
+$page_theme = 'search';
 $page_title = $query
     ? 'Search: ' . $query . ' | ' . $site_name
     : 'Search | ' . $site_name;

@@ -22,6 +22,7 @@ if ($selectedGallery) {
     $coming_soon_image = $selectedGallery['image_path'];
     $coming_soon_cta_label = 'See the gallery';
     $coming_soon_cta_url = '/galleries/';
+    $page_theme = 'gallery';
     $page_title = $coming_soon_title . ' | ' . $site_name;
 
     require __DIR__ . '/../includes/header.php';
@@ -37,6 +38,7 @@ try {
     $galleryCategories = [];
 }
 
+$page_theme = 'gallery';
 $page_title = 'Galleries | ' . $site_name;
 require __DIR__ . '/../includes/header.php';
 ?>

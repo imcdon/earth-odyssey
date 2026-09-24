@@ -22,6 +22,7 @@ if ($category) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_check();
     $name = trim($_POST['name'] ?? '');
     $slug = trim($_POST['slug'] ?? '');
     $imagePath = trim($_POST['image_path'] ?? '');
@@ -83,6 +84,7 @@ $form = $category ?: [
     'is_featured' => 0,
 ];
 
+$page_theme = 'admin';
 $page_title = ($id ? 'Edit' : 'New') . ' ' . category_type_label($form['type']) . ' Category | ' . $site_name;
 require __DIR__ . '/../includes/header.php';
 ?>
@@ -96,6 +98,7 @@ require __DIR__ . '/../includes/header.php';
     <?php endif; ?>
 
     <form class="admin-form" method="post" action="">
+        <?= csrf_field() ?>
         <input type="hidden" name="type" value="<?= htmlspecialchars($form['type']) ?>">
 
         <label for="name">Name</label>

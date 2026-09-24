@@ -12,6 +12,7 @@ $error = '';
 $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
+    csrf_check();
     $deleteError = delete_category((int) $_POST['delete_id']);
     if ($deleteError) {
         $error = $deleteError;
@@ -23,6 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
 $articleCategories = get_categories('article');
 $galleryCategories = get_categories('gallery');
 
+$page_theme = 'admin';
 $page_title = 'Manage Categories | ' . $site_name;
 require __DIR__ . '/../includes/header.php';
 
@@ -50,6 +52,7 @@ function render_category_list(array $categories): void
                 <div class="category-admin-actions">
                     <a class="btn-secondary" href="<?= htmlspecialchars(url('admin/category-edit.php')) ?>?id=<?= (int) $cat['id'] ?>">Edit</a>
                     <form method="post" action="" class="category-delete-form" onsubmit="return confirm('Delete this category?');">
+                        <?= csrf_field() ?>
                         <input type="hidden" name="delete_id" value="<?= (int) $cat['id'] ?>">
                         <button type="submit" class="btn-secondary">Delete</button>
                     </form>

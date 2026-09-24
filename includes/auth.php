@@ -42,9 +42,35 @@ function login_user(string $username, string $password): bool
     }
 
     start_session();
+    session_regenerate_id(true);
     $_SESSION['user_id'] = $user['id'];
 
     return true;
+}
+
+function csrf_token(): string
+{
+    start_session();
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+
+    return $_SESSION['csrf_token'];
+}
+
+function csrf_field(): string
+{
+    return '<input type="hidden" name="csrf_token" value="' . htmlspecialchars(csrf_token()) . '">';
+}
+
+function csrf_check(): void
+{
+    $sent = $_POST['csrf_token'] ?? '';
+    if (!is_string($sent) || !hash_equals(csrf_token(), $sent)) {
+        http_response_code(400);
+        echo 'Your session expired. Go back, refresh the page, and try again.';
+        exit;
+    }
 }
 
 function logout_user(): void

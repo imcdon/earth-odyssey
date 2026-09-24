@@ -9,6 +9,7 @@ require __DIR__ . '/../includes/articles.php';
 $user = require_login();
 $articles = get_articles_for_user((int) $user['id'], $user['role']);
 
+$page_theme = 'admin';
 $page_title = 'Admin | ' . $site_name;
 require __DIR__ . '/../includes/header.php';
 ?>

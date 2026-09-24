@@ -1,0 +1,124 @@
+/*
+ * pages/admin.css - Compact field-journal admin chrome.
+ */
+
+.theme-admin .admin-page {
+    margin-top: 2.5rem;
+    margin-bottom: 2rem;
+}
+
+.theme-admin .admin-page .section-title {
+    font-size: 1.65rem;
+}
+
+.theme-admin .admin-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-bottom: 2rem;
+}
+
+.theme-admin .admin-form {
+    max-width: 40rem;
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    padding: 1.5rem;
+}
+
+.theme-admin .admin-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--hairline);
+}
+
+.theme-admin .admin-list li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.95rem 0;
+    border-bottom: 1px solid var(--hairline);
+}
+
+.theme-admin .admin-list a {
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.theme-admin .admin-list a:hover {
+    color: var(--alpine);
+}
+
+.theme-admin .article-meta {
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+}
+
+.theme-admin .review-actions,
+.theme-admin .category-admin-actions,
+.theme-admin .category-delete-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    align-items: center;
+}
+
+.theme-admin .category-admin-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.theme-admin .category-admin-header .section-title {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.theme-admin .category-admin-section {
+    margin-bottom: 2.5rem;
+}
+
+.theme-admin .category-admin-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.theme-admin .category-admin-meta {
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+}
+
+.theme-admin .admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    border: 1px solid var(--hairline);
+}
+
+.theme-admin .admin-table th,
+.theme-admin .admin-table td {
+    padding: 0.7rem 0.85rem;
+    text-align: left;
+    border-bottom: 1px solid var(--hairline);
+}
+
+.theme-admin .admin-table th {
+    background: var(--paper-deep);
+    font-family: var(--font-ui);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+
+.theme-admin .admin-table tr:nth-child(even) td {
+    background: color-mix(in srgb, var(--paper-deep) 45%, transparent);
+}

@@ -1,0 +1,222 @@
+/*
+ * chrome.css - Paper header + night footer.
+ */
+
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    min-height: var(--header-height);
+    background: var(--paper);
+    border-bottom: 1px solid var(--hairline);
+    padding: 0.9rem 0;
+}
+
+.header-inner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 1.25rem;
+}
+
+.header-nav {
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
+}
+
+.header-logo {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+}
+
+.header-search {
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
+}
+
+.logo {
+    display: block;
+    color: var(--ink);
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(0.95rem, 2.2vw, 1.35rem);
+    letter-spacing: 0.04em;
+    line-height: 1.1;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.logo:hover {
+    color: var(--ink);
+    text-decoration: none;
+    opacity: 0.75;
+}
+
+.nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.15rem;
+}
+
+.nav-list a {
+    display: inline-block;
+    padding: 0.4rem 0.65rem;
+    color: var(--ink-soft);
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: color var(--duration) var(--ease), border-color var(--duration) var(--ease);
+}
+
+.nav-list a:hover {
+    color: var(--ink);
+    text-decoration: none;
+}
+
+.nav-list a.is-active {
+    color: var(--alpine);
+    border-bottom-color: var(--alpine);
+}
+
+.nav-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0.45rem;
+    background: transparent;
+    border: 1px solid var(--hairline);
+    color: var(--ink);
+    cursor: pointer;
+}
+
+.nav-toggle-bars {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    width: 18px;
+}
+
+.nav-toggle-bars span {
+    display: block;
+    height: 1.5px;
+    background: currentColor;
+    transition: transform var(--duration) var(--ease), opacity var(--duration) var(--ease);
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle-bars span:nth-child(1) {
+    transform: translateY(5.5px) rotate(45deg);
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle-bars span:nth-child(2) {
+    opacity: 0;
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle-bars span:nth-child(3) {
+    transform: translateY(-5.5px) rotate(-45deg);
+}
+
+.site-header.is-nav-collapsed .nav-toggle {
+    display: flex;
+}
+
+.site-header.is-nav-collapsed .nav-list {
+    display: none;
+    position: absolute;
+    top: calc(100% + 0.65rem);
+    left: 0;
+    z-index: 200;
+    flex-direction: column;
+    gap: 0;
+    min-width: 11rem;
+    padding: 0.35rem 0;
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+}
+
+.site-header.is-nav-collapsed .header-nav.is-open .nav-list {
+    display: flex;
+}
+
+.site-header.is-nav-collapsed .nav-list a {
+    display: block;
+    padding: 0.65rem 1rem;
+    border-bottom: none;
+    border-left: 2px solid transparent;
+}
+
+.site-header.is-nav-collapsed .nav-list a.is-active {
+    border-left-color: var(--alpine);
+    background: var(--paper-deep);
+}
+
+.header-search input {
+    width: 140px;
+    padding: 0.4rem 0.65rem;
+    border: 1px solid var(--hairline);
+    border-radius: 0;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    font-size: 0.8rem;
+    transition: width var(--duration) var(--ease), border-color var(--duration) var(--ease);
+}
+
+.header-search input::placeholder {
+    color: var(--ink-soft);
+}
+
+.header-search input:focus {
+    width: 200px;
+    outline: none;
+    border-color: var(--ink);
+}
+
+@media (max-width: 600px) {
+    .header-search input {
+        width: 100px;
+    }
+
+    .header-search input:focus {
+        width: 130px;
+    }
+
+    .logo {
+        font-size: 0.78rem;
+        letter-spacing: 0.02em;
+    }
+}
+
+/* Footer */
+
+.site-footer {
+    margin-top: auto;
+    padding: 2.25rem 0;
+    background: var(--night);
+    color: color-mix(in srgb, var(--paper) 70%, transparent);
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+}
+
+.site-footer p {
+    margin: 0;
+    text-align: center;
+}
+
+.site-footer a {
+    color: var(--paper);
+}

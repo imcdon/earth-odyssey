@@ -1,0 +1,104 @@
+/*
+ * pages/services.css - Calm, isolated tools hub (replace later with Into The Amazon skin).
+ */
+
+.theme-services .services-page {
+    margin-top: 0;
+}
+
+.theme-services .services-hero {
+    position: relative;
+    min-height: 26vh;
+    max-height: 30vh;
+    display: flex;
+    align-items: flex-end;
+    background-size: cover;
+    background-position: center;
+    color: var(--paper);
+}
+
+.theme-services .services-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--night-soft);
+}
+
+.theme-services .services-hero-inner {
+    position: relative;
+    z-index: 1;
+    width: min(100% - 2.5rem, var(--max-width));
+    margin-inline: auto;
+    padding: 2rem 0;
+}
+
+.theme-services .services-hero h1 {
+    margin: 0 0 0.4rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.theme-services .services-hero p {
+    margin: 0;
+    max-width: 36rem;
+    opacity: 0.88;
+    font-family: var(--font-read);
+    font-size: 1rem;
+}
+
+.theme-services .services-body {
+    padding: 2.5rem 0 3rem;
+}
+
+.theme-services .services-group {
+    margin-bottom: 2.5rem;
+}
+
+.theme-services .services-group-title {
+    margin: 0 0 1rem;
+    font-family: var(--font-ui);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    border-bottom: 1px solid var(--hairline);
+    padding-bottom: 0.5rem;
+}
+
+.theme-services .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+    gap: 1rem;
+}
+
+.theme-services .service-card {
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    padding: 1.35rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+.theme-services .service-card-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    color: var(--ink);
+}
+
+.theme-services .service-card-desc {
+    margin: 0;
+    flex: 1;
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.theme-services .service-card .btn-primary,
+.theme-services .service-card .btn-secondary {
+    align-self: flex-start;
+    margin-top: 0.35rem;
+    padding: 0.55rem 1rem;
+}

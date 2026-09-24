@@ -9,6 +9,7 @@ require __DIR__ . '/../includes/articles.php';
 require_role('editor');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_check();
     $id = (int) ($_POST['id'] ?? 0);
     $action = $_POST['action'] ?? '';
     $article = $id ? get_article_by_id($id) : null;
@@ -51,6 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $pending = get_pending_articles();
+$page_theme = 'admin';
 $page_title = 'Review Queue | ' . $site_name;
 require __DIR__ . '/../includes/header.php';
 ?>
@@ -70,6 +72,7 @@ require __DIR__ . '/../includes/header.php';
                         <a href="<?= htmlspecialchars(url('admin/edit.php')) ?>?id=<?= (int) $article['id'] ?>">Edit before publishing</a>
                     </div>
                     <form method="post" action="" class="review-actions">
+                        <?= csrf_field() ?>
                         <input type="hidden" name="id" value="<?= (int) $article['id'] ?>">
                         <button type="submit" name="action" value="publish" class="btn-primary">Publish</button>
                         <button type="submit" name="action" value="reject" class="btn-secondary">Reject</button>

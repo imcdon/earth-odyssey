@@ -1,0 +1,165 @@
+/*
+ * pages/articles.css - Readability: chip categories, hairline list, Newsreader prose.
+ */
+
+.theme-articles .articles-page,
+.theme-search .search-page {
+    margin-top: 2.5rem;
+}
+
+.theme-articles .articles-page-header,
+.theme-search .search-page-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.theme-articles .articles-page-title,
+.theme-search .section-title {
+    text-align: center;
+}
+
+.theme-articles .category-panel {
+    margin-bottom: 2.5rem;
+}
+
+.theme-articles .category-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+    max-width: var(--max-width);
+    margin-inline: auto;
+}
+
+.theme-articles .category-tile::before {
+    aspect-ratio: 1;
+}
+
+.theme-articles .articles-page-content {
+    margin-top: 0.5rem;
+}
+
+.theme-articles .articles-list-section {
+    margin-top: 0.5rem;
+}
+
+/* Single article — reading column */
+.theme-articles .article-page {
+    margin-top: 3rem;
+    max-width: var(--max-width-narrow);
+}
+
+.theme-articles .article-header {
+    margin-bottom: 2.25rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--hairline);
+    text-align: center;
+}
+
+.theme-articles .article-header .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.85rem, 4.5vw, 2.75rem);
+    line-height: 1.15;
+    margin-bottom: 0.85rem;
+}
+
+.theme-articles .article-meta {
+    margin: 0;
+    font-family: var(--font-ui);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+
+.theme-articles .article-back {
+    margin: 2.5rem 0 0;
+}
+
+.theme-articles .article-back-top {
+    margin: 0 0 2rem;
+}
+
+.theme-articles .article-body,
+.theme-articles .article-prose {
+    font-family: var(--font-read);
+    font-size: clamp(1.05rem, 1rem + 0.35vw, 1.125rem);
+    line-height: 1.75;
+    color: var(--ink);
+}
+
+.theme-articles .article-body > p:first-of-type::first-letter {
+    float: left;
+    font-family: var(--font-display);
+    font-size: 3.6rem;
+    line-height: 0.85;
+    padding: 0.1em 0.12em 0 0;
+    font-weight: 700;
+    color: var(--ink);
+}
+
+.theme-articles .article-body h2,
+.theme-articles .article-prose h2 {
+    font-family: var(--font-display);
+    font-size: 1.45rem;
+    margin: 2.25rem 0 0.85rem;
+    color: var(--ink);
+}
+
+.theme-articles .article-body h3,
+.theme-articles .article-prose h3 {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    margin: 1.75rem 0 0.65rem;
+}
+
+.theme-articles .article-body p,
+.theme-articles .article-prose p {
+    margin: 0 0 1.2rem;
+}
+
+.theme-articles .article-body ul,
+.theme-articles .article-body ol,
+.theme-articles .article-prose ul,
+.theme-articles .article-prose ol {
+    margin: 0 0 1.2rem;
+    padding-left: 1.35rem;
+}
+
+.theme-articles .article-body li,
+.theme-articles .article-prose li {
+    margin-bottom: 0.4rem;
+}
+
+.theme-articles .article-body blockquote,
+.theme-articles .article-prose blockquote {
+    margin: 1.75rem 0;
+    padding: 0.25rem 0 0.25rem 1.25rem;
+    border-left: 3px solid var(--alpine);
+    background: none;
+    color: var(--ink-soft);
+    font-style: italic;
+    font-size: 1.1em;
+}
+
+.theme-articles .article-body code,
+.theme-articles .article-prose code {
+    font-size: 0.88em;
+    padding: 0.1em 0.3em;
+    background: var(--paper-deep);
+    border: 1px solid var(--hairline);
+}
+
+.theme-articles .article-body pre,
+.theme-articles .article-prose pre {
+    padding: 1rem;
+    overflow-x: auto;
+    background: var(--paper-deep);
+    border: 1px solid var(--hairline);
+}
+
+.theme-articles .article-body pre code,
+.theme-articles .article-prose pre code {
+    padding: 0;
+    background: none;
+    border: none;
+}

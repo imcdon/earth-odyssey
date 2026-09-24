@@ -22,50 +22,12 @@ function get_db(): PDO
         $config['charset']
     );
 
-    // #region agent log
-    $__dbgPayload = [
-        'sessionId' => '0403b0',
-        'runId' => 'post-fix',
-        'hypothesisId' => 'A',
-        'location' => 'includes/db.php:get_db',
-        'message' => 'DB connect attempt',
-        'data' => [
-            'host' => (string) ($config['host'] ?? ''),
-            'dbname' => (string) ($config['dbname'] ?? ''),
-            'user' => (string) ($config['user'] ?? ''),
-            'passEmpty' => (($config['pass'] ?? '') === ''),
-            'userMissingCpanelPrefix' => !str_starts_with((string) ($config['user'] ?? ''), 'cpaneluser_'),
-            'dbnameMissingCpanelPrefix' => !str_starts_with((string) ($config['dbname'] ?? ''), 'cpaneluser_'),
-            'docRootHint' => (string) ($_SERVER['DOCUMENT_ROOT'] ?? ''),
-        ],
-        'timestamp' => (int) round(microtime(true) * 1000),
-    ];
-    @file_put_contents(dirname(__DIR__) . '/debug-0403b0.log', json_encode($__dbgPayload) . "\n", FILE_APPEND);
-    // #endregion
-
     try {
         $pdo = new PDO($dsn, $config['user'], $config['pass'], [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         ]);
     } catch (PDOException $e) {
-        // #region agent log
-        $__dbgFail = [
-            'sessionId' => '0403b0',
-            'runId' => 'post-fix',
-            'hypothesisId' => 'B',
-            'location' => 'includes/db.php:get_db:catch',
-            'message' => 'DB connect failed',
-            'data' => [
-                'errorPrefix' => substr($e->getMessage(), 0, 120),
-                'user' => (string) ($config['user'] ?? ''),
-                'dbname' => (string) ($config['dbname'] ?? ''),
-                'passEmpty' => (($config['pass'] ?? '') === ''),
-            ],
-            'timestamp' => (int) round(microtime(true) * 1000),
-        ];
-        @file_put_contents(dirname(__DIR__) . '/debug-0403b0.log', json_encode($__dbgFail) . "\n", FILE_APPEND);
-        // #endregion
         if (
             str_contains($e->getMessage(), '1045')
             && ($config['user'] ?? '') === 'root'
@@ -93,22 +55,6 @@ function get_db(): PDO
         }
         throw $e;
     }
-
-    // #region agent log
-    $__dbgOk = [
-        'sessionId' => '0403b0',
-        'runId' => 'post-fix',
-        'hypothesisId' => 'C',
-        'location' => 'includes/db.php:get_db:ok',
-        'message' => 'DB connect succeeded',
-        'data' => [
-            'user' => (string) ($config['user'] ?? ''),
-            'dbname' => (string) ($config['dbname'] ?? ''),
-        ],
-        'timestamp' => (int) round(microtime(true) * 1000),
-    ];
-    @file_put_contents(dirname(__DIR__) . '/debug-0403b0.log', json_encode($__dbgOk) . "\n", FILE_APPEND);
-    // #endregion
 
     return $pdo;
 }

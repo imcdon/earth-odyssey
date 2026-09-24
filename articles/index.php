@@ -7,6 +7,7 @@ require __DIR__ . '/../includes/categories.php';
 require __DIR__ . '/../includes/articles.php';
 require __DIR__ . '/../includes/search.php';
 
+$page_theme = 'articles';
 $page_title = 'Articles | ' . $site_name;
 $perPage = 20;
 $categorySlug = isset($_GET['category']) && $_GET['category'] !== '' ? trim($_GET['category']) : null;

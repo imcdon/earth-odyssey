@@ -26,6 +26,7 @@ if ($article && $user['role'] === 'author' && $article['status'] === 'published'
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_check();
     $action = $_POST['action'] ?? 'draft';
 
     if ($action === 'delete' && $id && $article) {
@@ -115,6 +116,7 @@ $form = $article ?: [
 
 $categories = get_categories('article');
 
+$page_theme = 'admin';
 $page_title = ($id ? 'Edit' : 'New') . ' Article | ' . $site_name;
 require __DIR__ . '/../includes/header.php';
 ?>
@@ -131,6 +133,7 @@ require __DIR__ . '/../includes/header.php';
     <?php endif; ?>
 
     <form class="admin-form" method="post" action="">
+        <?= csrf_field() ?>
         <label for="title">Title</label>
         <input type="text" id="title" name="title" value="<?= htmlspecialchars($form['title']) ?>" required>
 

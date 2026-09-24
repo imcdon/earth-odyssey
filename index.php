@@ -1,8 +1,10 @@
 <?php
 /*
- * index.php - Home page: hero carousel, feature blocks, latest articles, and about blurb.
+ * index.php - Home: cinematic hero, destination bands, article teasers, about.
  */
 require __DIR__ . '/includes/config.php';
+
+$page_theme = 'home';
 
 try {
     require_once __DIR__ . '/includes/articles.php';
@@ -42,8 +44,12 @@ try {
             return $slide['type'] !== 'article' && $slide['type'] !== 'gallery';
         }))
     );
+
+    // Prefer live gallery image on the Galleries destination band when available.
+    if ($gallery_for_hero && !empty($home_sections[1])) {
+        $home_sections[1]['image'] = $gallery_for_hero['image_path'];
+    }
 } catch (Throwable $e) {
-    // Fallback to config placeholders if database is unavailable.
     $featured = null;
 }
 
@@ -52,92 +58,73 @@ require __DIR__ . '/includes/header.php';
 require __DIR__ . '/includes/hero-carousel.php';
 ?>
 
-<section class="container">
-    <div class="feature-grid">
-        <?php foreach ($features as $feature): ?>
-            <article class="card">
-                <h2><?= htmlspecialchars($feature['title']) ?></h2>
-                <p><?= htmlspecialchars($feature['description']) ?></p>
-                <a class="card-link" href="<?= htmlspecialchars(url($feature['url'])) ?>">View <?= htmlspecialchars($feature['title']) ?> &rarr;</a>
-            </article>
-        <?php endforeach; ?>
-    </div>
+<section class="home-destinations" aria-label="Explore Earth Odyssey">
+    <?php foreach ($home_sections as $section): ?>
+        <article
+            class="home-destination"
+            style="background-image: url('<?= htmlspecialchars(url($section['image'])) ?>')"
+        >
+            <div class="home-destination-inner">
+                <p class="home-destination-label"><?= htmlspecialchars($section['label']) ?></p>
+                <h2 class="home-destination-title"><?= htmlspecialchars($section['title']) ?></h2>
+                <p class="home-destination-blurb"><?= htmlspecialchars($section['blurb']) ?></p>
+                <a class="btn-primary" href="<?= htmlspecialchars(url($section['url'])) ?>"><?= htmlspecialchars($section['cta']) ?> &rarr;</a>
+            </div>
+        </article>
+    <?php endforeach; ?>
 </section>
 
-<section class="container home-articles">
-    <h2 class="section-title">Latest Articles</h2>
+<?php
+$teaser_items = [];
+if (!empty($featured)) {
+    $teaser_items[] = $featured;
+}
+if (!empty($latest_articles)) {
+    foreach ($latest_articles as $article) {
+        if (count($teaser_items) >= 3) {
+            break;
+        }
+        if (!empty($featured) && (int) $article['id'] === (int) $featured['id']) {
+            continue;
+        }
+        $teaser_items[] = $article;
+    }
+}
+?>
 
-    <?php if (!empty($featured)): ?>
-        <section class="featured-article" aria-label="Featured article">
-            <a href="<?= htmlspecialchars(url($featured['url'])) ?>" class="featured-article-link">
-                <div class="featured-article-media">
+<?php if ($teaser_items): ?>
+<section class="home-teaser" aria-label="Latest articles">
+    <div class="container">
+        <h2 class="section-title">From the field</h2>
+        <p class="home-teaser-intro">Recent stories and guides.</p>
+        <div class="home-teaser-grid">
+            <?php foreach ($teaser_items as $article): ?>
+                <a class="home-teaser-card" href="<?= htmlspecialchars(url($article['url'])) ?>">
                     <img
-                        src="<?= htmlspecialchars(url($featured['thumbnail'])) ?>"
+                        src="<?= htmlspecialchars(url($article['thumbnail'] ?? '/assets/img/hero/day-hike.webp')) ?>"
                         alt=""
                         width="480"
-                        height="270"
-                        loading="eager"
+                        height="300"
+                        loading="lazy"
                     >
-                </div>
-                <div class="featured-article-body">
-                    <span class="featured-label">Featured</span>
-                    <h3 class="featured-article-title"><?= htmlspecialchars($featured['title']) ?></h3>
-                    <p class="featured-article-meta">
-                        By <?= htmlspecialchars($featured['author_name']) ?>
-                        <?php if ($featured['published_at']): ?>
-                            &middot; <?= htmlspecialchars(date('F j, Y', strtotime($featured['published_at']))) ?>
-                        <?php endif; ?>
-                        <?php if (!empty($featured['category_name'])): ?>
-                            &middot; <span class="category-badge"><?= htmlspecialchars($featured['category_name']) ?></span>
-                        <?php endif; ?>
-                    </p>
-                    <p class="featured-article-blurb"><?= htmlspecialchars($featured['blurb']) ?></p>
-                    <span class="featured-article-cta">Read article &rarr;</span>
-                </div>
-            </a>
-        </section>
-    <?php endif; ?>
-
-    <?php if (!empty($latest_articles)): ?>
-        <div class="article-list">
-            <?php foreach ($latest_articles as $article): ?>
-                <article class="article-row">
-                    <a href="<?= htmlspecialchars(url($article['url'])) ?>" class="article-row-thumb">
-                        <img
-                            src="<?= htmlspecialchars(url($article['thumbnail'] ?? '/assets/img/hero/day-hike.webp')) ?>"
-                            alt=""
-                            width="160"
-                            height="90"
-                            loading="lazy"
-                        >
-                    </a>
-                    <div class="article-row-body">
-                        <h3 class="article-row-title">
-                            <a href="<?= htmlspecialchars(url($article['url'])) ?>"><?= htmlspecialchars($article['title']) ?></a>
-                        </h3>
-                        <?php if (!empty($article['author_name'])): ?>
-                            <p class="article-row-meta">
-                                By <?= htmlspecialchars($article['author_name']) ?>
-                                <?php if (!empty($article['published_at'])): ?>
-                                    &middot; <?= htmlspecialchars(date('F j, Y', strtotime($article['published_at']))) ?>
-                                <?php endif; ?>
-                                <?php if (!empty($article['category_name'])): ?>
-                                    &middot; <span class="category-badge"><?= htmlspecialchars($article['category_name']) ?></span>
-                                <?php endif; ?>
-                            </p>
-                        <?php endif; ?>
-                        <p class="article-row-blurb"><?= htmlspecialchars($article['blurb']) ?></p>
+                    <div class="home-teaser-card-body">
+                        <h3 class="home-teaser-card-title"><?= htmlspecialchars($article['title']) ?></h3>
+                        <p class="home-teaser-card-blurb"><?= htmlspecialchars($article['blurb']) ?></p>
                     </div>
-                </article>
+                </a>
             <?php endforeach; ?>
         </div>
-        <p class="home-articles-more"><a href="<?= htmlspecialchars(url('articles/')) ?>">View all articles &rarr;</a></p>
-    <?php endif; ?>
+        <p class="home-teaser-more">
+            <a class="btn-secondary" href="<?= htmlspecialchars(url('articles/')) ?>">View all articles</a>
+        </p>
+    </div>
 </section>
+<?php endif; ?>
 
-<section class="container about-section">
+<section class="home-about container">
     <h2 class="section-title">About Earth Odyssey</h2>
     <p><?= htmlspecialchars($about_text) ?></p>
+    <a class="btn-ghost" href="<?= htmlspecialchars(url('about/')) ?>">Meet the editor &rarr;</a>
 </section>
 
 <?php require __DIR__ . '/includes/footer.php'; ?>
