@@ -6,7 +6,8 @@ INSERT INTO users (username, password_hash, role) VALUES
 ('editor', '!', 'editor'),
 ('author', '!', 'author');
 
--- Accounts start with login disabled; set passwords with database/set-password.php
+-- Accounts start with login disabled ('!' is not a valid hash). Set real passwords with
+-- database/set-password.php (cPanel Terminal) or paste a password_hash() value in phpMyAdmin.
 
 INSERT INTO categories (type, slug, name, image_path, sort_order, is_featured) VALUES
 ('article', 'hiking', 'Hiking', '/assets/img/categories/hiking.webp', 1, 0),

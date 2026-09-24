@@ -28,6 +28,7 @@ require __DIR__ . '/../includes/header.php';
             <a class="btn-secondary" href="<?= htmlspecialchars(url('admin/review.php')) ?>">Review queue</a>
             <a class="btn-secondary" href="<?= htmlspecialchars(url('admin/categories.php')) ?>">Manage categories</a>
         <?php endif; ?>
+        <a class="btn-secondary" href="<?= htmlspecialchars(url('admin/account.php')) ?>">Change password</a>
         <a class="btn-secondary" href="<?= htmlspecialchars(url('admin/logout.php')) ?>">Log out</a>
     </div>
 

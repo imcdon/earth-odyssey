@@ -28,32 +28,17 @@ function get_db(): PDO
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         ]);
     } catch (PDOException $e) {
-        if (
-            str_contains($e->getMessage(), '1045')
-            && ($config['user'] ?? '') === 'root'
-            && ($config['pass'] ?? '') === ''
-        ) {
-            throw new RuntimeException(
-                'Database login failed: includes/db.config.php is using local XAMPP credentials (root, no password). '
-                . 'On cPanel, create a MySQL database and user, then edit includes/db.config.php on the server with those credentials. '
-                . 'Do not upload your local db.config.php.',
-                0,
-                $e
-            );
+        // The original exception is logged, never rethrown or chained: its stack trace can
+        // include the password (PDO::__construct args) on PHP < 8.2 when errors are displayed.
+        error_log('Database connection failed: ' . $e->getMessage());
+
+        $hint = 'Check includes/db.config.php on the server (do not upload your local XAMPP copy).';
+        if (str_contains($e->getMessage(), '1045')) {
+            $hint = (($config['user'] ?? '') === 'root' && ($config['pass'] ?? '') === '')
+                ? 'includes/db.config.php is using local XAMPP credentials (root, no password). On cPanel, use the MySQL user and database you created there.'
+                : 'The MySQL login was rejected. On cPanel, the user and database names need the full account prefix, and the password must match cPanel → MySQL Databases.';
         }
-        if (
-            str_contains($e->getMessage(), '1045')
-            && str_contains((string) ($_SERVER['DOCUMENT_ROOT'] ?? ''), 'cpaneluser')
-        ) {
-            throw new RuntimeException(
-                'Database login failed for user "' . ($config['user'] ?? '') . '" on database "' . ($config['dbname'] ?? '') . '". '
-                . 'On cPanel, dbname and user must use the full prefixed names (e.g. cpaneluser_dbname and cpaneluser_dbuser). '
-                . 'Edit includes/db.config.php on the server only — do not upload your local XAMPP db.config.php.',
-                0,
-                $e
-            );
-        }
-        throw $e;
+        throw new RuntimeException('Database connection failed. ' . $hint);
     }
 
     return $pdo;
