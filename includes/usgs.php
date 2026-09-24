@@ -48,7 +48,8 @@ function usgs_url(string $collection, array $params): string
 }
 
 /*
- * Fetch several collections at once. $requests: [key => ['collection' => , 'params' => [], 'ttl' => seconds]].
+ * Fetch several collections at once.
+ * $requests: [key => ['collection' => , 'params' => [], 'ttl' => seconds, 'cache' => bool (default true)]].
  * Returns [key => ['ok' => bool, 'stale' => bool, 'fetched_at' => ?int, 'rows' => array]].
  * Fresh cache is served without a network call; on USGS failure the last cached copy is served as stale.
  */
@@ -60,13 +61,14 @@ function usgs_get_many(array $requests): array
 
     foreach ($requests as $key => $req) {
         $url = usgs_url($req['collection'], $req['params'] ?? []);
-        $cached = usgs_cache_read($url);
+        $useCache = $req['cache'] ?? true;
+        $cached = $useCache ? usgs_cache_read($url) : null;
         if ($cached && time() - $cached['fetched_at'] < ($req['ttl'] ?? 900)) {
             $results[$key] = ['ok' => true, 'stale' => false, 'fetched_at' => $cached['fetched_at'], 'rows' => $cached['rows']];
             $log[] = [$req['collection'], 0, 1, 0, 0, 0];
             continue;
         }
-        $pending[$key] = ['url' => $url, 'collection' => $req['collection'], 'cached' => $cached];
+        $pending[$key] = ['url' => $url, 'collection' => $req['collection'], 'cached' => $cached, 'cache' => $useCache];
     }
 
     $responses = $pending ? usgs_http_parallel(array_map(fn($p) => $p['url'], $pending)) : [];
@@ -98,7 +100,9 @@ function usgs_get_many(array $requests): array
         }
 
         if ($rows !== null) {
-            usgs_cache_write($p['url'], $rows);
+            if ($p['cache']) {
+                usgs_cache_write($p['url'], $rows);
+            }
             $results[$key] = ['ok' => true, 'stale' => false, 'fetched_at' => time(), 'rows' => $rows];
             $log[] = [$p['collection'], $status, 0, 0, $ms, $bytes];
         } elseif ($p['cached']) {
@@ -114,9 +118,9 @@ function usgs_get_many(array $requests): array
     return $results;
 }
 
-function usgs_get(string $collection, array $params, int $ttl): array
+function usgs_get(string $collection, array $params, int $ttl, bool $cache = true): array
 {
-    return usgs_get_many(['r' => ['collection' => $collection, 'params' => $params, 'ttl' => $ttl]])['r'];
+    return usgs_get_many(['r' => ['collection' => $collection, 'params' => $params, 'ttl' => $ttl, 'cache' => $cache]])['r'];
 }
 
 /* [key => url] -> [key => ['status', 'body', 'ms', 'bytes']], all requests in flight at once. */

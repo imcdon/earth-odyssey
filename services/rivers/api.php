@@ -1,9 +1,12 @@
 <?php
 /*
  * api.php - JSON proxy for the river tool. The browser never calls USGS directly.
- * Actions: latest (?action=latest&site=USGS-15266300). search and series arrive with the river pages.
+ * Actions:
+ *   search  ?action=search&q=kenai             gauge type-ahead (MySQL only, no USGS call)
+ *   latest  ?action=latest&site=USGS-15266300  latest reading per measurement
+ *   series  ?action=series&site=...&win=1W     this window vs the same window last year
  */
-require __DIR__ . '/../../includes/usgs.php';
+require __DIR__ . '/../../includes/rivers.php';
 require __DIR__ . '/../../includes/ratelimit.php';
 
 const API_RATE_LIMIT_PER_MINUTE = 60;
@@ -36,6 +39,32 @@ if (!rate_limit_allow('api:' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'), API_RATE_
 }
 
 switch ($_GET['action'] ?? '') {
+    case 'search':
+        $q = mb_substr(trim((string) ($_GET['q'] ?? '')), 0, 80);
+        $results = array_map(fn($r) => [
+            'id'     => $r['site_id'],
+            'name'   => $r['display_name'],
+            'state'  => $r['state'],
+            'county' => $r['county'],
+        ], river_search($q, 10));
+        api_send(200, ['q' => $q, 'results' => $results], 3600);
+
+    case 'series':
+        $site = (string) ($_GET['site'] ?? '');
+        $win = strtoupper((string) ($_GET['win'] ?? RIVER_DEFAULT_WINDOW));
+        if (!usgs_valid_site_id($site) || !isset(RIVER_WINDOWS[$win])) {
+            api_send(400, ['error' => 'Invalid site or window.']);
+        }
+        $row = river_site($site);
+        if (!$row) {
+            api_send(404, ['error' => 'Gauge not found.']);
+        }
+        $series = river_series($row, $win);
+        if (!$series['ok']) {
+            api_send(502, ['error' => 'USGS is not responding. Try again shortly.']);
+        }
+        api_send(200, ['site' => $site] + $series, RIVER_WINDOWS[$win]['source'] === 'daily' ? 3600 : 300);
+
     case 'latest':
         $site = (string) ($_GET['site'] ?? '');
         if (!usgs_valid_site_id($site)) {

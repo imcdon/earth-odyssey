@@ -1,0 +1,418 @@
+/*
+ * pages/rivers.css - River & stream gauge tool (search hub + site page). Field-journal paper style.
+ */
+
+.theme-rivers .rivers-head {
+    padding: 2.75rem 0 2rem;
+    border-bottom: 1px solid var(--hairline);
+    background: var(--paper-deep);
+}
+
+.theme-rivers .rivers-head .kicker a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.theme-rivers .rivers-title {
+    margin: 0 0 0.5rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 4vw, 2.6rem);
+    line-height: 1.15;
+}
+
+.theme-rivers .rivers-intro,
+.theme-rivers .river-site-meta {
+    margin: 0;
+    max-width: 40rem;
+    color: var(--ink-soft);
+    font-family: var(--font-read);
+    font-size: 1.05rem;
+}
+
+.theme-rivers .rivers-section-title {
+    margin: 0 0 1rem;
+    font-family: var(--font-ui);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+
+/* —— Search —— */
+
+.theme-rivers .rivers-search {
+    position: relative;
+    max-width: 36rem;
+    margin-top: 1.5rem;
+}
+
+.theme-rivers .rivers-search input {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    font: inherit;
+    font-size: 1.05rem;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--ink);
+    border-radius: 0;
+}
+
+.theme-rivers .rivers-results {
+    position: absolute;
+    z-index: 20;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background: var(--paper);
+    border: 1px solid var(--ink);
+    border-top: none;
+    max-height: 22rem;
+    overflow-y: auto;
+}
+
+.theme-rivers .rivers-results li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.65rem 1rem;
+    border-top: 1px solid var(--hairline);
+}
+
+.theme-rivers .rivers-results li.is-active,
+.theme-rivers .rivers-results li:hover {
+    background: var(--paper-deep);
+}
+
+.theme-rivers .rivers-results a {
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.theme-rivers .rivers-results-meta,
+.theme-rivers .rivers-results-empty {
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+}
+
+/* —— Favorites + list —— */
+
+.theme-rivers .rivers-favs,
+.theme-rivers .rivers-list-section,
+.theme-rivers .river-now,
+.theme-rivers .river-compare {
+    padding-top: 2.25rem;
+}
+
+.theme-rivers .rivers-fav-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.theme-rivers .rivers-fav-list a {
+    display: inline-block;
+    padding: 0.45rem 0.8rem;
+    border: 1px solid var(--ink);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.theme-rivers .rivers-fav-list a:hover {
+    background: var(--ink);
+    color: var(--paper);
+}
+
+.theme-rivers .rivers-list-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.75rem 1.25rem;
+    border-bottom: 1px solid var(--hairline);
+    margin-bottom: 0.5rem;
+}
+
+.theme-rivers .rivers-list-head .rivers-section-title {
+    margin: 0;
+    padding-bottom: 0.6rem;
+}
+
+.theme-rivers .rivers-count {
+    margin-left: auto;
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+}
+
+.theme-rivers .rivers-state-form select {
+    font: inherit;
+    padding: 0.3rem 0.5rem;
+    border: 1px solid var(--hairline);
+    background: var(--paper);
+}
+
+.theme-rivers .rivers-list {
+    columns: 2 22rem;
+    column-gap: 2.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.theme-rivers .rivers-list li {
+    break-inside: avoid;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--hairline);
+}
+
+.theme-rivers .rivers-list a {
+    display: block;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.theme-rivers .rivers-list-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.15rem;
+    color: var(--ink-soft);
+    font-size: 0.82rem;
+}
+
+.theme-rivers .rivers-chip {
+    padding: 0 0.35rem;
+    border: 1px solid var(--hairline);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--moss);
+}
+
+.theme-rivers .rivers-empty,
+.theme-rivers .river-stale {
+    color: var(--ink-soft);
+    font-style: italic;
+}
+
+.theme-rivers .rivers-credit {
+    margin-top: 2.5rem;
+    color: var(--ink-soft);
+    font-size: 0.8rem;
+}
+
+/* —— Site page —— */
+
+.theme-rivers .river-site-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.25rem;
+    margin-top: 1.25rem;
+}
+
+.theme-rivers .river-fav[aria-pressed='true'] {
+    background: var(--ink);
+    color: var(--paper);
+}
+
+.theme-rivers .river-units,
+.theme-rivers .river-params {
+    display: inline-flex;
+    flex-wrap: wrap;
+    border: 1px solid var(--ink);
+}
+
+.theme-rivers .river-units button,
+.theme-rivers .river-params button {
+    padding: 0.45rem 0.85rem;
+    font-family: var(--font-ui);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.theme-rivers .river-units button + button,
+.theme-rivers .river-params button + button {
+    border-left: 1px solid var(--ink);
+}
+
+.theme-rivers .river-units button[aria-pressed='true'],
+.theme-rivers .river-params button[aria-pressed='true'] {
+    background: var(--ink);
+    color: var(--paper);
+}
+
+.theme-rivers .river-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+    gap: 1rem;
+}
+
+.theme-rivers .river-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 1.1rem 1.25rem;
+    border: 1px solid var(--hairline);
+    background: var(--paper);
+}
+
+.theme-rivers .river-card-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+
+.theme-rivers .river-card-value {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    line-height: 1.1;
+}
+
+.theme-rivers .river-card-value small {
+    font-family: var(--font-ui);
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+}
+
+.theme-rivers .river-card-time {
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+}
+
+.theme-rivers .river-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.25rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--hairline);
+}
+
+.theme-rivers .river-tabs a {
+    padding: 0.5rem 0 0.55rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    color: var(--ink-soft);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+}
+
+.theme-rivers .river-tabs a[aria-current='true'] {
+    color: var(--ink);
+    border-bottom-color: var(--alpine);
+}
+
+.theme-rivers .river-params {
+    margin-bottom: 1rem;
+}
+
+.theme-rivers .river-chart {
+    min-height: 240px;
+    padding: 1rem 0.5rem 0.5rem;
+    border: 1px solid var(--hairline);
+    background: var(--paper);
+}
+
+.theme-rivers .river-chart-skeleton {
+    display: grid;
+    place-items: center;
+    min-height: 220px;
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    background: linear-gradient(90deg, var(--paper) 0%, var(--paper-deep) 50%, var(--paper) 100%);
+    background-size: 200% 100%;
+    animation: river-shimmer 1.4s linear infinite;
+}
+
+@keyframes river-shimmer {
+    to { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .theme-rivers .river-chart-skeleton { animation: none; }
+}
+
+.theme-rivers .river-chart-message {
+    padding: 3rem 1rem;
+    text-align: center;
+    color: var(--ink-soft);
+}
+
+.theme-rivers .river-chart .u-legend {
+    font-family: var(--font-ui);
+    font-size: 0.8rem;
+}
+
+.theme-rivers .river-stats-wrap {
+    overflow-x: auto;
+    margin-top: 1.25rem;
+}
+
+.theme-rivers .river-stats {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.theme-rivers .river-stats th,
+.theme-rivers .river-stats td {
+    padding: 0.6rem 0.75rem 0.6rem 0;
+    text-align: left;
+    border-bottom: 1px solid var(--hairline);
+    white-space: nowrap;
+}
+
+.theme-rivers .river-stats thead th {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+
+.theme-rivers .river-stats tr.is-selected th {
+    color: var(--alpine);
+}
+
+.theme-rivers .river-change {
+    font-weight: 700;
+}
+
+@media (max-width: 40rem) {
+    .theme-rivers .river-stats {
+        font-size: 0.82rem;
+    }
+
+    .theme-rivers .river-stats th,
+    .theme-rivers .river-stats td {
+        white-space: normal;
+        padding-right: 0.5rem;
+        vertical-align: top;
+    }
+}
+
+.theme-rivers .river-stats-note {
+    margin: 0.6rem 0 0;
+    color: var(--ink-soft);
+    font-size: 0.8rem;
+}
+
+.theme-rivers .rivers-missing {
+    padding: 3rem 0;
+}
