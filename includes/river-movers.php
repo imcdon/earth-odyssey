@@ -109,14 +109,14 @@ function river_movers_run(string $state): array
         }
     }
 
-    // For gauges without daily means (most gage heights): every-6-hour snapshots for the week, plus all of them near 7 days ago.
+    // Gage height rarely has daily means, so its 1-week change falls back to the 6-hourly snapshots kept for it.
     $stmt = $db->prepare(
         'SELECT s.site_id, s.param, s.observed_at, s.value FROM river_snapshots s JOIN river_sites r ON r.site_id = s.site_id
-         WHERE r.state = ? AND s.observed_at >= UTC_TIMESTAMP() - INTERVAL 171 HOUR
-           AND (HOUR(s.observed_at) % 6 = 0 OR s.observed_at < UTC_TIMESTAMP() - INTERVAL 166 HOUR)
+         WHERE r.state = ? AND s.observed_at >= UTC_TIMESTAMP() - INTERVAL 172 HOUR
+           AND s.param = ? AND HOUR(s.observed_at) % 6 = 0
          ORDER BY s.observed_at'
     );
-    $stmt->execute([$state]);
+    $stmt->execute([$state, '00065']);
     $week = [];
     foreach ($stmt->fetchAll() as $row) {
         $week[$row['site_id']][$row['param']][] = [strtotime($row['observed_at'] . ' UTC'), (float) $row['value']];
@@ -144,7 +144,11 @@ function river_movers_run(string $state): array
     $windows = $r['daily']['ok'] ? ['24h', '1w'] : ['24h'];
     $saved = river_movers_save($state, $windows, $candidates);
 
-    $db->exec('DELETE FROM river_snapshots WHERE observed_at < UTC_TIMESTAMP() - INTERVAL ' . RIVER_SNAPSHOT_KEEP_DAYS . ' DAY');
+    // Hourly detail is only needed for 24 hours; beyond that keep gage height every 6 hours for the 1-week fallback.
+    $db->exec(
+        "DELETE FROM river_snapshots WHERE observed_at < UTC_TIMESTAMP() - INTERVAL 30 HOUR
+           AND (param <> '00065' OR HOUR(observed_at) % 6 <> 0 OR observed_at < UTC_TIMESTAMP() - INTERVAL " . RIVER_SNAPSHOT_KEEP_DAYS . ' DAY)'
+    );
 
     return [
         'ok' => true, 'state' => $state, 'snapshots' => $inserted, 'backfilled' => $backfill && $r['backfill']['ok'],
@@ -192,7 +196,7 @@ function river_movers_save_snapshots(array $snapshots): int
 }
 
 /*
- * Now vs the snapshot closest to $ago seconds earlier (must be within 90 minutes of it).
+ * Now vs the snapshot closest to $ago seconds earlier (within 90 minutes, or half a $step when snapshots are sparser).
  * Sparkline: the last snapshot in each $step-second bucket since then, plus the latest reading.
  */
 function river_movers_vs_snapshot(array $history, int $tNow, float $vNow, int $ago, int $step): ?array
@@ -200,7 +204,7 @@ function river_movers_vs_snapshot(array $history, int $tNow, float $vNow, int $a
     $target = $tNow - $ago;
     $then = null;
     foreach ($history as $p) {
-        if (abs($p[0] - $target) <= RIVER_MOVER_MATCH && (!$then || abs($p[0] - $target) < abs($then[0] - $target))) {
+        if (abs($p[0] - $target) <= max(RIVER_MOVER_MATCH, intdiv($step, 2)) && (!$then || abs($p[0] - $target) < abs($then[0] - $target))) {
             $then = $p;
         }
     }

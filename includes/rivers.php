@@ -55,12 +55,11 @@ const RIVER_NAME_WORDS = [
     'THE' => 'the', 'NEAR' => 'near', 'ABOVE' => 'above', 'BELOW' => 'below',
 ];
 
+/* Configured states, deduplicated; also accepts 'MI, AK, WA' written as a single string. */
 function river_states(): array
 {
-    return array_values(array_filter(
-        array_map('strtoupper', (array) usgs_config()['river_states']),
-        fn($s) => isset(STATE_FIPS[$s])
-    ));
+    $codes = preg_split('/[\s,]+/', strtoupper(implode(',', (array) usgs_config()['river_states'])), -1, PREG_SPLIT_NO_EMPTY);
+    return array_values(array_unique(array_filter($codes, fn($s) => isset(STATE_FIPS[$s]))));
 }
 
 /* "KENAI R AT SOLDOTNA AK" -> "Kenai River at Soldotna" */
@@ -77,6 +76,8 @@ function river_display_name(string $raw, string $state = ''): string
         $upper = strtoupper($core);
         if (isset(RIVER_NAME_WORDS[$upper])) {
             $text = RIVER_NAME_WORDS[$upper];
+        } elseif (isset(STATE_FIPS[$upper]) && $i > 0 && $i === count($words) - 1) {
+            $text = $upper;
         } elseif (preg_match('/\d/', $core)) {
             $text = $upper;
         } else {
@@ -84,7 +85,7 @@ function river_display_name(string $raw, string $state = ''): string
         }
         $out[] = ($i === 0 ? ucfirst($text) : $text) . $tail;
     }
-    return implode(' ', $out);
+    return rtrim(implode(' ', $out), ' ,.;');
 }
 
 function river_site_url(string $siteId, array $query = []): string
@@ -234,7 +235,7 @@ function river_site(string $siteId): ?array
     return $site;
 }
 
-/* [state => gauge count] for every configured state, in the order listed in usgs.config.php. */
+/* [state => gauge count] for every configured state, alphabetical by state name. */
 function river_state_counts(): array
 {
     $counts = array_fill_keys(river_states(), 0);
@@ -243,6 +244,7 @@ function river_state_counts(): array
             $counts[$row['state']] = (int) $row['n'];
         }
     }
+    uksort($counts, fn($a, $b) => strcmp(RIVER_STATE_NAMES[$a] ?? $a, RIVER_STATE_NAMES[$b] ?? $b));
     return $counts;
 }
 

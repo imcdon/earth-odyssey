@@ -67,19 +67,16 @@ require __DIR__ . '/../../includes/header.php';
         </div>
 
         <?php if ($sites): ?>
-            <ul class="rivers-list">
-                <?php foreach ($sites as $site): ?>
-                    <li>
-                        <a href="<?= htmlspecialchars(river_site_url($site['site_id'])) ?>"><?= htmlspecialchars($site['display_name']) ?></a>
-                        <span class="rivers-list-meta">
-                            <?= htmlspecialchars((string) $site['county']) ?>
-                            <?php foreach (array_filter(explode(',', $site['params'])) as $code): ?>
-                                <span class="rivers-chip"><?= htmlspecialchars(RIVER_PARAM_SHORT[$code] ?? $code) ?></span>
-                            <?php endforeach; ?>
-                        </span>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
+            <ul class="rivers-list"><?php
+                foreach ($sites as $site) {
+                    $chips = '';
+                    foreach (array_filter(explode(',', $site['params'])) as $code) {
+                        $chips .= '<span class="rivers-chip">' . htmlspecialchars(RIVER_PARAM_SHORT[$code] ?? $code) . '</span>';
+                    }
+                    echo '<li><a href="', htmlspecialchars(river_site_url($site['site_id'])), '">', htmlspecialchars($site['display_name']), '</a>',
+                        '<span class="rivers-list-meta">', htmlspecialchars((string) $site['county']), ' ', $chips, '</span></li>';
+                }
+            ?></ul>
         <?php else: ?>
             <p class="rivers-empty">The gauge list is being set up. Check back shortly.</p>
         <?php endif; ?>
