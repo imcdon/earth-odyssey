@@ -234,6 +234,18 @@ function river_site(string $siteId): ?array
     return $site;
 }
 
+/* [state => gauge count] for every configured state, in the order listed in usgs.config.php. */
+function river_state_counts(): array
+{
+    $counts = array_fill_keys(river_states(), 0);
+    foreach (get_db()->query('SELECT state, COUNT(*) n FROM river_sites GROUP BY state') as $row) {
+        if (isset($counts[$row['state']])) {
+            $counts[$row['state']] = (int) $row['n'];
+        }
+    }
+    return $counts;
+}
+
 function river_sites_by_state(string $state): array
 {
     $stmt = get_db()->prepare(

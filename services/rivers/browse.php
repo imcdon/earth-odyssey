@@ -9,7 +9,7 @@ require __DIR__ . '/../../includes/river-movers.php';
 $states = river_states();
 $state = strtoupper((string) ($_GET['state'] ?? ''));
 if (!in_array($state, $states, true)) {
-    $state = $states[0] ?? '';
+    $state = '';
 }
 $win = (string) ($_GET['win'] ?? '24h');
 if (!isset(RIVER_MOVER_WINDOWS[$win])) {
@@ -59,29 +59,19 @@ function mover_delta_text(string $code, float $delta, string $units): string
 }
 
 $page_theme = 'rivers';
-$page_title = 'Biggest River Changes in ' . $stateName . ' | ' . $site_name;
+$page_title = 'Biggest River Changes' . ($state ? ' in ' . $stateName : '') . ' | ' . $site_name;
 require __DIR__ . '/../../includes/header.php';
 ?>
 
 <div class="rivers-page river-browse" data-river-page="browse" data-units="<?= htmlspecialchars($units) ?>">
     <header class="rivers-head">
         <div class="container">
-            <p class="kicker"><a href="<?= htmlspecialchars(url('services/rivers/')) ?>">Stream gauges</a> &middot; <?= htmlspecialchars($stateName) ?></p>
+            <p class="kicker"><a href="<?= htmlspecialchars(url('services/rivers/') . ($state ? '?state=' . $state : '')) ?>">Stream gauges</a><?= $state ? ' &middot; ' . htmlspecialchars($stateName) : '' ?></p>
             <h1 class="rivers-title">Biggest changes</h1>
             <p class="rivers-intro">Which rivers are rising, dropping, warming, or cooling fastest right now. Rankings update every hour.</p>
+            <?php if ($state): ?>
             <div class="river-site-actions">
-                <?php if (count($states) > 1): ?>
-                    <form method="get" class="rivers-state-form">
-                        <label for="browse-state" class="visually-hidden">State</label>
-                        <input type="hidden" name="win" value="<?= htmlspecialchars($win) ?>">
-                        <select id="browse-state" name="state" onchange="this.form.submit()">
-                            <?php foreach ($states as $s): ?>
-                                <option value="<?= htmlspecialchars($s) ?>"<?= $s === $state ? ' selected' : '' ?>><?= htmlspecialchars(RIVER_STATE_NAMES[$s] ?? $s) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <noscript><button type="submit" class="btn-secondary">Go</button></noscript>
-                    </form>
-                <?php endif; ?>
+                <a class="rivers-change-state" href="<?= htmlspecialchars(url('services/rivers/browse.php')) ?>">Change state</a>
                 <div class="river-units" role="group" aria-label="Units">
                     <button type="button" data-units-btn="us" aria-pressed="<?= $units === 'us' ? 'true' : 'false' ?>">US</button>
                     <button type="button" data-units-btn="metric" aria-pressed="<?= $units === 'metric' ? 'true' : 'false' ?>">Metric</button>
@@ -90,9 +80,13 @@ require __DIR__ . '/../../includes/header.php';
                     <span class="rivers-count">Updated <?= htmlspecialchars(river_time_ago($data['computed_at'] . ' UTC')) ?></span>
                 <?php endif; ?>
             </div>
+            <?php endif; ?>
         </div>
     </header>
 
+    <?php if (!$state): ?>
+        <?php $pickerAction = url('services/rivers/browse.php'); $pickerQuery = ['win' => $win]; require __DIR__ . '/../../includes/partials/river-state-picker.php'; ?>
+    <?php else: ?>
     <section class="container river-compare">
         <nav class="river-tabs" aria-label="Time window">
             <?php foreach (RIVER_MOVER_WINDOWS as $key => $label): ?>
@@ -127,6 +121,7 @@ require __DIR__ . '/../../includes/header.php';
             </section>
         <?php endforeach; ?>
     </section>
+    <?php endif; ?>
 
     <p class="container rivers-credit">
         Data: <a href="https://waterdata.usgs.gov/" rel="noopener">USGS Water Data</a>. Provisional data may be revised.

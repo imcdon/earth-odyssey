@@ -100,8 +100,8 @@ $service_tool_groups = [
             [
                 'title' => 'Stream gauges',
                 'description' => 'Check flow levels before you fish or ford a creek.',
-                'status' => 'soon',
-                'url' => null,
+                'status' => 'live',
+                'url' => '/services/rivers/',
             ],
             [
                 'title' => 'Buoy & marine',

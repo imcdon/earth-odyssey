@@ -8,9 +8,10 @@ require __DIR__ . '/../../includes/rivers.php';
 $states = river_states();
 $state = strtoupper((string) ($_GET['state'] ?? ''));
 if (!in_array($state, $states, true)) {
-    $state = $states[0] ?? '';
+    $state = '';
 }
 $sites = $state ? river_sites_by_state($state) : [];
+$hubUrl = url('services/rivers/');
 
 $page_theme = 'rivers';
 $page_title = 'River & Stream Gauges | ' . $site_name;
@@ -53,22 +54,15 @@ require __DIR__ . '/../../includes/header.php';
         <ul class="rivers-fav-list"></ul>
     </section>
 
+    <?php if (!$state): ?>
+        <?php $pickerAction = $hubUrl; require __DIR__ . '/../../includes/partials/river-state-picker.php'; ?>
+    <?php else: ?>
     <section class="container rivers-list-section" aria-labelledby="list-title">
         <div class="rivers-list-head">
             <h2 class="rivers-section-title" id="list-title">
-                Active gauges<?= $state ? ' in ' . htmlspecialchars(RIVER_STATE_NAMES[$state] ?? $state) : '' ?>
+                Active gauges in <?= htmlspecialchars(RIVER_STATE_NAMES[$state] ?? $state) ?>
             </h2>
-            <?php if (count($states) > 1): ?>
-                <form method="get" class="rivers-state-form">
-                    <label for="river-state" class="visually-hidden">State</label>
-                    <select id="river-state" name="state" onchange="this.form.submit()">
-                        <?php foreach ($states as $s): ?>
-                            <option value="<?= htmlspecialchars($s) ?>"<?= $s === $state ? ' selected' : '' ?>><?= htmlspecialchars(RIVER_STATE_NAMES[$s] ?? $s) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                    <noscript><button type="submit" class="btn-secondary">Go</button></noscript>
-                </form>
-            <?php endif; ?>
+            <a class="rivers-change-state" href="<?= htmlspecialchars($hubUrl) ?>">Change state</a>
             <span class="rivers-count"><?= count($sites) ?> gauges</span>
         </div>
 
@@ -90,6 +84,7 @@ require __DIR__ . '/../../includes/header.php';
             <p class="rivers-empty">The gauge list is being set up. Check back shortly.</p>
         <?php endif; ?>
     </section>
+    <?php endif; ?>
 
     <p class="container rivers-credit">Data: <a href="https://waterdata.usgs.gov/" rel="noopener">USGS Water Data</a>. Provisional data may be revised.</p>
 </div>

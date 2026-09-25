@@ -149,11 +149,60 @@
     font-size: 0.85rem;
 }
 
-.theme-rivers .rivers-state-form select {
-    font: inherit;
-    padding: 0.3rem 0.5rem;
-    border: 1px solid var(--hairline);
+.theme-rivers .rivers-change-state {
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.theme-rivers .river-states {
+    padding-top: 2.25rem;
+}
+
+.theme-rivers .river-state-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.theme-rivers .river-state {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    height: 100%;
+    padding: 1.1rem 1.25rem;
+    border: 1px solid var(--ink);
     background: var(--paper);
+    text-decoration: none;
+    color: var(--ink);
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.theme-rivers a.river-state:hover,
+.theme-rivers a.river-state:focus-visible {
+    background: var(--ink);
+    color: var(--paper);
+}
+
+.theme-rivers .river-state.is-pending {
+    border-color: var(--hairline);
+    color: var(--ink-soft);
+}
+
+.theme-rivers .river-state-name {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    line-height: 1.2;
+}
+
+.theme-rivers .river-state-count {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.75;
 }
 
 .theme-rivers .rivers-list {
