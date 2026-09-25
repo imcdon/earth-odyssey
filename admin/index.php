@@ -24,6 +24,7 @@ require __DIR__ . '/../includes/header.php';
 
     <div class="admin-actions">
         <a class="btn-primary" href="<?= htmlspecialchars(url('admin/edit.php')) ?>">New article</a>
+        <a class="btn-secondary" href="<?= htmlspecialchars(url('admin/river-reports.php')) ?>">Fishing reports</a>
         <?php if ($user['role'] === 'editor'): ?>
             <a class="btn-secondary" href="<?= htmlspecialchars(url('admin/review.php')) ?>">Review queue</a>
             <a class="btn-secondary" href="<?= htmlspecialchars(url('admin/categories.php')) ?>">Manage categories</a>

@@ -5,6 +5,7 @@
  */
 require __DIR__ . '/../../includes/config.php';
 require __DIR__ . '/../../includes/rivers.php';
+require __DIR__ . '/../../includes/auth.php';
 
 $id = (string) ($_GET['id'] ?? '');
 $site = usgs_valid_site_id($id) ? river_site($id) : null;
@@ -33,6 +34,8 @@ if (!in_array($param, $site['param_list'], true)) {
 }
 
 river_record_view($site['site_id']);
+// Only look up staff when a session cookie exists, so ordinary visitors never get a session.
+$staff = isset($_COOKIE[session_name()]) ? current_user() : null;
 $latest = usgs_latest_for_site($site['site_id']);
 $usgsNumber = preg_replace('/^[A-Z]+-/', '', $site['site_id']);
 
@@ -62,6 +65,9 @@ require __DIR__ . '/../../includes/header.php';
             </p>
             <div class="river-site-actions">
                 <button type="button" class="btn-secondary river-fav" aria-pressed="false" data-river-fav>&#9734; Save to favorites</button>
+                <?php if ($staff): ?>
+                    <a class="btn-primary" href="<?= htmlspecialchars(url('admin/river-report-edit.php') . '?site=' . rawurlencode($site['site_id'])) ?>">Start a report</a>
+                <?php endif; ?>
                 <div class="river-units" role="group" aria-label="Units">
                     <button type="button" data-units-btn="us" aria-pressed="<?= $units === 'us' ? 'true' : 'false' ?>">US</button>
                     <button type="button" data-units-btn="metric" aria-pressed="<?= $units === 'metric' ? 'true' : 'false' ?>">Metric</button>
