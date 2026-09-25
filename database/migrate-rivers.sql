@@ -46,3 +46,30 @@ CREATE TABLE IF NOT EXISTS river_site_views (
     PRIMARY KEY (site_id, viewed_on),
     INDEX idx_viewed_on (viewed_on)
 );
+
+CREATE TABLE IF NOT EXISTS river_snapshots (
+    site_id VARCHAR(32) NOT NULL,
+    param CHAR(5) NOT NULL,
+    observed_at DATETIME NOT NULL,
+    value DOUBLE NOT NULL,
+    PRIMARY KEY (site_id, param, observed_at),
+    INDEX idx_observed_at (observed_at)
+);
+
+CREATE TABLE IF NOT EXISTS river_movers (
+    state CHAR(2) NOT NULL,
+    win VARCHAR(3) NOT NULL,
+    param CHAR(5) NOT NULL,
+    direction VARCHAR(4) NOT NULL,
+    rank_no TINYINT NOT NULL,
+    site_id VARCHAR(32) NOT NULL,
+    value_then DOUBLE NOT NULL,
+    value_now DOUBLE NOT NULL,
+    delta DOUBLE NOT NULL,
+    pct DOUBLE NULL,
+    observed_then DATETIME NOT NULL,
+    observed_now DATETIME NOT NULL,
+    spark VARCHAR(1000) NOT NULL DEFAULT '[]',
+    computed_at DATETIME NOT NULL,
+    PRIMARY KEY (state, win, param, direction, rank_no)
+);

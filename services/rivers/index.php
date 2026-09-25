@@ -44,6 +44,7 @@ require __DIR__ . '/../../includes/header.php';
                 >
                 <ul id="river-results" class="rivers-results" role="listbox" hidden></ul>
             </div>
+            <a class="rivers-browse-link" href="<?= htmlspecialchars(url('services/rivers/browse.php') . ($state ? '?state=' . $state : '')) ?>">Biggest changes today &rarr;</a>
         </div>
     </header>
 

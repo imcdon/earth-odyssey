@@ -53,7 +53,7 @@ require __DIR__ . '/../../includes/header.php';
 >
     <header class="rivers-head river-site-head">
         <div class="container">
-            <p class="kicker"><a href="<?= htmlspecialchars(url('services/rivers/')) ?>">Stream gauges</a> &middot; <?= htmlspecialchars(RIVER_STATE_NAMES[$site['state']] ?? $site['state']) ?></p>
+            <p class="kicker"><a href="<?= htmlspecialchars(url('services/rivers/')) ?>">Stream gauges</a> &middot; <a href="<?= htmlspecialchars(url('services/rivers/browse.php') . '?state=' . $site['state']) ?>"><?= htmlspecialchars(RIVER_STATE_NAMES[$site['state']] ?? $site['state']) ?></a></p>
             <h1 class="rivers-title"><?= htmlspecialchars($site['display_name']) ?></h1>
             <p class="river-site-meta">
                 <?= htmlspecialchars((string) $site['county']) ?>

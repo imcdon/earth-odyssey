@@ -416,3 +416,134 @@
 .theme-rivers .rivers-missing {
     padding: 3rem 0;
 }
+
+/* —— Browse: biggest changes —— */
+
+.theme-rivers .rivers-browse-link {
+    display: inline-block;
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.theme-rivers .river-movers-section {
+    padding: 1.5rem 0 1rem;
+    border-bottom: 1px solid var(--hairline);
+}
+
+.theme-rivers .river-movers-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 1rem;
+    margin-bottom: 1rem;
+}
+
+.theme-rivers .river-movers-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+}
+
+.theme-rivers .river-movers-head .river-stats-note {
+    margin: 0;
+}
+
+.theme-rivers .river-movers-cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr));
+    gap: 1.5rem 2.5rem;
+}
+
+.theme-rivers .river-movers-col .rivers-section-title {
+    margin-bottom: 0.25rem;
+}
+
+.theme-rivers .river-movers-col.is-up .rivers-section-title,
+.theme-rivers .river-movers-col.is-up .river-spark {
+    color: var(--alpine);
+}
+
+.theme-rivers .river-movers-col.is-down .rivers-section-title,
+.theme-rivers .river-movers-col.is-down .river-spark {
+    color: var(--moss);
+}
+
+.theme-rivers .river-movers-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: mover;
+}
+
+.theme-rivers .river-mover {
+    display: grid;
+    grid-template-columns: 1.5rem minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--hairline);
+    counter-increment: mover;
+}
+
+.theme-rivers .river-mover::before {
+    content: counter(mover);
+    font-family: var(--font-display);
+    color: var(--ink-soft);
+}
+
+.theme-rivers .river-mover-main a {
+    display: block;
+    font-weight: 600;
+    text-decoration: none;
+    line-height: 1.3;
+}
+
+.theme-rivers .river-mover-meta {
+    display: block;
+    margin-top: 0.1rem;
+    color: var(--ink-soft);
+    font-size: 0.78rem;
+}
+
+.theme-rivers .river-spark {
+    display: block;
+    width: 84px;
+    height: 24px;
+    overflow: visible;
+}
+
+.theme-rivers .river-spark path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+}
+
+.theme-rivers .river-mover-values {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.theme-rivers .river-mover-range {
+    color: var(--ink-soft);
+    font-size: 0.78rem;
+}
+
+@media (max-width: 30rem) {
+    .theme-rivers .river-mover {
+        grid-template-columns: 1rem minmax(0, 1fr) auto auto;
+        gap: 0.5rem;
+    }
+
+    .theme-rivers .river-spark {
+        width: 44px;
+    }
+}

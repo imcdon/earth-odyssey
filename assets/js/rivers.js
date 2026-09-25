@@ -50,8 +50,52 @@
         return v.toLocaleString(undefined, { maximumFractionDigits: a >= 100 ? 0 : a >= 10 ? 1 : 2 });
     }
 
-    if (root.getAttribute('data-river-page') === 'index') initIndex();
+    var page = root.getAttribute('data-river-page');
+    if (page === 'index') initIndex();
+    else if (page === 'browse') initBrowse();
     else initSite();
+
+    /* ---------- Browse: biggest changes ---------- */
+
+    function initBrowse() {
+        var units = root.getAttribute('data-units');
+
+        function paint() {
+            root.querySelectorAll('[data-delta]').forEach(function (node) {
+                var code = node.getAttribute('data-code');
+                var v = parseFloat(node.getAttribute('data-delta'));
+                var shown = code === '00010' ? (units === 'us' ? v * 9 / 5 : v) : convert(code, v, units);
+                node.textContent = (shown > 0 ? '+' : '') + fmt(shown) + ' ' + unitLabel(code, units);
+            });
+            root.querySelectorAll('.river-mover-range').forEach(function (node) {
+                var code = node.getAttribute('data-code');
+                node.textContent = fmt(convert(code, parseFloat(node.getAttribute('data-a')), units)) + ' → '
+                    + fmt(convert(code, parseFloat(node.getAttribute('data-b')), units)) + ' ' + unitLabel(code, units);
+            });
+            root.querySelectorAll('[data-units-btn]').forEach(function (b) {
+                b.setAttribute('aria-pressed', b.getAttribute('data-units-btn') === units ? 'true' : 'false');
+            });
+            root.querySelectorAll('.river-tabs a, .river-mover a').forEach(function (a) {
+                a.href = a.href.replace(/([?&]units=)(us|metric)/, '$1' + units);
+            });
+            var q = new URLSearchParams(location.search);
+            q.set('units', units);
+            history.replaceState(null, '', '?' + q.toString());
+        }
+
+        root.querySelectorAll('[data-units-btn]').forEach(function (b) {
+            b.addEventListener('click', function () {
+                units = b.getAttribute('data-units-btn');
+                store(UNITS_KEY, units);
+                paint();
+            });
+        });
+
+        if (!/[?&]units=/.test(location.search) && store(UNITS_KEY) === 'metric') {
+            units = 'metric';
+            paint();
+        }
+    }
 
     /* ---------- Index: search + favorites ---------- */
 
