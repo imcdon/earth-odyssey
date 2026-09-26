@@ -15,6 +15,13 @@ $page_theme = preg_replace('/[^a-z]/', '', strtolower((string) ($page_theme ?? '
     <meta name="description" content="<?= htmlspecialchars($site_tagline) ?>">
     <title><?= htmlspecialchars($page_title) ?></title>
     <link rel="icon" href="<?= htmlspecialchars(url('assets/img/favicon.svg')) ?>" type="image/svg+xml">
+    <?php if ($page_theme === 'rivers'): ?>
+    <link rel="manifest" href="<?= htmlspecialchars(url('services/rivers/manifest.php')) ?>">
+    <link rel="apple-touch-icon" href="<?= htmlspecialchars(url('assets/img/app/apple-touch-icon.png')) ?>">
+    <meta name="theme-color" content="#1f3f2b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="EO Rivers">
+    <?php endif; ?>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Newsreader:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">

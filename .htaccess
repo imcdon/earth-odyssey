@@ -23,6 +23,10 @@ RewriteRule ^(includes|database|storage|cron|scripts|_raw|node_modules|\.git|\.c
     <FilesMatch "\.(webp|jpe?g|png|gif|svg|ico|woff2?)$">
         Header set Cache-Control "public, max-age=2592000"
     </FilesMatch>
+    # The river tool's service worker must be re-checked on every visit so updates reach phones
+    <Files "sw.js">
+        Header set Cache-Control "no-cache"
+    </Files>
 </IfModule>
 
 # Clean article URLs: /articles/slug/ -> article.php?slug=slug

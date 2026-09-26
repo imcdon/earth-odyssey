@@ -50,10 +50,77 @@
         return v.toLocaleString(undefined, { maximumFractionDigits: a >= 100 ? 0 : a >= 10 ? 1 : 2 });
     }
 
+    function ago(iso) {
+        var mins = Math.max(0, Math.floor((Date.now() - Date.parse(iso)) / 60000));
+        if (mins < 1) return 'just now';
+        if (mins < 60) return mins + ' min ago';
+        if (mins < 1440) return Math.floor(mins / 60) + ' hr ago';
+        return Math.floor(mins / 1440) + ' days ago';
+    }
+
+    function when(t) {
+        return new Date(t).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+    }
+
     var page = root.getAttribute('data-river-page');
     if (page === 'index') initIndex();
     else if (page === 'browse') initBrowse();
+    else if (page === 'offline') initOfflinePage();
     else initSite();
+    initOffline();
+
+    /* ---------- Offline support (services/rivers/sw.js) ---------- */
+
+    function tellWorker(msg) {
+        if (!('serviceWorker' in navigator)) return;
+        navigator.serviceWorker.ready.then(function (reg) { if (reg.active) reg.active.postMessage(msg); });
+    }
+
+    function initOffline() {
+        if (!('serviceWorker' in navigator)) return;
+        var base = api.replace(/api\.php.*$/, '');
+        navigator.serviceWorker.register(base + 'sw.js', { scope: base }).catch(function () { /* offline support is optional */ });
+
+        var urls = [];
+        document.querySelectorAll('link[rel="stylesheet"][href], script[src]').forEach(function (n) { urls.push(n.href || n.src); });
+        (performance.getEntriesByType ? performance.getEntriesByType('resource') : []).forEach(function (r) {
+            if (/^https:\/\/fonts\.(googleapis|gstatic)\.com\//.test(r.name)) urls.push(r.name);
+        });
+        tellWorker({ type: 'assets', urls: urls });
+
+        if (page === 'site') {
+            tellWorker({
+                type: 'viewed',
+                id: root.getAttribute('data-site'),
+                name: root.getAttribute('data-name'),
+                win: root.getAttribute('data-win'),
+                offline: root.getAttribute('data-offline') === '1',
+                favorites: favorites()
+            });
+        } else if (page !== 'offline') {
+            tellWorker({ type: 'sync', favorites: favorites() });
+        }
+    }
+
+    function initOfflinePage() {
+        var list = root.querySelector('[data-saved-list]');
+        var empty = root.querySelector('[data-saved-empty]');
+        var controller = 'serviceWorker' in navigator && navigator.serviceWorker.controller;
+        if (!controller) { empty.hidden = false; return; }
+        var channel = new MessageChannel();
+        channel.port1.onmessage = function (e) {
+            var items = e.data || [];
+            empty.hidden = items.length > 0;
+            items.forEach(function (r) {
+                var li = el('li');
+                li.appendChild(el('a', { href: r.url }, r.name));
+                li.appendChild(el('span', { class: 'rivers-list-meta' },
+                    (r.favorite ? '★ Favorite · ' : '') + (r.savedAt ? 'Saved ' + when(r.savedAt) : 'Saved')));
+                list.appendChild(li);
+            });
+        };
+        controller.postMessage({ type: 'list' }, [channel.port2]);
+    }
 
     /* ---------- Browse: biggest changes ---------- */
 
@@ -222,8 +289,16 @@
             if (favBtn.getAttribute('aria-pressed') !== 'true') list.unshift({ id: siteId, name: siteName });
             store(FAV_KEY, list.slice(0, 30));
             paintFav();
+            tellWorker({ type: 'sync', favorites: favorites() });
         });
         paintFav();
+
+        if (root.getAttribute('data-offline') === '1') {
+            var bar = el('p', { class: 'river-offline-bar', role: 'status' },
+                'You\'re offline. Showing data saved ' + when(root.getAttribute('data-rendered')) + '.');
+            root.insertBefore(bar, root.firstChild);
+            root.querySelectorAll('[data-time]').forEach(function (node) { node.textContent = ago(node.getAttribute('data-time')); });
+        }
 
         function syncUrl(push) {
             var q = '?id=' + encodeURIComponent(siteId) + '&win=' + state.win + '&p=' + state.param + '&units=' + state.units;

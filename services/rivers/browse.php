@@ -65,7 +65,7 @@ $page_title = 'Biggest River Changes' . ($state ? ' in ' . $stateName : '') . ' 
 require __DIR__ . '/../../includes/header.php';
 ?>
 
-<div class="rivers-page river-browse" data-river-page="browse" data-units="<?= htmlspecialchars($units) ?>">
+<div class="rivers-page river-browse" data-river-page="browse" data-units="<?= htmlspecialchars($units) ?>" data-api="<?= htmlspecialchars(url('services/rivers/api.php')) ?>">
     <header class="rivers-head">
         <div class="container">
             <p class="kicker"><a href="<?= htmlspecialchars(url('services/rivers/') . ($state ? '?state=' . $state : '')) ?>">Stream gauges</a><?= $state ? ' &middot; ' . htmlspecialchars($stateName) : '' ?></p>

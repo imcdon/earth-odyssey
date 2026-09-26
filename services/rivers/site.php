@@ -33,7 +33,9 @@ if (!in_array($param, $site['param_list'], true)) {
     $param = $site['param_list'][0] ?? '00060';
 }
 
-river_record_view($site['site_id']);
+if (empty($_SERVER['HTTP_X_EO_OFFLINE_REFRESH'])) {
+    river_record_view($site['site_id']);
+}
 // Only look up staff when a session cookie exists, so ordinary visitors never get a session.
 $staff = isset($_COOKIE[session_name()]) ? current_user() : null;
 $latest = usgs_latest_for_site($site['site_id']);
@@ -55,6 +57,7 @@ require __DIR__ . '/../../includes/header.php';
     data-win="<?= htmlspecialchars($win) ?>"
     data-param="<?= htmlspecialchars($param) ?>"
     data-units="<?= htmlspecialchars($units) ?>"
+    data-rendered="<?= gmdate('c') ?>"
 >
     <header class="rivers-head river-site-head">
         <div class="container">
@@ -96,7 +99,7 @@ require __DIR__ . '/../../includes/header.php';
                     <div class="river-card" data-reading data-code="<?= htmlspecialchars($code) ?>" data-value="<?= htmlspecialchars((string) $r['value']) ?>">
                         <span class="river-card-label"><?= htmlspecialchars($r['label']) ?></span>
                         <span class="river-card-value"><span data-reading-value><?= river_format($v) ?></span> <small data-reading-unit><?= htmlspecialchars($u) ?></small></span>
-                        <span class="river-card-time"><?= htmlspecialchars(river_time_ago($r['time'])) ?></span>
+                        <span class="river-card-time" data-time="<?= htmlspecialchars($r['time']) ?>"><?= htmlspecialchars(river_time_ago($r['time'])) ?></span>
                     </div>
                 <?php endforeach; ?>
             </div>

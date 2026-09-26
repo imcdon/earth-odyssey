@@ -235,6 +235,20 @@
     font-size: 0.82rem;
 }
 
+.theme-rivers .river-offline-bar {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    margin: 0;
+    padding: 0.7rem 1.25rem;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--font-ui);
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-align: center;
+}
+
 .theme-rivers .river-fishability {
     display: flex;
     flex-wrap: wrap;
