@@ -5,8 +5,9 @@
  *   search  ?action=search&q=kenai             gauge type-ahead (MySQL only, no USGS call)
  *   latest  ?action=latest&site=USGS-15266300  latest reading per measurement
  *   series  ?action=series&site=...&win=1W     this window vs the same window last year
+ *   badges  ?action=badges&ids=A,B&units=us    fishability badges from the hourly snapshots (MySQL only)
  */
-require __DIR__ . '/../../includes/rivers.php';
+require __DIR__ . '/../../includes/river-ranges.php';
 require __DIR__ . '/../../includes/ratelimit.php';
 
 const API_RATE_LIMIT_PER_MINUTE = 60;
@@ -75,6 +76,15 @@ switch ($_GET['action'] ?? '') {
             api_send(502, ['error' => 'USGS is not responding. Try again shortly.']);
         }
         api_send(200, ['site' => $site] + $latest, 300);
+
+    case 'badges':
+        $ids = array_slice(array_filter(explode(',', (string) ($_GET['ids'] ?? '')), 'usgs_valid_site_id'), 0, 30);
+        $units = ($_GET['units'] ?? '') === 'metric' ? 'metric' : 'us';
+        $badges = [];
+        foreach (river_badges_from_snapshots(river_ranges_for_sites($ids)) as $id => $b) {
+            $badges[$id] = ['level' => $b['level'], 'label' => $b['label'], 'title' => river_badge_title($b, $units)];
+        }
+        api_send(200, ['badges' => (object) $badges], 300);
 
     default:
         api_send(400, ['error' => 'Unknown action.']);

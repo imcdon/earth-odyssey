@@ -24,16 +24,19 @@ if (!$states) {
     exit(1);
 }
 
-$failed = false;
+river_job_start('snapshot');
+$failed = [];
+$requests = 0;
 foreach ($states as $state) {
     $t = microtime(true);
     $r = river_movers_run($state);
     if ($r['ok']) {
+        $requests += $r['requests'];
         printf("%s: %d new snapshots%s, %d ranked rows%s, %d USGS requests, %.1fs\n",
             $state, $r['snapshots'], $r['backfilled'] ? ' (incl. 26h backfill)' : '', $r['ranked'],
             $r['weekly_skipped'] ? ' (1-week skipped: daily means unavailable)' : '', $r['requests'], microtime(true) - $t);
     } else {
-        $failed = true;
+        $failed[] = "{$state} ({$r['error']})";
         fwrite(STDERR, "{$state}: FAILED - {$r['error']}\n");
     }
 }
@@ -42,5 +45,8 @@ $t = microtime(true);
 $p = river_preload_popular();
 printf("Preloaded %d popular rivers, %.1fs\n", $p['warmed'], microtime(true) - $t);
 
+river_job_finish('snapshot', !$failed, sprintf('%d of %d states updated, %d USGS requests, %d popular rivers preloaded.',
+    count($states) - count($failed), count($states), $requests, $p['warmed'])
+    . ($failed ? ' Failed: ' . implode(', ', $failed) . '.' : ''));
 flock($lock, LOCK_UN);
 exit($failed ? 1 : 0);

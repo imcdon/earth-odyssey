@@ -72,13 +72,13 @@ function usgs_get_many(array $requests): array
     }
 
     $responses = $pending ? usgs_http_parallel(array_map(fn($p) => $p['url'], $pending)) : [];
+    $rates = array_column($responses, 'rate');
 
     foreach ($pending as $key => $p) {
         $res = $responses[$key];
         $rows = null;
-        $ms = $res['ms'];
-        $bytes = $res['bytes'];
         $status = $res['status'];
+        $pages = [];
 
         $json = $status === 200 ? json_decode($res['body'], true) : null;
         if (is_array($json)) {
@@ -86,11 +86,10 @@ function usgs_get_many(array $requests): array
             $next = usgs_next_link($json);
             for ($page = 1; $next && $page < USGS_MAX_PAGES; $page++) {
                 $more = usgs_http_parallel([$next])[0];
-                $ms += $more['ms'];
-                $bytes += $more['bytes'];
+                $rates[] = $more['rate'];
+                $pages[] = [$p['collection'], $more['status'], 0, 0, $more['ms'], $more['bytes']];
                 $moreJson = $more['status'] === 200 ? json_decode($more['body'], true) : null;
                 if (!is_array($moreJson)) {
-                    $status = $more['status'];
                     $rows = null;
                     break;
                 }
@@ -104,16 +103,18 @@ function usgs_get_many(array $requests): array
                 usgs_cache_write($p['url'], $rows);
             }
             $results[$key] = ['ok' => true, 'stale' => false, 'fetched_at' => time(), 'rows' => $rows];
-            $log[] = [$p['collection'], $status, 0, 0, $ms, $bytes];
+            $log[] = [$p['collection'], $status, 0, 0, $res['ms'], $res['bytes']];
         } elseif ($p['cached']) {
             $results[$key] = ['ok' => true, 'stale' => true, 'fetched_at' => $p['cached']['fetched_at'], 'rows' => $p['cached']['rows']];
-            $log[] = [$p['collection'], $status, 0, 1, $ms, $bytes];
+            $log[] = [$p['collection'], $status, 0, 1, $res['ms'], $res['bytes']];
         } else {
             $results[$key] = ['ok' => false, 'stale' => false, 'fetched_at' => null, 'rows' => []];
-            $log[] = [$p['collection'], $status, 0, 0, $ms, $bytes];
+            $log[] = [$p['collection'], $status, 0, 0, $res['ms'], $res['bytes']];
         }
+        array_push($log, ...$pages);
     }
 
+    usgs_rate_record(array_filter($rates));
     usgs_log($log);
     return $results;
 }
@@ -123,7 +124,7 @@ function usgs_get(string $collection, array $params, int $ttl, bool $cache = tru
     return usgs_get_many(['r' => ['collection' => $collection, 'params' => $params, 'ttl' => $ttl, 'cache' => $cache]])['r'];
 }
 
-/* [key => url] -> [key => ['status', 'body', 'ms', 'bytes']], all requests in flight at once. */
+/* [key => url] -> [key => ['status', 'body', 'ms', 'bytes', 'rate' => ?[limit, remaining]]], all requests in flight at once. */
 function usgs_http_parallel(array $urls): array
 {
     $apiKey = (string) usgs_config()['api_key'];
@@ -134,8 +135,10 @@ function usgs_http_parallel(array $urls): array
 
     $mh = curl_multi_init();
     $handles = [];
+    $limits = [];
     foreach ($urls as $k => $url) {
         $ch = curl_init($url);
+        $limits[$k] = [];
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_CONNECTTIMEOUT => 5,
@@ -143,6 +146,12 @@ function usgs_http_parallel(array $urls): array
             CURLOPT_ENCODING       => '',
             CURLOPT_HTTPHEADER     => $headers,
             CURLOPT_USERAGENT      => 'EarthOdyssey-RiverTool/1.0',
+            CURLOPT_HEADERFUNCTION => function ($ch, string $line) use (&$limits, $k): int {
+                if (preg_match('/^x-ratelimit-(limit|remaining):\s*(\d+)/i', $line, $m)) {
+                    $limits[$k][strtolower($m[1])] = (int) $m[2];
+                }
+                return strlen($line);
+            },
         ]);
         curl_multi_add_handle($mh, $ch);
         $handles[$k] = $ch;
@@ -162,6 +171,7 @@ function usgs_http_parallel(array $urls): array
             'body'   => (string) curl_multi_getcontent($ch),
             'ms'     => (int) round(curl_getinfo($ch, CURLINFO_TOTAL_TIME) * 1000),
             'bytes'  => (int) curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD),
+            'rate'   => isset($limits[$k]['limit'], $limits[$k]['remaining']) ? [$limits[$k]['limit'], $limits[$k]['remaining']] : null,
         ];
         curl_multi_remove_handle($mh, $ch);
         curl_close($ch);
@@ -243,6 +253,51 @@ function usgs_log(array $entries): void
     } catch (Throwable $e) {
         error_log('river_api_log insert failed: ' . $e->getMessage());
     }
+}
+
+/* Small JSON status files in storage/status (API quota, cron runs). Written atomically; never break a page. */
+function usgs_status_read(string $name): ?array
+{
+    $file = usgs_storage_dir('status') . '/' . $name . '.json';
+    $data = is_file($file) ? json_decode((string) @file_get_contents($file), true) : null;
+    return is_array($data) ? $data : null;
+}
+
+function usgs_status_write(string $name, array $data): void
+{
+    $file = usgs_storage_dir('status') . '/' . $name . '.json';
+    $tmp = $file . '.' . getmypid() . '.tmp';
+    if (@file_put_contents($tmp, json_encode($data)) !== false) {
+        @rename($tmp, $file);
+    }
+    @unlink($tmp);
+}
+
+/* USGS (api.data.gov) sends X-RateLimit-* only on keyed requests. $rates: [[limit, remaining], ...]; keeps the lowest. */
+function usgs_rate_record(array $rates): void
+{
+    if (!$rates) {
+        return;
+    }
+    usort($rates, fn($a, $b) => $a[1] <=> $b[1]);
+    usgs_status_write('usgs-rate', ['limit' => $rates[0][0], 'remaining' => $rates[0][1], 'at' => time()]);
+}
+
+function river_job_start(string $job): void
+{
+    $data = usgs_status_read('job-' . $job) ?? [];
+    $data['started_at'] = time();
+    usgs_status_write('job-' . $job, $data);
+}
+
+function river_job_finish(string $job, bool $ok, string $summary): void
+{
+    $data = usgs_status_read('job-' . $job) ?? [];
+    $data['finished_at'] = time();
+    $data['ok'] = $ok;
+    $data['summary'] = mb_substr($summary, 0, 500);
+    $data['seconds'] = isset($data['started_at']) ? time() - (int) $data['started_at'] : null;
+    usgs_status_write('job-' . $job, $data);
 }
 
 /* Latest reading per tracked measurement for one site (15-minute cache). */

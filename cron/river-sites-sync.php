@@ -17,16 +17,22 @@ if (!$states) {
     exit(1);
 }
 
-$failed = false;
+river_job_start('sites-sync');
+$failed = [];
+$saved = 0;
 foreach ($states as $state) {
     $t = microtime(true);
     $r = river_sync_state($state);
     if ($r['ok']) {
+        $saved += $r['saved'];
         printf("%s: %d active, %d saved, %d removed, %d USGS requests, %.1fs\n",
             $state, $r['active'], $r['saved'], $r['removed'], $r['requests'], microtime(true) - $t);
     } else {
-        $failed = true;
+        $failed[] = "{$state} ({$r['error']})";
         fwrite(STDERR, "{$state}: FAILED - {$r['error']}\n");
     }
 }
+river_job_finish('sites-sync', !$failed, sprintf('%d of %d states synced, %s gauges saved.',
+    count($states) - count($failed), count($states), number_format($saved))
+    . ($failed ? ' Failed: ' . implode(', ', $failed) . '.' : ''));
 exit($failed ? 1 : 0);

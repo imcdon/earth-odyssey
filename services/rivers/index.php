@@ -3,7 +3,7 @@
  * index.php - River & stream gauges: type-ahead search, favorites, and the active gauges for a state.
  */
 require __DIR__ . '/../../includes/config.php';
-require __DIR__ . '/../../includes/rivers.php';
+require __DIR__ . '/../../includes/river-ranges.php';
 
 $states = river_states();
 $state = strtoupper((string) ($_GET['state'] ?? ''));
@@ -11,6 +11,7 @@ if (!in_array($state, $states, true)) {
     $state = '';
 }
 $sites = $state ? river_sites_by_state($state) : [];
+$badges = $state ? river_badges_from_snapshots(river_ranges_for_state($state)) : [];
 $hubUrl = url('services/rivers/');
 
 $page_theme = 'rivers';
@@ -74,7 +75,7 @@ require __DIR__ . '/../../includes/header.php';
                         $chips .= '<span class="rivers-chip">' . htmlspecialchars(RIVER_PARAM_SHORT[$code] ?? $code) . '</span>';
                     }
                     echo '<li><a href="', htmlspecialchars(river_site_url($site['site_id'])), '">', htmlspecialchars($site['display_name']), '</a>',
-                        '<span class="rivers-list-meta">', htmlspecialchars((string) $site['county']), ' ', $chips, '</span></li>';
+                        '<span class="rivers-list-meta">', river_badge_html($badges[$site['site_id']] ?? null, 'us'), htmlspecialchars((string) $site['county']), ' ', $chips, '</span></li>';
                 }
             ?></ul>
         <?php else: ?>

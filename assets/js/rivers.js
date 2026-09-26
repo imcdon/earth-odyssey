@@ -170,12 +170,24 @@
         var favs = favorites();
         if (favs.length) {
             var ul = favSection.querySelector('ul');
+            var items = {};
             favs.forEach(function (f) {
                 var li = el('li');
                 li.appendChild(el('a', { href: hrefFor(f.id) }, f.name));
                 ul.appendChild(li);
+                items[f.id] = li;
             });
             favSection.hidden = false;
+            var units = store(UNITS_KEY) === 'metric' ? 'metric' : 'us';
+            fetch(api + '?action=badges&units=' + units + '&ids=' + encodeURIComponent(Object.keys(items).join(',')))
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    Object.keys(data.badges || {}).forEach(function (id) {
+                        var b = data.badges[id];
+                        if (items[id]) items[id].appendChild(el('span', { class: 'river-badge is-' + b.level, title: b.title }, b.label));
+                    });
+                })
+                .catch(function () { /* badges are optional */ });
         }
     }
 
@@ -235,6 +247,9 @@
                 var v = convert(code, parseFloat(card.getAttribute('data-value')), state.units);
                 card.querySelector('[data-reading-value]').textContent = fmt(v);
                 card.querySelector('[data-reading-unit]').textContent = unitLabel(code, state.units, card.querySelector('[data-reading-unit]').textContent);
+            });
+            root.querySelectorAll('[data-units-only]').forEach(function (node) {
+                node.hidden = node.getAttribute('data-units-only') !== state.units;
             });
         }
 

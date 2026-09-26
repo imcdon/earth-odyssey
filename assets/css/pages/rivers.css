@@ -235,6 +235,24 @@
     font-size: 0.82rem;
 }
 
+.theme-rivers .river-fishability {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 1rem;
+}
+
+.theme-rivers .rivers-fav-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.theme-rivers .river-mover-meta .river-badge {
+    margin-right: 0.35rem;
+}
+
 .theme-rivers .rivers-chip {
     padding: 0 0.35rem;
     border: 1px solid var(--hairline);

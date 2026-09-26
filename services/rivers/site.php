@@ -4,7 +4,7 @@
  * URL state: ?id=USGS-15266300&win=1W&p=00060&units=us
  */
 require __DIR__ . '/../../includes/config.php';
-require __DIR__ . '/../../includes/rivers.php';
+require __DIR__ . '/../../includes/river-ranges.php';
 require __DIR__ . '/../../includes/auth.php';
 
 $id = (string) ($_GET['id'] ?? '');
@@ -37,6 +37,8 @@ river_record_view($site['site_id']);
 // Only look up staff when a session cookie exists, so ordinary visitors never get a session.
 $staff = isset($_COOKIE[session_name()]) ? current_user() : null;
 $latest = usgs_latest_for_site($site['site_id']);
+$ranges = river_ranges_for_sites([$site['site_id']])[$site['site_id']] ?? [];
+$badge = $ranges ? river_badge($ranges, array_map(fn($r) => ['v' => $r['value'], 't' => strtotime($r['time'])], $latest['readings'])) : null;
 $usgsNumber = preg_replace('/^[A-Z]+-/', '', $site['site_id']);
 
 $page_title = $site['display_name'] . ' | River Gauges | ' . $site_name;
@@ -57,7 +59,7 @@ require __DIR__ . '/../../includes/header.php';
     <header class="rivers-head river-site-head">
         <div class="container">
             <p class="kicker"><a href="<?= htmlspecialchars(url('services/rivers/')) ?>">Stream gauges</a> &middot; <a href="<?= htmlspecialchars(url('services/rivers/browse.php') . '?state=' . $site['state']) ?>"><?= htmlspecialchars(RIVER_STATE_NAMES[$site['state']] ?? $site['state']) ?></a></p>
-            <h1 class="rivers-title"><?= htmlspecialchars($site['display_name']) ?></h1>
+            <h1 class="rivers-title"><?= htmlspecialchars($site['display_name']) ?><?= $badge ? ' ' . river_badge_html($badge, $units) : '' ?></h1>
             <p class="river-site-meta">
                 <?= htmlspecialchars((string) $site['county']) ?>
                 &middot; USGS <?= htmlspecialchars($usgsNumber) ?>
@@ -67,6 +69,7 @@ require __DIR__ . '/../../includes/header.php';
                 <button type="button" class="btn-secondary river-fav" aria-pressed="false" data-river-fav>&#9734; Save to favorites</button>
                 <?php if ($staff): ?>
                     <a class="btn-primary" href="<?= htmlspecialchars(url('admin/river-report-edit.php') . '?site=' . rawurlencode($site['site_id'])) ?>">Start a report</a>
+                    <a class="btn-secondary" href="<?= htmlspecialchars(url('admin/river-range-edit.php') . '?site=' . rawurlencode($site['site_id'])) ?>"><?= $ranges ? 'Edit range' : 'Set range' ?></a>
                 <?php endif; ?>
                 <div class="river-units" role="group" aria-label="Units">
                     <button type="button" data-units-btn="us" aria-pressed="<?= $units === 'us' ? 'true' : 'false' ?>">US</button>
@@ -78,6 +81,14 @@ require __DIR__ . '/../../includes/header.php';
 
     <section class="container river-now" aria-labelledby="now-title">
         <h2 class="rivers-section-title" id="now-title">Right now</h2>
+        <?php if ($badge): ?>
+            <p class="river-fishability">
+                <?= river_badge_html($badge, $units) ?>
+                <?php foreach (['us', 'metric'] as $u): ?>
+                    <span data-units-only="<?= $u ?>"<?= $u === $units ? '' : ' hidden' ?>><?= htmlspecialchars(river_badge_sentence($badge, $u)) ?></span>
+                <?php endforeach; ?>
+            </p>
+        <?php endif; ?>
         <?php if ($latest['readings']): ?>
             <div class="river-cards">
                 <?php foreach ($latest['readings'] as $code => $r): ?>

@@ -122,3 +122,355 @@
 .theme-admin .admin-table tr:nth-child(even) td {
     background: color-mix(in srgb, var(--paper-deep) 45%, transparent);
 }
+
+.theme-admin .admin-alert {
+    max-width: 62rem;
+    margin: 0 0 1.5rem;
+    padding: 0.8rem 1rem;
+    border-left: 4px solid var(--alpine);
+    background: var(--paper);
+    font-weight: 600;
+}
+
+/* —— Fishability ranges —— */
+
+.theme-admin .range-search {
+    max-width: 36rem;
+    margin: 1.5rem 0 1rem;
+}
+
+.theme-admin .range-search label,
+.theme-admin .range-field label {
+    display: block;
+    margin: 0 0 0.35rem;
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.theme-admin .range-search-row {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.theme-admin .range-search input {
+    flex: 1;
+    padding: 0.7rem 0.85rem;
+    border: 1px solid var(--hairline);
+    background: var(--paper);
+    font: inherit;
+}
+
+.theme-admin .range-results {
+    max-width: 44rem;
+    margin-bottom: 2rem;
+}
+
+.theme-admin .range-table-wrap {
+    overflow-x: auto;
+}
+
+.theme-admin .range-table td {
+    vertical-align: top;
+}
+
+.theme-admin .range-table .article-meta,
+.theme-admin .range-ideal,
+.theme-admin .range-fish {
+    display: block;
+}
+
+.theme-admin .range-fish,
+.theme-admin .range-none {
+    color: var(--ink-soft);
+    font-size: 0.82rem;
+}
+
+.theme-admin .range-now {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2.5rem;
+    margin: 0 0 1.25rem;
+}
+
+.theme-admin .range-now dt {
+    font-family: var(--font-ui);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+
+.theme-admin .range-now dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+}
+
+.theme-admin .range-now dd.article-meta {
+    font-family: var(--font-ui);
+    font-size: 0.8rem;
+}
+
+.theme-admin .admin-form.range-form {
+    max-width: 50rem;
+}
+
+.theme-admin .range-help {
+    margin: 0 0 1rem;
+    color: var(--ink-soft);
+    font-size: 0.88rem;
+}
+
+.theme-admin .range-units {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.theme-admin .range-units label {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin: 0;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 0.95rem;
+    font-weight: 400;
+}
+
+.theme-admin .range-units input {
+    width: auto;
+}
+
+.theme-admin .range-fieldset {
+    margin: 0 0 1.25rem;
+    padding: 0;
+    border: none;
+}
+
+.theme-admin .range-fieldset legend {
+    margin-bottom: 0.5rem;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+}
+
+.theme-admin .range-fieldset legend small {
+    font-family: var(--font-ui);
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+}
+
+.theme-admin .range-row {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.theme-admin .range-field {
+    padding-top: 0.5rem;
+    border-top: 4px solid var(--alpine);
+}
+
+.theme-admin .range-field.is-ideal_low,
+.theme-admin .range-field.is-ideal_high {
+    border-top-color: var(--moss);
+}
+
+@media (max-width: 40rem) {
+    .theme-admin .range-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* —— API usage panel —— */
+
+.theme-admin .api-tabs {
+    margin-bottom: 1.5rem;
+}
+
+.theme-admin .api-tabs a {
+    display: inline-block;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--ink);
+    text-decoration: none;
+    color: var(--ink);
+    font-family: var(--font-ui);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.theme-admin .api-tabs a[aria-current] {
+    background: var(--ink);
+    color: var(--paper);
+}
+
+.theme-admin .api-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.theme-admin .api-card,
+.theme-admin .api-job {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 1rem;
+    border: 1px solid var(--hairline);
+    background: var(--paper);
+}
+
+.theme-admin .api-card-label {
+    font-family: var(--font-ui);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+
+.theme-admin .api-card-value {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    line-height: 1.1;
+}
+
+.theme-admin .api-card-value.is-bad {
+    color: var(--alpine);
+}
+
+.theme-admin .api-card-value.is-warn {
+    color: #9a6f12;
+}
+
+.theme-admin .api-card-note,
+.theme-admin .api-legend {
+    color: var(--ink-soft);
+    font-size: 0.82rem;
+}
+
+.theme-admin .api-section {
+    margin-bottom: 2.5rem;
+}
+
+.theme-admin .api-h2 {
+    margin: 0 0 0.5rem;
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+}
+
+.theme-admin .api-h3 {
+    margin: 1.25rem 0 0.5rem;
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.theme-admin .swatch {
+    display: inline-block;
+    width: 0.75rem;
+    height: 0.75rem;
+    margin: 0 0.2rem 0 0.5rem;
+    vertical-align: -0.05rem;
+}
+
+.theme-admin .swatch.is-usgs,
+.theme-admin .api-chart .bar-usgs {
+    background: var(--ink);
+    fill: var(--ink);
+}
+
+.theme-admin .swatch.is-weather,
+.theme-admin .api-chart .bar-weather {
+    background: var(--moss);
+    fill: var(--moss);
+}
+
+.theme-admin .api-chart {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--hairline);
+    background: var(--paper);
+}
+
+.theme-admin .api-chart .grid {
+    stroke: var(--hairline);
+}
+
+.theme-admin .api-chart .axis {
+    fill: var(--ink-soft);
+    font-family: var(--font-ui);
+    font-size: 11px;
+}
+
+.theme-admin .api-ok {
+    color: var(--moss);
+    font-weight: 600;
+}
+
+.theme-admin .api-jobs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    gap: 1rem;
+}
+
+.theme-admin .api-job-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.theme-admin .api-status {
+    padding: 0.1rem 0.45rem;
+    font-family: var(--font-ui);
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--paper);
+}
+
+.theme-admin .api-status.is-ok { background: var(--moss); }
+.theme-admin .api-status.is-warn { background: #c99a2e; color: var(--ink); }
+.theme-admin .api-status.is-bad { background: var(--alpine); }
+
+.theme-admin .api-job-facts {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.3rem 1rem;
+    margin: 0.5rem 0 0;
+    font-size: 0.88rem;
+}
+
+.theme-admin .api-job-facts dt {
+    color: var(--ink-soft);
+}
+
+.theme-admin .api-job-facts dd {
+    margin: 0;
+}
+
+.theme-admin .api-top {
+    max-width: 40rem;
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.theme-admin .api-top li {
+    padding: 0.45rem 0;
+    border-bottom: 1px solid var(--hairline);
+}
+
+.theme-admin .api-top-views {
+    float: right;
+    font-variant-numeric: tabular-nums;
+}
