@@ -7,6 +7,7 @@
  *   series  ?action=series&site=...&win=1W     this window vs the same window last year
  *   badges  ?action=badges&ids=A,B&units=us    fishability badges from the hourly snapshots (MySQL only)
  */
+require __DIR__ . '/../../includes/bootstrap.php';
 require __DIR__ . '/../../includes/river-ranges.php';
 require __DIR__ . '/../../includes/ratelimit.php';
 

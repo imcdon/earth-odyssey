@@ -2,7 +2,7 @@
 RewriteEngine On
 
 # Private folders: never served over the web (PHP include() still reads them)
-RewriteRule ^(includes|database|storage|cron|scripts|_raw|node_modules|\.git|\.cursor)(/|$) - [F,L]
+RewriteRule ^(includes|database|storage|cron|scripts|tools|_raw|node_modules|\.git|\.cursor)(/|$) - [F,L]
 
 # Private files: SQL dumps, logs, archives, dotfiles, and package manifests
 <FilesMatch "(\.(sql|log|zip|md|lock)|^\..*|^package(-lock)?\.json)$">

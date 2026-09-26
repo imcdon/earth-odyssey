@@ -2,6 +2,8 @@
 /*
  * db.php - PDO MySQL connection. Loads credentials from db.config.php.
  */
+require_once __DIR__ . '/bootstrap.php';
+
 function get_db(): PDO
 {
     static $pdo = null;

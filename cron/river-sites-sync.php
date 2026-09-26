@@ -9,6 +9,7 @@ if (PHP_SAPI !== 'cli') {
     exit;
 }
 
+require __DIR__ . '/../includes/bootstrap.php';
 require __DIR__ . '/../includes/rivers.php';
 
 $states = river_states();

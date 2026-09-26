@@ -3,6 +3,7 @@
  * manifest.php - Web app manifest for the river tool ("EO Rivers" on the home screen).
  * PHP so the paths follow the install folder (/ on the live site, /earth-odyssey/ locally).
  */
+require __DIR__ . '/../../includes/bootstrap.php';
 require __DIR__ . '/../../includes/paths.php';
 
 header('Content-Type: application/manifest+json; charset=utf-8');

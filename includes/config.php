@@ -2,6 +2,7 @@
 /*
  * config.php - Site-wide settings: name, navigation, themes, and sample data.
  */
+require_once __DIR__ . '/bootstrap.php';
 require_once __DIR__ . '/paths.php';
 require_once __DIR__ . '/assets.php';
 

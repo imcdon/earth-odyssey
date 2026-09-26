@@ -10,6 +10,7 @@ if (PHP_SAPI !== 'cli') {
     exit;
 }
 
+require __DIR__ . '/../includes/bootstrap.php';
 require __DIR__ . '/../includes/river-movers.php';
 
 $lock = fopen(usgs_storage_dir('locks') . '/river-snapshot.lock', 'c');

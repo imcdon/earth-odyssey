@@ -22,7 +22,7 @@ function asset_url(string $path): string
  * Rebuilds only when a source file is newer than the bundle; falls back to style.css if the
  * bundle can't be written (e.g. read-only filesystem).
  */
-function css_bundle_url(): string
+function css_build_bundle(bool $force = false): string
 {
     $dir = asset_path('assets/css');
     $manifest = $dir . '/style.css';
@@ -31,12 +31,12 @@ function css_bundle_url(): string
     preg_match_all('/@import\s+url\([\'"]?([^\'")]+)[\'"]?\)\s*;/', (string) file_get_contents($manifest), $m);
     $sources = array_map(fn($rel) => $dir . '/' . $rel, $m[1]);
 
-    $newest = filemtime($manifest);
+    $newest = (int) @filemtime($manifest);
     foreach ($sources as $src) {
         $newest = max($newest, (int) @filemtime($src));
     }
 
-    if (!is_file($bundle) || filemtime($bundle) < $newest) {
+    if ($force || !is_file($bundle) || filemtime($bundle) < $newest) {
         $css = '';
         foreach ($sources as $src) {
             $css .= (string) @file_get_contents($src) . "\n";
@@ -49,7 +49,14 @@ function css_bundle_url(): string
         clearstatcache(true, $bundle);
     }
 
-    return is_file($bundle) ? asset_url('assets/css/style.min.css') : asset_url('assets/css/style.css');
+    return is_file($bundle) ? $bundle : '';
+}
+
+function css_bundle_url(): string
+{
+    return css_build_bundle() !== ''
+        ? asset_url('assets/css/style.min.css')
+        : asset_url('assets/css/style.css');
 }
 
 function css_minify(string $css): string

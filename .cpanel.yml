@@ -3,3 +3,6 @@ deployment:
   tasks:
     - export DEPLOYPATH=$HOME/public_html/
     - /usr/bin/rsync -rlt --chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r --exclude=.git/ --exclude=.gitignore --exclude=.cpanel.yml --exclude=.cursor/ --exclude=README.md --exclude=package.json --exclude=package-lock.json --exclude=node_modules/ --exclude=scripts/ --exclude=_raw/ --exclude=includes/db.config.php --exclude=includes/usgs.config.php --exclude=assets/css/style.min.css --exclude=uploads/ --exclude=storage/ ./ $DEPLOYPATH
+    - mkdir -p $HOME/logs
+    - chmod 700 $HOME/logs
+    - php ${DEPLOYPATH}tools/build-css.php
