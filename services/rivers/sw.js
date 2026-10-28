@@ -20,7 +20,7 @@ var OFFLINE_URL = new URL('offline.php', BASE).href;
 var KEEP_RECENT = 10;
 var REFRESH_GAP = 10 * 60 * 1000;
 var FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com'];
-var NEVER = ['report.php', 'sw.js', 'manifest.php'];
+var NEVER = ['report.php', 'report-print.php', 'report-edit.php', 'report-photo.php', 'reports.php', 'sw.js', 'manifest.php'];
 
 self.addEventListener('install', function (e) {
     e.waitUntil(

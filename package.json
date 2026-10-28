@@ -7,9 +7,11 @@
   },
   "scripts": {
     "media:images": "node scripts/process-images.mjs && node scripts/make-variants.mjs",
-    "media:variants": "node scripts/make-variants.mjs"
+    "media:variants": "node scripts/make-variants.mjs",
+    "media:meta": "node scripts/extract-image-meta.mjs"
   },
   "devDependencies": {
+    "exifr": "^7.1.3",
     "heic-convert": "^2.1.0",
     "sharp": "^0.33.5"
   }

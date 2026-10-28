@@ -32,6 +32,13 @@ RewriteRule ^(includes|database|storage|cron|scripts|tools|_raw|node_modules|\.g
 # Clean article URLs: /articles/slug/ -> article.php?slug=slug
 RewriteRule ^articles/([a-z0-9-]+)/?$ articles/article.php?slug=$1 [L,QSA]
 
+# Books: /books/slug/read/, /books/g/123/, /books/slug/
+RewriteRule ^books/g/([0-9]+)/?$ books/book.php?gutenberg=$1 [L,QSA]
+RewriteRule ^books/([a-z0-9-]+)/read/?$ books/read.php?slug=$1 [L,QSA]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^books/([a-z0-9-]+)/?$ books/book.php?slug=$1 [L,QSA]
+
 # Galleries and services: unknown paths -> placeholder page (real files like services/rivers/ are served directly)
 RewriteRule ^galleries(/.*)?$ galleries/index.php [L,QSA]
 RewriteCond %{REQUEST_FILENAME} !-f

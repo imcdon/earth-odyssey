@@ -13,32 +13,61 @@ require __DIR__ . '/../includes/header.php';
 <section class="services-page">
     <div
         class="services-hero"
-        style="background-image: url('<?= htmlspecialchars(img_fit('/assets/img/hero/services.webp', 1600)) ?>')"
+        style="background-image: url('<?= htmlspecialchars(img_fit('/assets/img/galleries/alaska/img_3535.webp', 1600)) ?>')"
     >
         <div class="services-hero-inner">
             <h1>Tools &amp; Services</h1>
-            <p>Free outdoor tech helpers for weather, water, and trip planning. More tools as we build them.</p>
+            <p>Stream gauges and fishing reports for the water.</p>
         </div>
     </div>
 
-    <div class="container services-body">
+    <div class="container-wide services-body">
         <?php foreach ($service_tool_groups as $group): ?>
             <section class="services-group" aria-label="<?= htmlspecialchars($group['title']) ?>">
                 <h2 class="services-group-title"><?= htmlspecialchars($group['title']) ?></h2>
                 <div class="services-grid">
                     <?php foreach ($group['tools'] as $tool): ?>
-                        <?php $isLive = ($tool['status'] ?? '') === 'live' && !empty($tool['url']); ?>
+                        <?php
+                        $isLive = ($tool['status'] ?? '') === 'live' && !empty($tool['url']);
+                        $image = (string) ($tool['image'] ?? '');
+                        $toolUrl = $isLive ? url($tool['url']) : '';
+                        ?>
                         <article class="service-card">
-                            <span class="service-status <?= $isLive ? 'is-live' : 'is-soon' ?>">
-                                <?= $isLive ? 'Live' : 'Coming soon' ?>
-                            </span>
-                            <h3 class="service-card-title"><?= htmlspecialchars($tool['title']) ?></h3>
-                            <p class="service-card-desc"><?= htmlspecialchars($tool['description']) ?></p>
-                            <?php if ($isLive): ?>
-                                <a class="btn-primary" href="<?= htmlspecialchars(url($tool['url'])) ?>">Open tool</a>
-                            <?php else: ?>
-                                <span class="btn-secondary" aria-disabled="true">Coming soon</span>
+                            <?php if ($image !== ''): ?>
+                                <?php if ($isLive): ?>
+                                    <a class="service-card-media" href="<?= htmlspecialchars($toolUrl) ?>" tabindex="-1" aria-hidden="true">
+                                <?php else: ?>
+                                    <div class="service-card-media">
+                                <?php endif; ?>
+                                    <img
+                                        src="<?= htmlspecialchars(img_fit($image, 640)) ?>"
+                                        <?= img_srcset($image, '(min-width: 800px) 38vw, 100vw') ?>
+                                        alt=""
+                                    >
+                                <?php if ($isLive): ?>
+                                    </a>
+                                <?php else: ?>
+                                    </div>
+                                <?php endif; ?>
                             <?php endif; ?>
+                            <div class="service-card-body">
+                                <span class="service-status <?= $isLive ? 'is-live' : 'is-soon' ?>">
+                                    <?= $isLive ? 'Live' : 'Coming soon' ?>
+                                </span>
+                                <h3 class="service-card-title">
+                                    <?php if ($isLive): ?>
+                                        <a href="<?= htmlspecialchars($toolUrl) ?>"><?= htmlspecialchars($tool['title']) ?></a>
+                                    <?php else: ?>
+                                        <?= htmlspecialchars($tool['title']) ?>
+                                    <?php endif; ?>
+                                </h3>
+                                <p class="service-card-desc"><?= htmlspecialchars($tool['description']) ?></p>
+                                <?php if ($isLive): ?>
+                                    <a class="btn-primary" href="<?= htmlspecialchars($toolUrl) ?>">Open tool</a>
+                                <?php else: ?>
+                                    <span class="btn-secondary" aria-disabled="true">Coming soon</span>
+                                <?php endif; ?>
+                            </div>
                         </article>
                     <?php endforeach; ?>
                 </div>

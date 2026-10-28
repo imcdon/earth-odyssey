@@ -1,46 +1,100 @@
 /*
- * pages/river-report.css - Fishing report editor (admin) and the printable report (theme-report).
+ * pages/river-report.css - Fishing report editor (theme-rivers) and the printable report (theme-report).
  */
 
 /* —— Editor —— */
 
-.theme-admin .admin-form.report-form {
+.theme-rivers .admin-page {
+    margin-top: 2.5rem;
+    margin-bottom: 2rem;
+}
+
+.theme-rivers .admin-page .section-title {
+    font-size: 1.65rem;
+}
+
+.theme-rivers .admin-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-bottom: 2rem;
+}
+
+.theme-rivers .admin-form {
+    max-width: 40rem;
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    padding: 1.5rem;
+}
+
+.theme-rivers .admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    border: 1px solid var(--hairline);
+}
+
+.theme-rivers .admin-table th,
+.theme-rivers .admin-table td {
+    padding: 0.7rem 0.85rem;
+    text-align: left;
+    border-bottom: 1px solid var(--hairline);
+}
+
+.theme-rivers .admin-table th {
+    background: var(--paper-deep);
+    font-family: var(--font-ui);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+
+.theme-rivers .admin-table tr:nth-child(even) td {
+    background: color-mix(in srgb, var(--paper-deep) 45%, transparent);
+}
+
+.theme-rivers .admin-form.report-form {
     max-width: 62rem;
 }
 
-.theme-admin .report-form fieldset {
+.theme-rivers .report-form > .report-toolbar:first-of-type {
+    margin-top: 0;
+}
+
+.theme-rivers .report-form fieldset {
     margin: 0 0 1.75rem;
     padding: 0 0 1.5rem;
     border: none;
     border-bottom: 1px solid var(--hairline);
 }
 
-.theme-admin .report-form legend {
+.theme-rivers .report-form legend {
     margin-bottom: 0.25rem;
     font-family: var(--font-display);
     font-size: 1.3rem;
 }
 
-.theme-admin .report-form textarea {
+.theme-rivers .report-form textarea {
     min-height: 0;
 }
 
-.theme-admin .report-form #writeup {
+.theme-rivers .report-form #writeup {
     min-height: 20rem;
 }
 
-.theme-admin .report-form input[type='radio'],
-.theme-admin .report-form input[type='checkbox'] {
+.theme-rivers .report-form input[type='radio'],
+.theme-rivers .report-form input[type='checkbox'] {
     width: auto;
 }
 
-.theme-admin .report-row {
+.theme-rivers .report-row {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
     gap: 0 1rem;
 }
 
-.theme-admin .report-label {
+.theme-rivers .report-label {
     display: block;
     margin: 0.85rem 0 0.35rem;
     font-family: var(--font-ui);
@@ -50,13 +104,13 @@
     text-transform: uppercase;
 }
 
-.theme-admin .report-choice {
+.theme-rivers .report-choice {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem 1.5rem;
 }
 
-.theme-admin .report-choice label {
+.theme-rivers .report-choice label {
     display: flex;
     align-items: center;
     gap: 0.45rem;
@@ -67,18 +121,18 @@
     font-weight: 400;
 }
 
-.theme-admin .report-help {
+.theme-rivers .report-help {
     margin: 0.25rem 0 0.5rem;
     color: var(--ink-soft);
     font-size: 0.85rem;
 }
 
-.theme-admin .report-gauge {
+.theme-rivers .report-gauge {
     position: relative;
     margin-bottom: 0.5rem;
 }
 
-.theme-admin .report-gauge .rivers-results {
+.theme-rivers .report-gauge .rivers-results {
     position: absolute;
     z-index: 20;
     top: 100%;
@@ -94,7 +148,7 @@
     overflow-y: auto;
 }
 
-.theme-admin .report-gauge .rivers-results li {
+.theme-rivers .report-gauge .rivers-results li {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -103,7 +157,7 @@
     border-top: 1px solid var(--hairline);
 }
 
-.theme-admin .report-gauge .rivers-results button {
+.theme-rivers .report-gauge .rivers-results button {
     flex: 1;
     padding: 0.6rem 1rem;
     border: none;
@@ -115,32 +169,32 @@
     cursor: pointer;
 }
 
-.theme-admin .report-gauge .rivers-results li:hover {
+.theme-rivers .report-gauge .rivers-results li:hover {
     background: var(--paper-deep);
 }
 
-.theme-admin .rivers-results-meta,
-.theme-admin .rivers-results-empty {
+.theme-rivers .rivers-results-meta,
+.theme-rivers .rivers-results-empty {
     color: var(--ink-soft);
     font-size: 0.8rem;
 }
 
-.theme-admin .rivers-results-empty {
+.theme-rivers .rivers-results-empty {
     padding: 0.6rem 1rem;
 }
 
-.theme-admin .report-catch-wrap {
+.theme-rivers .report-catch-wrap {
     overflow-x: auto;
     margin-bottom: 0.75rem;
 }
 
-.theme-admin .report-catch {
+.theme-rivers .report-catch {
     width: 100%;
     min-width: 52rem;
     border-collapse: collapse;
 }
 
-.theme-admin .report-catch th {
+.theme-rivers .report-catch th {
     padding: 0 0.35rem 0.35rem 0;
     text-align: left;
     font-family: var(--font-ui);
@@ -151,30 +205,30 @@
     white-space: nowrap;
 }
 
-.theme-admin .report-catch td {
+.theme-rivers .report-catch td {
     padding: 0 0.35rem 0.4rem 0;
     vertical-align: top;
 }
 
-.theme-admin .report-catch input,
-.theme-admin .report-catch select {
+.theme-rivers .report-catch input,
+.theme-rivers .report-catch select {
     padding: 0.5rem 0.55rem;
     font-size: 0.9rem;
 }
 
-.theme-admin .report-catch .is-narrow {
+.theme-rivers .report-catch .is-narrow {
     width: 5.5rem;
 }
 
-.theme-admin .report-catch td:first-child input {
+.theme-rivers .report-catch td:first-child input {
     min-width: 13rem;
 }
 
-.theme-admin .report-catch select {
+.theme-rivers .report-catch select {
     min-width: 7.5rem;
 }
 
-.theme-admin .report-remove {
+.theme-rivers .report-remove {
     width: 2.2rem;
     height: 2.3rem;
     border: 1px solid var(--hairline);
@@ -184,12 +238,12 @@
     cursor: pointer;
 }
 
-.theme-admin .report-remove:hover {
+.theme-rivers .report-remove:hover {
     border-color: var(--alpine);
     color: var(--alpine);
 }
 
-.theme-admin .report-photos {
+.theme-rivers .report-photos {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr));
     gap: 1rem;
@@ -198,7 +252,7 @@
     list-style: none;
 }
 
-.theme-admin .report-photos img {
+.theme-rivers .report-photos img {
     display: block;
     width: 100%;
     height: 9rem;
@@ -207,11 +261,11 @@
     background: var(--paper-deep);
 }
 
-.theme-admin .report-photos .checkbox-label {
+.theme-rivers .report-photos .checkbox-label {
     margin-top: 0.35rem;
 }
 
-.theme-admin .report-draft {
+.theme-rivers .report-draft {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -223,7 +277,7 @@
     background: var(--paper);
 }
 
-.theme-admin .report-draft[hidden] {
+.theme-rivers .report-draft[hidden] {
     display: none;
 }
 

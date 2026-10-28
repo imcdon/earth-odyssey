@@ -2,11 +2,13 @@
 // Bulk-optimize photos for Earth Odyssey (Soldotna-style pipeline).
 // Drop raw photos in _raw/images/<folder>/ (jpg/JPG/heic/HEIC/png/webp/etc.) and run `npm run media:images`.
 // Outputs go to assets/img/... as lowercase .webp files at quality 82, max width 2400px.
+// Also writes a sibling .json sidecar with Make / Model / DateTimeOriginal when EXIF is present.
 
 import { mkdir, readFile, readdir, stat } from "node:fs/promises";
 import path from "node:path";
 import { createRequire } from "node:module";
 import sharp from "sharp";
+import { extractCaptureMeta, writeCaptureSidecar } from "./lib/image-meta.mjs";
 
 const require = createRequire(import.meta.url);
 /** Lazy — only loads when Sharp cannot decode HEIC (common on Windows). */
@@ -22,6 +24,7 @@ const IN_ROOT = path.resolve(process.cwd(), "_raw/images");
 const OUT_ROOT = path.resolve(process.cwd(), "assets/img");
 const MAX_WIDTH = 2400;
 const QUALITY = 82;
+const SKIP_DIRS = new Set(["drive-download-20260714T021053Z-1-001"]);
 
 /** Match walk filter (case-insensitive). */
 const INPUT_EXT_REGEX = /\.(jpe?g|png|tiff?|webp|hei[cf])$/i;
@@ -71,6 +74,7 @@ async function walk(dir) {
   for (const entry of entries) {
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) {
+      if (SKIP_DIRS.has(entry.name)) continue;
       out.push(...(await walk(full)));
     } else if (INPUT_EXT_REGEX.test(entry.name)) {
       out.push(full);
@@ -107,6 +111,7 @@ async function processFile(inputPath) {
   const rel = path.relative(IN_ROOT, inputPath);
   const outPath = outputPath(rel);
   const extLow = path.extname(inputPath).toLowerCase();
+  const captureMeta = await extractCaptureMeta(inputPath);
 
   try {
     await encodeToWebpFromSharpInput(inputPath, outPath);
@@ -117,10 +122,15 @@ async function processFile(inputPath) {
     await encodeHeicFile(inputPath, rel, outPath);
   }
 
+  await writeCaptureSidecar(outPath, captureMeta);
+
   const inSize = (await stat(inputPath)).size;
   const outSize = (await stat(outPath)).size;
+  const metaNote = captureMeta
+    ? `  meta:${[captureMeta.make, captureMeta.model].filter(Boolean).join(" ") || "date"}`
+    : "  meta:-";
   console.log(
-    `${rel.replace(/\\/g, "/")}  ${(inSize / 1024 / 1024).toFixed(2)}MB → ${(outSize / 1024 / 1024).toFixed(2)}MB`,
+    `${rel.replace(/\\/g, "/")}  ${(inSize / 1024 / 1024).toFixed(2)}MB → ${(outSize / 1024 / 1024).toFixed(2)}MB${metaNote}`,
   );
 }
 

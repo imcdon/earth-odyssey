@@ -1,14 +1,22 @@
 <?php
 /*
- * search.php - Global and scoped search (FULLTEXT articles, LIKE categories, PHP about).
+ * search.php - Sitewide and scoped search (articles, galleries, photos, tools, rivers).
  */
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/articles.php';
 require_once __DIR__ . '/categories.php';
 require_once __DIR__ . '/markdown.php';
+require_once __DIR__ . '/rivers.php';
 
 const SEARCH_MAX_QUERY_LENGTH = 200;
 const SEARCH_EXCERPT_RADIUS = 80;
+const SEARCH_PHOTO_CAP = 40;
+const SEARCH_RIVER_CAP = 25;
+const SEARCH_ARTICLE_CAP = 100;
+const SEARCH_TOOL_THUMB_CANDIDATES = [
+    '/assets/img/hero/services.webp',
+    '/assets/img/hero/services.svg',
+];
 
 function normalize_search_query(string $q): ?string
 {
@@ -142,25 +150,60 @@ function article_search_description(array $article, string $query): string
 
 function map_article_to_search_result(array $article, string $query): array
 {
+    $hasThumb = !empty($article['thumbnail']);
     enrich_article_row($article);
 
-    $meta = 'Article';
-    if (!empty($article['category_name'])) {
-        $meta .= ' · ' . $article['category_name'];
-    }
-
     return [
-        'kind'        => 'article',
-        'title'       => $article['title'],
-        'description' => article_search_description($article, $query),
-        'url'         => $article['url'],
-        'meta'        => $meta,
-        'thumbnail'   => $article['thumbnail'],
-        'score'       => (float) ($article['score'] ?? 1),
-        'author_name' => $article['author_name'] ?? null,
-        'published_at'=> $article['published_at'] ?? null,
+        'kind'          => 'article',
+        'title'         => $article['title'],
+        'description'   => article_search_description($article, $query),
+        'url'           => $article['url'],
+        'meta'          => 'Article',
+        'thumbnail'     => $hasThumb ? $article['thumbnail'] : null,
+        'score'         => (float) ($article['score'] ?? 1),
+        'author_name'   => $article['author_name'] ?? null,
+        'published_at'  => $article['published_at'] ?? null,
         'category_name' => $article['category_name'] ?? null,
     ];
+}
+
+function search_asset_exists(string $webPath): bool
+{
+    $relative = ltrim(str_replace('\\', '/', $webPath), '/');
+    if ($relative === '' || str_contains($relative, '..')) {
+        return false;
+    }
+
+    return is_file(dirname(__DIR__) . '/' . $relative);
+}
+
+function search_tool_thumbnail(): ?string
+{
+    foreach (SEARCH_TOOL_THUMB_CANDIDATES as $path) {
+        if (search_asset_exists($path)) {
+            return $path;
+        }
+    }
+
+    return null;
+}
+
+function search_photo_title(string $path): string
+{
+    $base = pathinfo($path, PATHINFO_FILENAME);
+    $label = str_replace(['-', '_'], ' ', $base);
+
+    return ucwords(trim($label));
+}
+
+function search_result_sort(array $a, array $b): int
+{
+    $scoreCmp = ($b['score'] <=> $a['score']);
+    if ($scoreCmp !== 0) {
+        return $scoreCmp;
+    }
+
+    return strcasecmp((string) ($a['title'] ?? ''), (string) ($b['title'] ?? ''));
 }
 
 function search_articles_base_sql(?string $categorySlug): array
@@ -330,17 +373,18 @@ function search_categories(string $query, array $types, int $limit = 20): array
 
     foreach ($rows as $row) {
         $isArticle = $row['type'] === 'article';
+        $thumb = !empty($row['image_path']) ? $row['image_path'] : null;
         $results[] = [
-            'kind'        => 'category',
+            'kind'        => $isArticle ? 'category' : 'gallery',
             'title'       => $row['name'],
             'description' => $isArticle
                 ? 'Browse articles in ' . $row['name']
-                : 'Browse galleries in ' . $row['name'],
+                : 'Photo collection from the field — ' . $row['name'] . '.',
             'url'         => $isArticle
                 ? '/articles/?category=' . rawurlencode($row['slug'])
-                : '/galleries/?category=' . rawurlencode($row['slug']),
-            'meta'        => $isArticle ? 'Article category' : 'Gallery category',
-            'thumbnail'   => $row['image_path'],
+                : '/galleries/' . rawurlencode($row['slug']) . '/',
+            'meta'        => $isArticle ? 'Article' : 'Gallery',
+            'thumbnail'   => $thumb,
             'score'       => query_matches_text($row['name'], $terms) ? 2.0 : 1.5,
         ];
     }
@@ -348,45 +392,43 @@ function search_categories(string $query, array $types, int $limit = 20): array
     return $results;
 }
 
-function search_about(string $query, array $aboutConfig): array
+function search_galleries(string $query, int $limit = 20): array
+{
+    return search_categories($query, ['gallery'], $limit);
+}
+
+function search_tools(string $query, array $toolGroups): array
 {
     $terms = search_query_terms($query);
     if ($terms === []) {
         return [];
     }
 
+    $thumb = search_tool_thumbnail();
     $results = [];
-    $heroTitle = $aboutConfig['about_hero_title'] ?? 'About Earth Odyssey';
-    $intro = $aboutConfig['about_intro'] ?? '';
 
-    if (query_matches_text($heroTitle, $terms) || query_matches_text($intro, $terms)) {
-        $field = query_matches_text($intro, $terms) ? $intro : $heroTitle;
-        $results[] = [
-            'kind'        => 'about',
-            'title'       => $heroTitle,
-            'description' => build_search_excerpt($field, $terms),
-            'url'         => '/about/',
-            'meta'        => 'About',
-            'thumbnail'   => $aboutConfig['about_hero_image'] ?? null,
-            'score'       => 1.0,
-        ];
-    }
+    foreach ($toolGroups as $group) {
+        $groupTitle = (string) ($group['title'] ?? '');
+        foreach ($group['tools'] ?? [] as $tool) {
+            $title = (string) ($tool['title'] ?? '');
+            $description = (string) ($tool['description'] ?? '');
+            $url = $tool['url'] ?? null;
+            $image = (string) ($tool['image'] ?? '');
+            if ($url === null || $url === '') {
+                continue;
+            }
+            if (!query_matches_text($title . ' ' . $description . ' ' . $groupTitle, $terms)) {
+                continue;
+            }
 
-    $editor = $aboutConfig['about_editor'] ?? null;
-    if (is_array($editor)) {
-        $name = $editor['name'] ?? '';
-        $role = $editor['role'] ?? '';
-        $bio = $editor['bio'] ?? '';
-        if (query_matches_text($name, $terms) || query_matches_text($role, $terms) || query_matches_text($bio, $terms)) {
-            $excerptSource = query_matches_text($bio, $terms) ? $bio : ($name !== '' ? $name : $role);
             $results[] = [
-                'kind'        => 'about',
-                'title'       => $name !== '' ? $name : 'Editor',
-                'description' => build_search_excerpt($excerptSource, $terms),
-                'url'         => '/about/#editor',
-                'meta'        => 'About · Editor',
-                'thumbnail'   => $editor['image'] ?? null,
-                'score'       => query_matches_text($name, $terms) ? 1.5 : 1.0,
+                'kind'        => 'tool',
+                'title'       => $title,
+                'description' => htmlspecialchars($description, ENT_QUOTES, 'UTF-8'),
+                'url'         => $url,
+                'meta'        => 'Tool',
+                'thumbnail'   => ($image !== '' && search_asset_exists($image)) ? $image : $thumb,
+                'score'       => query_matches_text($title, $terms) ? 2.2 : 1.4,
             ];
         }
     }
@@ -394,29 +436,115 @@ function search_about(string $query, array $aboutConfig): array
     return $results;
 }
 
-function search_global(string $query, int $page, int $perPage, array $aboutConfig): array
+function search_rivers_global(string $query, int $limit = SEARCH_RIVER_CAP): array
 {
-    $offset = max(0, ($page - 1) * $perPage);
-    $articleRows = search_articles($query, $perPage, $offset);
-    $totalArticles = count_search_articles($query);
-    $totalPages = max(1, (int) ceil($totalArticles / $perPage));
+    $rows = river_search($query, $limit);
+    $terms = search_query_terms($query);
+    $results = [];
 
-    $articles = [];
-    foreach ($articleRows as $row) {
-        $articles[] = map_article_to_search_result($row, $query);
+    foreach ($rows as $row) {
+        $name = (string) ($row['display_name'] ?? '');
+        $state = (string) ($row['state'] ?? '');
+        $county = (string) ($row['county'] ?? '');
+        $bits = array_filter([$state, $county]);
+        $description = 'Stream gauge' . ($bits !== [] ? ' · ' . implode(' · ', $bits) : '');
+
+        $results[] = [
+            'kind'        => 'river',
+            'title'       => $name,
+            'description' => htmlspecialchars($description, ENT_QUOTES, 'UTF-8'),
+            'url'         => '/services/rivers/site.php?id=' . rawurlencode((string) $row['site_id']),
+            'meta'        => 'River',
+            'thumbnail'   => null,
+            'score'       => query_matches_text($name, $terms) ? 2.0 : 1.3,
+        ];
     }
 
-    $categories = search_categories($query, ['article', 'gallery']);
-    $about = search_about($query, $aboutConfig);
+    return $results;
+}
+
+function search_gallery_photos(string $query, int $limit = SEARCH_PHOTO_CAP): array
+{
+    $terms = search_query_terms($query);
+    if ($terms === []) {
+        return [];
+    }
+
+    $albums = get_categories('gallery');
+    $results = [];
+
+    foreach ($albums as $album) {
+        $slug = (string) ($album['slug'] ?? '');
+        $albumName = (string) ($album['name'] ?? $slug);
+        foreach (get_gallery_photos($slug) as $photo) {
+            $path = (string) ($photo['path'] ?? '');
+            $title = search_photo_title($path);
+            $haystack = $title . ' ' . str_replace(['-', '_'], ' ', pathinfo($path, PATHINFO_FILENAME));
+            if (!query_matches_text($haystack, $terms)) {
+                continue;
+            }
+
+            $results[] = [
+                'kind'        => 'photo',
+                'title'       => $title,
+                'description' => htmlspecialchars('From the ' . $albumName . ' gallery.', ENT_QUOTES, 'UTF-8'),
+                'url'         => '/galleries/' . rawurlencode($slug) . '/',
+                'meta'        => 'Photo',
+                'thumbnail'   => $path !== '' ? $path : null,
+                'score'       => query_matches_text($title, $terms) ? 1.8 : 1.2,
+            ];
+
+            if (count($results) >= $limit) {
+                return $results;
+            }
+        }
+    }
+
+    return $results;
+}
+
+function search_global(string $query, int $page, int $perPage, array $options = []): array
+{
+    $toolGroups = $options['service_tool_groups'] ?? [];
+    $scope = strtolower(trim((string) ($options['scope'] ?? '')));
+    $all = [];
+
+    if ($scope === 'galleries') {
+        $all = array_merge(
+            search_galleries($query),
+            search_gallery_photos($query)
+        );
+    } else {
+        foreach (search_articles($query, SEARCH_ARTICLE_CAP, 0) as $row) {
+            $all[] = map_article_to_search_result($row, $query);
+        }
+
+        $all = array_merge(
+            $all,
+            search_galleries($query),
+            search_gallery_photos($query),
+            search_tools($query, is_array($toolGroups) ? $toolGroups : []),
+            search_rivers_global($query)
+        );
+    }
+
+    usort($all, 'search_result_sort');
+
+    $total = count($all);
+    $totalPages = max(1, (int) ceil(max(1, $total) / $perPage));
+    if ($total === 0) {
+        $totalPages = 1;
+    }
+    $page = min(max(1, $page), $totalPages);
+    $offset = ($page - 1) * $perPage;
+    $results = array_slice($all, $offset, $perPage);
 
     return [
-        'articles'       => $articles,
-        'categories'     => $categories,
-        'about'          => $about,
-        'total_articles' => $totalArticles,
-        'page'           => min($page, $totalPages),
-        'total_pages'    => $totalPages,
-        'has_results'    => $articles !== [] || $categories !== [] || $about !== [],
+        'results'     => $results,
+        'total'       => $total,
+        'page'        => $page,
+        'total_pages' => $totalPages,
+        'has_results' => $total > 0,
     ];
 }
 

@@ -222,6 +222,60 @@ function river_report_parse(array $post): array
     return [$data, $siteIds, array_slice($catches, 0, RIVER_REPORT_MAX_CATCHES), $errors];
 }
 
+/* Form POST -> a report-shaped array for the print view. Does not save. Empty title/gauges are allowed. */
+function river_report_preview(array $post): array
+{
+    [$data, , $catches] = river_report_parse($post);
+    if ($data['title'] === '') {
+        $data['title'] = 'Fishing report';
+    }
+
+    $sites = [];
+    $seen = [];
+    $labels = (array) ($post['site_label'] ?? []);
+    foreach ((array) ($post['sites'] ?? []) as $i => $siteId) {
+        $siteId = trim((string) $siteId);
+        $label = trim((string) ($labels[$i] ?? ''));
+        if ($siteId === '' && preg_match('/\b([A-Z]{2,10}-[0-9A-Za-z]{4,20})\b/', $label, $m)) {
+            $siteId = $m[1];
+        }
+        if ($siteId === '' && $label === '') {
+            continue;
+        }
+        $key = $siteId !== '' ? $siteId : $label;
+        if (isset($seen[$key])) {
+            continue;
+        }
+        $seen[$key] = true;
+        $site = ($siteId !== '' && usgs_valid_site_id($siteId)) ? river_site($siteId) : null;
+        $sites[] = [
+            'site_id' => $site['site_id'] ?? $siteId,
+            'display_name' => $site['display_name'] ?? trim(preg_replace('/\s*\([^)]*\)\s*$/', '', $label)) ?: ($siteId ?: $label),
+        ];
+    }
+
+    $mapped = [];
+    foreach ($catches as $c) {
+        $mapped[] = [
+            'species'    => $c['species'],
+            'fish_count' => $c['count'],
+            'length'     => $c['length'],
+            'weight'     => $c['weight'],
+            'kept'       => $c['kept'],
+            'fly'        => $c['fly'],
+            'caught_at'  => $c['time'],
+            'note'       => $c['note'],
+        ];
+    }
+
+    return $data + [
+        'sites'   => $sites,
+        'catches' => $mapped,
+        'photos'  => [],
+        'author'  => $data['angler'],
+    ];
+}
+
 function river_report_delete(array $report): void
 {
     get_db()->prepare('DELETE FROM river_reports WHERE id = ?')->execute([(int) $report['id']]);
@@ -232,7 +286,7 @@ function river_report_delete(array $report): void
     }
 }
 
-/* ---------- Photos (stored under storage/, which the web can't reach; served by admin/river-report-photo.php) ---------- */
+/* ---------- Photos (stored under storage/, which the web can't reach; served by services/rivers/report-photo.php) ---------- */
 
 function river_report_photo_dir(int $reportId, bool $create = true): string
 {

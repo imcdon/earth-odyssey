@@ -5,6 +5,6 @@
  * Never put a real key in this example file; it is committed to git.
  */
 return [
-    'api_key'      => '',
-    'river_states' => ['AK'],
+    'api_key'      => 'dvXQT59PequkLuizUlLD8z1hamuldfJJEobb9rJm',
+    'river_states' => ['MI, AK, WA, OH, WI, PA, VA, NC, NY, OR, CO'],
 ];

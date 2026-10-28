@@ -154,11 +154,72 @@
     font-weight: 600;
 }
 
-.theme-rivers .river-states {
+/* State map (rivers hub, browse, and home) */
+.river-states {
     padding-top: 2.25rem;
 }
 
-.theme-rivers .river-state-grid {
+.river-map {
+    max-width: 56rem;
+    margin: 0 auto;
+}
+
+.river-map-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    color: #d8d0c4;
+    overflow: visible;
+}
+
+.river-map-svg .borders {
+    stroke: var(--paper);
+    stroke-width: 1;
+}
+
+.river-map-svg .separator1 {
+    stroke: var(--hairline);
+    stroke-width: 2;
+}
+
+.river-map-svg .is-off {
+    fill: #d8d0c4;
+    pointer-events: none;
+}
+
+.river-map-svg .is-live {
+    fill: color-mix(in srgb, var(--moss) 42%, var(--paper-deep));
+    cursor: pointer;
+    transition: fill 0.15s ease;
+}
+
+.river-map-link {
+    outline: none;
+}
+
+.river-map-link:hover .is-live,
+.river-map-link:focus-visible .is-live,
+.river-map-svg .is-live:hover,
+.river-map-svg .is-live:focus-visible {
+    fill: var(--moss);
+}
+
+.river-map-link:focus-visible .is-live {
+    stroke: var(--ink);
+    stroke-width: 2;
+}
+
+.river-map-caption {
+    margin: 0.85rem 0 0;
+    min-height: 1.4em;
+    color: var(--ink-soft);
+    font-family: var(--font-read);
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+/* Fallback list if the map file is missing */
+.river-state-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
     gap: 0.75rem;
@@ -167,7 +228,7 @@
     list-style: none;
 }
 
-.theme-rivers .river-state {
+.river-state {
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
@@ -180,24 +241,24 @@
     transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.theme-rivers a.river-state:hover,
-.theme-rivers a.river-state:focus-visible {
+a.river-state:hover,
+a.river-state:focus-visible {
     background: var(--ink);
     color: var(--paper);
 }
 
-.theme-rivers .river-state.is-pending {
+.river-state.is-pending {
     border-color: var(--hairline);
     color: var(--ink-soft);
 }
 
-.theme-rivers .river-state-name {
+.river-state-name {
     font-family: var(--font-display);
     font-size: 1.4rem;
     line-height: 1.2;
 }
 
-.theme-rivers .river-state-count {
+.river-state-count {
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.12em;

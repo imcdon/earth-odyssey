@@ -1,0 +1,93 @@
+/*
+ * pages/advocacy.css - Directory of outside advocacy groups.
+ */
+
+.theme-advocacy .advocacy-page {
+    margin-top: 2.5rem;
+    padding-bottom: 3rem;
+}
+
+.theme-advocacy .advocacy-header {
+    margin-bottom: 2.5rem;
+    text-align: center;
+}
+
+.theme-advocacy .advocacy-header .section-title {
+    text-align: center;
+}
+
+.theme-advocacy .advocacy-header .section-intro {
+    max-width: 36rem;
+    margin-inline: auto;
+    font-family: var(--font-read);
+    text-align: center;
+}
+
+.theme-advocacy .advocacy-empty {
+    margin: 0;
+    text-align: center;
+    font-family: var(--font-read);
+    color: var(--ink-soft);
+}
+
+.theme-advocacy .advocacy-focus {
+    margin-bottom: 2.75rem;
+}
+
+.theme-advocacy .advocacy-focus-title {
+    margin: 0 0 1rem;
+    font-family: var(--font-ui);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    border-bottom: 1px solid var(--hairline);
+    padding-bottom: 0.5rem;
+}
+
+.theme-advocacy .advocacy-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.theme-advocacy .advocacy-card {
+    padding: 1.15rem 0 0.25rem;
+    border-bottom: 1px solid var(--hairline);
+}
+
+.theme-advocacy .advocacy-card-name {
+    margin: 0 0 0.4rem;
+    font-family: var(--font-display);
+    font-size: 1.45rem;
+    line-height: 1.2;
+}
+
+.theme-advocacy .advocacy-card-summary {
+    margin: 0 0 0.75rem;
+    max-width: 40rem;
+    font-family: var(--font-read);
+    color: var(--ink-soft);
+}
+
+.theme-advocacy .advocacy-card-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.25rem;
+    margin: 0 0 1rem;
+    font-family: var(--font-ui);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.theme-advocacy .advocacy-card-links a {
+    color: var(--alpine);
+    text-decoration: none;
+}
+
+.theme-advocacy .advocacy-card-links a:hover {
+    color: var(--alpine-hover);
+    text-decoration: underline;
+}

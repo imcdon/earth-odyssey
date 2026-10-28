@@ -63,11 +63,16 @@
     }
 
     var page = root.getAttribute('data-river-page');
+    if (page === 'home') {
+        initStateMap();
+        return;
+    }
     if (page === 'index') initIndex();
     else if (page === 'browse') initBrowse();
     else if (page === 'offline') initOfflinePage();
     else initSite();
     initOffline();
+    initStateMap();
 
     /* ---------- Offline support (services/rivers/sw.js) ---------- */
 
@@ -164,12 +169,34 @@
         }
     }
 
-    /* ---------- Index: search + favorites ---------- */
+    /* ---------- State map caption ---------- */
 
-    function initIndex() {
+    function initStateMap() {
+        var map = root.querySelector('[data-river-map]');
+        if (!map) return;
+        var caption = map.querySelector('[data-map-caption]');
+        if (!caption) return;
+        var idle = caption.textContent;
+
+        function show(label) { caption.textContent = label || idle; }
+
+        map.querySelectorAll('.river-map-link').forEach(function (link) {
+            var label = link.getAttribute('data-label') || link.getAttribute('aria-label') || '';
+            link.addEventListener('mouseenter', function () { show(label); });
+            link.addEventListener('focus', function () { show(label); });
+            link.addEventListener('mouseleave', function () { show(idle); });
+            link.addEventListener('blur', function () { show(idle); });
+        });
+    }
+
+    /* ---------- Gauge type-ahead (rivers hub + home hero) ---------- */
+
+    function initSearch() {
         var siteUrl = root.getAttribute('data-site-url');
         var input = root.querySelector('[data-river-search]');
         var list = root.querySelector('#river-results');
+        if (!siteUrl || !input || !list) return;
+
         var timer = null;
         var active = -1;
         var lastQuery = '';
@@ -232,10 +259,19 @@
         document.addEventListener('click', function (e) {
             if (!list.contains(e.target) && e.target !== input) close();
         });
+    }
+
+    /* ---------- Index: search + favorites ---------- */
+
+    function initIndex() {
+        var siteUrl = root.getAttribute('data-site-url');
+        function hrefFor(id) { return siteUrl + '?id=' + encodeURIComponent(id); }
+
+        initSearch();
 
         var favSection = root.querySelector('[data-river-favs]');
         var favs = favorites();
-        if (favs.length) {
+        if (favSection && favs.length) {
             var ul = favSection.querySelector('ul');
             var items = {};
             favs.forEach(function (f) {

@@ -23,7 +23,6 @@ require __DIR__ . '/../includes/header.php';
         <div class="about-hero-copy">
             <p class="about-hero-role"><?= htmlspecialchars($about_hero_role) ?></p>
             <h1 class="about-hero-title"><?= htmlspecialchars($about_hero_title) ?></h1>
-            <p class="about-intro"><?= htmlspecialchars($about_intro) ?></p>
         </div>
     </div>
 </section>
@@ -44,7 +43,9 @@ require __DIR__ . '/../includes/header.php';
         <div class="about-editor-body">
             <p class="about-editor-role"><?= htmlspecialchars($about_editor['role']) ?></p>
             <h2 class="about-editor-name"><?= htmlspecialchars($about_editor['name']) ?></h2>
-            <p class="about-editor-bio"><?= htmlspecialchars($about_editor['bio']) ?></p>
+            <?php foreach ($about_editor['bio'] as $paragraph): ?>
+                <p class="about-editor-bio"><?= htmlspecialchars($paragraph) ?></p>
+            <?php endforeach; ?>
         </div>
     </div>
 </section>

@@ -80,11 +80,29 @@ function logout_user(): void
     session_destroy();
 }
 
+function login_next(?string $next = null): string
+{
+    $raw = $next ?? (string) ($_POST['next'] ?? $_GET['next'] ?? '');
+    $path = parse_url($raw, PHP_URL_PATH) ?: '';
+    $query = parse_url($raw, PHP_URL_QUERY);
+    if ($path === '' || preg_match('#^[a-z][a-z0-9+.-]*:#i', $raw) || str_starts_with($raw, '//')) {
+        return url('admin/index.php');
+    }
+    foreach (['admin/', 'services/rivers/'] as $prefix) {
+        $base = rtrim(parse_url(url($prefix), PHP_URL_PATH) ?: '', '/') . '/';
+        if (str_starts_with($path, $base) || $path === rtrim($base, '/')) {
+            return $path . ($query ? '?' . $query : '');
+        }
+    }
+    return url('admin/index.php');
+}
+
 function require_login(): array
 {
     $user = current_user();
     if (!$user) {
-        header('Location: ' . url('admin/login.php'));
+        $here = (string) ($_SERVER['REQUEST_URI'] ?? '');
+        header('Location: ' . url('admin/login.php') . ($here !== '' ? '?next=' . rawurlencode($here) : ''));
         exit;
     }
 

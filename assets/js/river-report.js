@@ -198,6 +198,15 @@
 
     form.addEventListener('submit', function (e) {
         var submitter = e.submitter;
+        if (submitter && submitter.getAttribute('data-report-print') !== null) {
+            writeDraft();
+            return;
+        }
+        if (form.getAttribute('data-logged-in') !== '1' && (!submitter || submitter.value === 'save')) {
+            e.preventDefault();
+            goLogin();
+            return;
+        }
         if (!pending.length || (submitter && submitter.value !== 'save')) return;
         e.preventDefault();
         var fd = new FormData(form);
@@ -239,14 +248,22 @@
         });
     }
 
+    function writeDraft() {
+        var data = fields().map(function (f) {
+            return (f.type === 'checkbox' || f.type === 'radio') ? [f.name, f.value, f.checked] : [f.name, f.value];
+        });
+        try { localStorage.setItem(draftKey, JSON.stringify({ t: Date.now(), fields: data })); } catch (err) { /* storage full or blocked */ }
+    }
+
     function saveDraft() {
         clearTimeout(draftTimer);
-        draftTimer = setTimeout(function () {
-            var data = fields().map(function (f) {
-                return (f.type === 'checkbox' || f.type === 'radio') ? [f.name, f.value, f.checked] : [f.name, f.value];
-            });
-            try { localStorage.setItem(draftKey, JSON.stringify({ t: Date.now(), fields: data })); } catch (err) { /* storage full or blocked */ }
-        }, 800);
+        draftTimer = setTimeout(writeDraft, 800);
+    }
+
+    function goLogin() {
+        writeDraft();
+        var next = window.location.pathname + window.location.search;
+        window.location.href = form.getAttribute('data-login-url') + '?next=' + encodeURIComponent(next);
     }
 
     function restore(draft) {

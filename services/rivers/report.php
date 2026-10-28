@@ -109,9 +109,9 @@ require __DIR__ . '/../../includes/header.php';
 
 <article class="container report">
     <div class="report-actions">
-        <button type="button" class="btn-primary" onclick="window.print()">Print / Save as PDF</button>
-        <a class="btn-secondary" href="<?= htmlspecialchars(url('admin/river-report-edit.php') . '?id=' . (int) $report['id']) ?>">Edit report</a>
-        <a class="btn-ghost" href="<?= htmlspecialchars(url('admin/river-reports.php')) ?>">All reports</a>
+        <button type="button" class="btn-primary" onclick="window.print()">Print to PDF</button>
+        <a class="btn-secondary" href="<?= htmlspecialchars(url('services/rivers/report-edit.php') . '?id=' . (int) $report['id']) ?>">Edit report</a>
+        <a class="btn-ghost" href="<?= htmlspecialchars(url('services/rivers/reports.php')) ?>">All reports</a>
     </div>
 
     <header class="report-head">
@@ -280,7 +280,7 @@ require __DIR__ . '/../../includes/header.php';
             <div class="report-photo-grid">
                 <?php foreach ($report['photos'] as $p): ?>
                     <figure>
-                        <img src="<?= htmlspecialchars(url('admin/river-report-photo.php') . '?id=' . (int) $p['id']) ?>" alt="<?= htmlspecialchars($p['caption']) ?>" width="<?= (int) $p['width'] ?>" height="<?= (int) $p['height'] ?>">
+                        <img src="<?= htmlspecialchars(url('services/rivers/report-photo.php') . '?id=' . (int) $p['id']) ?>" alt="<?= htmlspecialchars($p['caption']) ?>" width="<?= (int) $p['width'] ?>" height="<?= (int) $p['height'] ?>">
                         <?php if ($p['caption'] !== ''): ?><figcaption><?= htmlspecialchars($p['caption']) ?></figcaption><?php endif; ?>
                     </figure>
                 <?php endforeach; ?>

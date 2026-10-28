@@ -2,7 +2,7 @@
 /*
  * header.php - Opens the HTML document, head, and site header with navigation.
  * Expects $site_name, $site_tagline, $nav_links from config.php.
- * Optional: $page_theme (home|articles|gallery|services|about|admin|search).
+ * Optional: $page_theme (home|articles|gallery|books|services|about|admin|search).
  */
 $page_title = $page_title ?? $site_name;
 $page_theme = preg_replace('/[^a-z]/', '', strtolower((string) ($page_theme ?? 'home'))) ?: 'home';
@@ -15,6 +15,8 @@ $page_theme = preg_replace('/[^a-z]/', '', strtolower((string) ($page_theme ?? '
     <meta name="description" content="<?= htmlspecialchars($site_tagline) ?>">
     <title><?= htmlspecialchars($page_title) ?></title>
     <link rel="icon" href="<?= htmlspecialchars(url('assets/img/favicon.svg')) ?>" type="image/svg+xml">
+    <link rel="icon" href="<?= htmlspecialchars(url('assets/img/favicon-32.png')) ?>" type="image/png" sizes="32x32">
+    <link rel="apple-touch-icon" href="<?= htmlspecialchars(url('assets/img/favicon-180.png')) ?>">
     <?php if ($page_theme === 'rivers'): ?>
     <link rel="manifest" href="<?= htmlspecialchars(url('services/rivers/manifest.php')) ?>">
     <link rel="apple-touch-icon" href="<?= htmlspecialchars(url('assets/img/app/apple-touch-icon.png')) ?>">
@@ -27,7 +29,7 @@ $page_theme = preg_replace('/[^a-z]/', '', strtolower((string) ($page_theme ?? '
     <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Newsreader:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?= htmlspecialchars(css_bundle_url()) ?>">
 </head>
-<body class="theme-<?= htmlspecialchars($page_theme) ?>">
+<body class="theme-<?= htmlspecialchars($page_theme) ?><?= !empty($body_class) ? ' ' . htmlspecialchars((string) $body_class) : '' ?>">
     <header class="site-header">
         <div class="header-inner">
             <nav class="header-nav" aria-label="Main">
@@ -54,7 +56,13 @@ $page_theme = preg_replace('/[^a-z]/', '', strtolower((string) ($page_theme ?? '
             <a class="logo header-logo" href="<?= htmlspecialchars(url()) ?>">EARTH-ODYSSEY.COM</a>
             <form class="header-search" action="<?= htmlspecialchars(url('search/')) ?>" method="get" role="search">
                 <label class="visually-hidden" for="site-search">Search</label>
-                <input type="search" id="site-search" name="q" placeholder="Search..." aria-label="Search" value="<?= htmlspecialchars($search_query ?? '') ?>">
+                <input type="search" id="site-search" name="q" placeholder="Search" aria-label="Search" value="<?= htmlspecialchars($search_query ?? '') ?>">
+                <a class="header-search-icon" href="<?= htmlspecialchars(url('search/')) ?>" aria-label="Search">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="11" cy="11" r="7"></circle>
+                        <path d="M20 20l-3.5-3.5"></path>
+                    </svg>
+                </a>
             </form>
         </div>
     </header>

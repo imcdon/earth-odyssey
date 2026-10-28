@@ -634,55 +634,110 @@ h1 .river-badge {
     text-underline-offset: 0.12em;
 }
 
-.search-results-section {
-    margin-bottom: 2.5rem;
+/* Unified search panels — mobile: vertical image panels; desktop: row */
+
+.search-panels {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin: 0 0 2rem;
 }
 
-.search-results-heading {
-    margin: 0 0 1rem;
+.search-panel {
+    display: flex;
+    flex-direction: column;
+    background: var(--paper);
+    border-bottom: 1px solid var(--hairline);
+    padding-bottom: 1.25rem;
+}
+
+.search-panel-media {
+    display: block;
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: var(--paper-deep);
+    text-decoration: none;
+}
+
+.search-panel-media img,
+.search-panel-placeholder {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.search-panel-placeholder {
+    background: color-mix(in srgb, var(--ink-soft) 28%, var(--paper-deep));
+}
+
+.search-panel-body {
+    padding: 0.85rem 0 0;
+}
+
+.search-panel-meta {
+    margin: 0 0 0.35rem;
     font-family: var(--font-ui);
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--ink-soft);
-    border-bottom: 1px solid var(--hairline);
-    padding-bottom: 0.5rem;
 }
 
-.search-result-row {
-    display: flex;
-    gap: 1rem;
-    padding: 1.15rem 0;
-    border-bottom: 1px solid var(--hairline);
-}
-
-.search-result-thumb img {
-    width: 120px;
-    height: 75px;
-    object-fit: cover;
-}
-
-.search-result-title {
-    margin: 0 0 0.35rem;
+.search-panel-title {
+    margin: 0 0 0.4rem;
     font-family: var(--font-display);
-    font-size: 1.15rem;
+    font-size: 1.2rem;
+    line-height: 1.25;
 }
 
-.search-result-title a {
+.search-panel-title a {
     color: var(--ink);
     text-decoration: none;
 }
 
-.search-result-title a:hover {
+.search-panel-title a:hover {
     color: var(--alpine);
 }
 
-.search-result-meta,
-.search-result-description {
-    margin: 0 0 0.25rem;
+.search-panel-description {
+    margin: 0;
     color: var(--ink-soft);
-    font-size: 0.9rem;
+    font-size: 0.92rem;
+    line-height: 1.45;
+}
+
+@media (min-width: 721px) {
+    .search-panels {
+        gap: 0;
+    }
+
+    .search-panel {
+        flex-direction: row;
+        align-items: stretch;
+        gap: 1.25rem;
+        padding: 1.15rem 0;
+    }
+
+    .search-panel-media {
+        flex: 0 0 200px;
+        width: 200px;
+        aspect-ratio: 16 / 10;
+        align-self: flex-start;
+    }
+
+    .search-panel-body {
+        flex: 1;
+        min-width: 0;
+        padding: 0.15rem 0 0;
+    }
+
+    .search-panel-title {
+        font-size: 1.15rem;
+    }
 }
 
 .category-filter-clear {

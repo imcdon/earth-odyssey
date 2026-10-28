@@ -57,17 +57,10 @@
 }
 
 .theme-about .about-hero-title {
-    margin: 0 0 0.65rem;
+    margin: 0;
     font-family: var(--font-display);
     font-size: clamp(1.75rem, 4vw, 2.5rem);
     line-height: 1.1;
-}
-
-.theme-about .about-intro {
-    margin: 0;
-    color: var(--ink-soft);
-    font-size: 0.98rem;
-    line-height: 1.55;
 }
 
 .theme-about .about-editor-section {
@@ -114,12 +107,15 @@
 }
 
 .theme-about .about-editor-bio {
-    margin: 0;
+    margin: 0 0 1rem;
     color: var(--ink-soft);
     font-family: var(--font-read);
-    font-size: 1.1rem;
+    font-size: 1.08rem;
     line-height: 1.7;
-    max-width: 34rem;
+}
+
+.theme-about .about-editor-bio:last-child {
+    margin-bottom: 0;
 }
 
 @media (max-width: 700px) {

@@ -1,6 +1,6 @@
-<!-- favicon.svg - Small favicon matching the Earth Odyssey logo. -->
+<!-- favicon.svg - Earth Odyssey EO mark on paper. -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-  <rect width="32" height="32" rx="6" fill="#1f3f2b"/>
-  <path d="M4 24 L12 12 L16 18 L22 10 L28 24 Z" fill="#7a5c3e"/>
-  <path d="M16 8 C16 8 13 11 13 14 C13 16 14 17 16 17 C18 17 19 16 19 14 C19 11 16 8 16 8 Z" fill="#2d5a3d"/>
+  <rect width="32" height="32" fill="#f4efe6"/>
+  <text x="16" y="22.5" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" font-weight="700" fill="#1c1a17" letter-spacing="-0.04em">EO</text>
+  <circle cx="26" cy="7" r="2.25" fill="#9e2a2b"/>
 </svg>

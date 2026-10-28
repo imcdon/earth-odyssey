@@ -7,7 +7,7 @@ require __DIR__ . '/../includes/auth.php';
 
 start_session();
 if (current_user()) {
-    header('Location: ' . url('admin/index.php'));
+    header('Location: ' . login_next());
     exit;
 }
 
@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
     if (login_user($username, $password)) {
-        header('Location: ' . url('admin/index.php'));
+        header('Location: ' . login_next());
         exit;
     }
     $error = 'Invalid username or password.';
@@ -35,6 +35,7 @@ require __DIR__ . '/../includes/header.php';
     <?php endif; ?>
     <form class="admin-form" method="post" action="">
         <?= csrf_field() ?>
+        <input type="hidden" name="next" value="<?= htmlspecialchars((string) ($_POST['next'] ?? $_GET['next'] ?? '')) ?>">
         <label for="username">Username</label>
         <input type="text" id="username" name="username" required autocomplete="username">
 

@@ -70,8 +70,8 @@ require __DIR__ . '/../../includes/header.php';
             </p>
             <div class="river-site-actions">
                 <button type="button" class="btn-secondary river-fav" aria-pressed="false" data-river-fav>&#9734; Save to favorites</button>
+                <a class="btn-primary" href="<?= htmlspecialchars(url('services/rivers/report-edit.php') . '?site=' . rawurlencode($site['site_id'])) ?>">Start a report</a>
                 <?php if ($staff): ?>
-                    <a class="btn-primary" href="<?= htmlspecialchars(url('admin/river-report-edit.php') . '?site=' . rawurlencode($site['site_id'])) ?>">Start a report</a>
                     <a class="btn-secondary" href="<?= htmlspecialchars(url('admin/river-range-edit.php') . '?site=' . rawurlencode($site['site_id'])) ?>"><?= $ranges ? 'Edit range' : 'Set range' ?></a>
                 <?php endif; ?>
                 <div class="river-units" role="group" aria-label="Units">

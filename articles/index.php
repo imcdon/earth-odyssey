@@ -112,9 +112,10 @@ require __DIR__ . '/../includes/header.php';
     <?php if ($isSearch): ?>
         <?php if ($searchResults['has_results']): ?>
             <?php
-            $searchCategories = $searchResults['categories'];
-            $searchArticles = $searchResults['articles'];
-            $searchAbout = [];
+            $searchPanels = array_merge(
+                $searchResults['categories'] ?? [],
+                $searchResults['articles'] ?? []
+            );
             require __DIR__ . '/../includes/partials/search-results.php';
             ?>
 

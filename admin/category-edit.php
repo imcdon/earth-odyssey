@@ -116,7 +116,7 @@ require __DIR__ . '/../includes/header.php';
         <?php if ($form['type'] === 'gallery'): ?>
             <label class="checkbox-label">
                 <input type="checkbox" name="is_featured" value="1"<?= !empty($form['is_featured']) ? ' checked' : '' ?>>
-                Featured gallery (home carousel + galleries page image)
+                Featured gallery (home hero + galleries page image)
             </label>
         <?php endif; ?>
 

@@ -7,16 +7,19 @@ require_once __DIR__ . '/paths.php';
 require_once __DIR__ . '/assets.php';
 
 $site_name = 'Earth Odyssey';
-$site_tagline = 'Articles, galleries, and outdoor tech';
+$site_tagline = 'Outdoor tools, photo galleries, and field stories';
 $company_name = 'Earth Odyssey LLC';
 
 $nav_links = [
-    'Home'      => '/',
-    'Articles'  => '/articles/',
     'Galleries' => '/galleries/',
-    'Services'  => '/services/',
+    'Articles'  => '/articles/',
+    'Books'     => '/books/',
+    'Tools'     => '/services/',
+    'Advocacy'  => '/advocacy/',
     'About'     => '/about/',
 ];
+
+$advocacy_groups = [];
 
 $hero_slides = [
     [
@@ -61,71 +64,25 @@ $hero_type_labels = [
     'services' => 'Services',
 ];
 
-$home_sections = [
-    [
-        'label' => 'Articles',
-        'title' => 'Stories from the trail',
-        'blurb' => 'Guides, field notes, and tips for campers, hunters, and anglers.',
-        'url'   => '/articles/',
-        'cta'   => 'Browse articles',
-        'image' => '/assets/img/hero/day-hike.webp',
-    ],
-    [
-        'label' => 'Galleries',
-        'title' => 'Places worth seeing',
-        'blurb' => 'Landscapes, wildlife, campsites, and water — photos from the field.',
-        'url'   => '/galleries/',
-        'cta'   => 'Open galleries',
-        'image' => '/assets/img/hero/autumn-camp.webp',
-    ],
-    [
-        'label' => 'Tools',
-        'title' => 'Outdoor tech, free to use',
-        'blurb' => 'Weather, streams, buoys, and more — tools for planning your next trip.',
-        'url'   => '/services/',
-        'cta'   => 'Explore tools',
-        'image' => '/assets/img/hero/services.webp',
-    ],
-];
+/* Home destination bands are built in index.php (galleries only). */
 
 $service_tool_groups = [
     [
-        'title' => 'Weather & conditions',
+        'title' => 'Water',
         'tools' => [
             [
-                'title' => 'Regional forecast',
-                'description' => 'Quick look at temperature, wind, and precipitation for your area.',
-                'status' => 'soon',
-                'url' => null,
-            ],
-            [
                 'title' => 'Stream gauges',
-                'description' => 'Check flow levels before you fish or ford a creek.',
+                'description' => 'Look up live USGS flow, gauge height, and water temperature before you fish or ford a creek. Search a river, creek, or town, pick a state, and compare this week, this month, or this year with the same stretch of water last year.',
+                'image' => '/assets/img/galleries/alaska/img_3440.webp',
                 'status' => 'live',
                 'url' => '/services/rivers/',
             ],
             [
-                'title' => 'Buoy & marine',
-                'description' => 'Coastal and lake conditions for boaters and anglers.',
-                'status' => 'soon',
-                'url' => null,
-            ],
-        ],
-    ],
-    [
-        'title' => 'Trip helpers',
-        'tools' => [
-            [
-                'title' => 'Pack checklist',
-                'description' => 'Build a day-hike or overnight kit without overpacking.',
-                'status' => 'soon',
-                'url' => null,
-            ],
-            [
-                'title' => 'Sunrise / sunset',
-                'description' => 'Daylight windows for hunting, fishing, and trail time.',
-                'status' => 'soon',
-                'url' => null,
+                'title' => 'Fishing reports',
+                'description' => 'Write the trip while it is still fresh. Choose the gauges you fished, set the date and time, and flow, height, and the weather from that stretch are filled in when you save.',
+                'image' => '/assets/img/categories/fish.webp',
+                'status' => 'live',
+                'url' => '/services/rivers/reports.php',
             ],
         ],
     ],
@@ -171,13 +128,21 @@ $latest_articles = [
 $about_hero_image = '/assets/img/about/hero.webp';
 $about_hero_role = 'About';
 $about_hero_title = 'Earth Odyssey';
-$about_intro = 'Outdoor stories, photography, and free tech tools for campers, hunters, and anglers. Built for anyone who wants more time outside.';
-$about_text = $about_intro;
 
 // Panel 2 — editor (portrait + editor copy)
 $about_editor = [
     'name'  => 'Ian McDonnell',
     'role'  => 'Editor/Writer',
-    'bio'   => 'Always in search of the next adventure. The founder and developer of Earth Odyssey, also the editor and writer. Every year the adventures get bigger, the stories crazier, and my hunts for big fish and game across North America continue.',
+    'bio'   => [
+        'Since I was very young, I\'ve been obsessed with the outdoors. As a kid I would flip over rocks and logs in my backyard looking for any creepy or crawly thing I could find. As I got older I turned into a fishing freak, and now a calmer outdoor enthusiast with a passion for showcasing the outdoors, experiencing every new place I can, and advocating for it\'s protection.',
+        'I started Earth Odyssey with the goal of providing a platform and tools for other outdoor enthusiasts. In doing this I had a few principles; one, that it would be free, and two, it would advocate for wildlife and the world at large. Earth Odyssey is also a portfolio piece for my web design and coding skills, as well as my writing and photography.',
+        'There\'s a few primary features you\'ll find on earth-odyssey.com, the first one is the articles tab. This is a place where myself and writers that submit articles via the portal can have their articles published without the pressure of a company editor or pernicious content companies. All of it is free and not behind a paywall or sign-in wall.',
+        'Another item is the Galleries tab. This is where I display collections of my own photos. A few collections have photos from my iPhone, which isn\'t as appealing as my collections from my Nikon D600 with a standard kit lense. It\'s just a place for me and others to publish and for users to view high-definition pictures in a viewer friendly format.',
+        'Another cool tab is the books tab. This tab uses open source libraries and APIs to compile public domain works about fishing, hunting, or anything outdoors. Peruse ancient titles like the Compleat Angler and more.',
+        'The last and nerdiest item is the tools tab. These are custom coded tools that use APIs and php to make tools that outdoor enthusiasts can use to plan and learn. The streamguage tool uses USGS stream monitoring data with a modern interface. The fishing reports tool uses USGS data and weather data to autofill certain information about a day on the water.',
+        'The most impactful item is the advocacy tab. Every year, habitats are threatened and more species are on the verge of extinction. In addition, more and more people are displaced and killed by polution and war every year. Even if I can not make a difference myself, I can help by encouraging users of Earth Odyssey to educate themselves on advocacy for habitats, for species, and for people.',
+        'Please, If you have any questions, bugs, concerns, or would like to contribute articles, photos, or technology, hit up the contact page.',
+        'Thank you!',
+    ],
     'image' => '/assets/img/about/editor.webp',
 ];
