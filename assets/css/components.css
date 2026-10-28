@@ -92,6 +92,10 @@
     color: var(--moss);
 }
 
+.service-status.is-beta {
+    color: var(--alpine);
+}
+
 .service-status.is-soon {
     color: var(--ink-soft);
 }
