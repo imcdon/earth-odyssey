@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Inventory of recent Earth Odyssey changes shipped to GitHub (gallery admin upload). -->
+<changes project="earth-odyssey" updated="2026-10-29">
+  <release id="31c2d61" title="Fix gallery photo submit and harden large uploads">
+    <item path="admin/gallery-upload-api.php">JSON-only upload API for gallery photos</item>
+    <item path="admin/gallery-photos.php">Choose → resizer → submit UI; gallery_action field (avoids form.action clash)</item>
+    <item path="assets/js/gallery-admin.js">Large-photo downsample, one-file batches, confirmation message</item>
+    <item path="includes/gallery-photos.php">Save/delete WebP + variants under assets/img/galleries/{slug}/</item>
+    <item path="includes/auth.php">JSON-aware login/role errors for fetch uploads</item>
+    <item path="assets/css/pages/admin.css">Gallery upload step and preview styles</item>
+    <item path="assets/img/galleries/fish/">Fish album WebPs, responsive variants, and JSON EXIF sidecars</item>
+    <item path="sitemap.xml">Public sitemap including /galleries/fish/</item>
+  </release>
+  <release id="0911bc6" title="Add admin gallery photo upload by category">
+    <item path="admin/gallery-photos.php">Editor album photo manager</item>
+    <item path="includes/gallery-photos.php">Filesystem helpers for gallery uploads</item>
+    <item path="assets/js/gallery-admin.js">Browser WebP resizer</item>
+  </release>
+</changes>
