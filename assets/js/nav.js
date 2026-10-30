@@ -1,40 +1,24 @@
 /*
- * nav.js - Header nav: hamburger toggle and collapse when nav overlaps logo.
+ * nav.js - Header Explore dropdown: toggle, Escape, outside click.
  */
 (function () {
-    var header = document.querySelector('.site-header');
-    var nav = document.querySelector('.header-nav');
-    var toggle = document.querySelector('.nav-toggle');
-    var menu = document.getElementById('nav-menu');
-    var logo = document.querySelector('.header-logo');
-    var search = document.querySelector('.header-search');
-    if (!header || !nav || !toggle || !menu || !logo || !search) return;
-
-    var buffer = 16;
+    var nav = document.querySelector('[data-nav]');
+    var toggle = document.querySelector('[data-nav-toggle]');
+    var menu = document.querySelector('[data-nav-menu]');
+    if (!nav || !toggle || !menu) return;
 
     function setOpen(open) {
         nav.classList.toggle('is-open', open);
         toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-    }
-
-    function updateNavCollapse() {
-        header.classList.remove('is-nav-collapsed');
-        setOpen(false);
-
-        var logoRect = logo.getBoundingClientRect();
-        var navRect = menu.getBoundingClientRect();
-        var searchRect = search.getBoundingClientRect();
-        var navOverlaps = navRect.right + buffer > logoRect.left;
-        var searchOverlaps = searchRect.left - buffer < logoRect.right;
-        var shouldCollapse = navOverlaps || searchOverlaps;
-
-        header.classList.toggle('is-nav-collapsed', shouldCollapse);
-        if (shouldCollapse) {
-            setOpen(false);
+        if (open) {
+            menu.removeAttribute('hidden');
+        } else {
+            menu.setAttribute('hidden', '');
         }
     }
 
-    toggle.addEventListener('click', function () {
+    toggle.addEventListener('click', function (event) {
+        event.stopPropagation();
         setOpen(!nav.classList.contains('is-open'));
     });
 
@@ -50,13 +34,9 @@
         }
     });
 
-    if (window.ResizeObserver) {
-        var observer = new ResizeObserver(updateNavCollapse);
-        observer.observe(header);
-    }
-
-    window.addEventListener('resize', updateNavCollapse);
-    search.addEventListener('focusin', updateNavCollapse);
-    search.addEventListener('focusout', updateNavCollapse);
-    updateNavCollapse();
+    document.addEventListener('click', function (event) {
+        if (!nav.contains(event.target)) {
+            setOpen(false);
+        }
+    });
 })();

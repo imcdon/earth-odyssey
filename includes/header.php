@@ -6,6 +6,14 @@
  */
 $page_title = $page_title ?? $site_name;
 $page_theme = preg_replace('/[^a-z]/', '', strtolower((string) ($page_theme ?? 'home'))) ?: 'home';
+
+require_once __DIR__ . '/auth.php';
+$header_user = null;
+try {
+    $header_user = current_user();
+} catch (Throwable $e) {
+    $header_user = null;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -32,16 +40,20 @@ $page_theme = preg_replace('/[^a-z]/', '', strtolower((string) ($page_theme ?? '
 <body class="theme-<?= htmlspecialchars($page_theme) ?><?= !empty($body_class) ? ' ' . htmlspecialchars((string) $body_class) : '' ?>">
     <header class="site-header">
         <div class="header-inner">
-            <nav class="header-nav" aria-label="Main">
-                <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="nav-menu">
-                    <span class="nav-toggle-bars" aria-hidden="true">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </span>
-                    <span class="visually-hidden">Menu</span>
+            <nav class="header-nav" aria-label="Main" data-nav>
+                <button
+                    type="button"
+                    class="nav-explore"
+                    aria-expanded="false"
+                    aria-controls="nav-menu"
+                    data-nav-toggle
+                >
+                    <span class="nav-explore-label">Explore</span>
+                    <svg class="nav-explore-chevron" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+                        <path d="M2.2 4.2L6 8l3.8-3.8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+                    </svg>
                 </button>
-                <ul class="nav-list" id="nav-menu">
+                <ul class="nav-list" id="nav-menu" data-nav-menu hidden>
                     <?php foreach ($nav_links as $label => $navUrl): ?>
                         <li>
                             <a
@@ -51,6 +63,26 @@ $page_theme = preg_replace('/[^a-z]/', '', strtolower((string) ($page_theme ?? '
                             ><?= htmlspecialchars($label) ?></a>
                         </li>
                     <?php endforeach; ?>
+                    <?php if ($header_user): ?>
+                        <li class="nav-list-divider" aria-hidden="true"></li>
+                        <li>
+                            <a
+                                href="<?= htmlspecialchars(url('admin/index.php')) ?>"
+                                class="<?= nav_is_active('admin/index.php') || (nav_is_active('admin/') && !nav_is_active('admin/login.php')) ? 'is-active' : '' ?>"
+                            >Admin</a>
+                        </li>
+                        <li>
+                            <a href="<?= htmlspecialchars(url('admin/logout.php')) ?>">Log out</a>
+                        </li>
+                    <?php else: ?>
+                        <li class="nav-list-divider" aria-hidden="true"></li>
+                        <li>
+                            <a
+                                href="<?= htmlspecialchars(url('admin/login.php')) ?>"
+                                class="<?= nav_is_active('/admin/login.php') ? 'is-active' : '' ?>"
+                            >Login</a>
+                        </li>
+                    <?php endif; ?>
                 </ul>
             </nav>
             <a class="logo header-logo" href="<?= htmlspecialchars(url()) ?>">EARTH-ODYSSEY.COM</a>
