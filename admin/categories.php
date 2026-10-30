@@ -28,7 +28,7 @@ $page_theme = 'admin';
 $page_title = 'Manage Categories | ' . $site_name;
 require __DIR__ . '/../includes/header.php';
 
-function render_category_list(array $categories): void
+function render_category_list(array $categories, bool $isGallery = false): void
 {
     if (!$categories) {
         echo '<p>No categories yet.</p>';
@@ -46,10 +46,17 @@ function render_category_list(array $categories): void
                         <?php if (!empty($cat['is_featured'])): ?>
                             &middot; Featured
                         <?php endif; ?>
-                        &middot; <?= htmlspecialchars($cat['image_path']) ?>
+                        <?php if ($isGallery): ?>
+                            &middot; <?= count(get_gallery_photos($cat['slug'])) ?> photos
+                        <?php else: ?>
+                            &middot; <?= htmlspecialchars($cat['image_path']) ?>
+                        <?php endif; ?>
                     </span>
                 </div>
                 <div class="category-admin-actions">
+                    <?php if ($isGallery): ?>
+                        <a class="btn-primary" href="<?= htmlspecialchars(url('admin/gallery-photos.php')) ?>?id=<?= (int) $cat['id'] ?>">Photos</a>
+                    <?php endif; ?>
                     <a class="btn-secondary" href="<?= htmlspecialchars(url('admin/category-edit.php')) ?>?id=<?= (int) $cat['id'] ?>">Edit</a>
                     <form method="post" action="" class="category-delete-form" onsubmit="return confirm('Delete this category?');">
                         <?= csrf_field() ?>
@@ -80,15 +87,18 @@ function render_category_list(array $categories): void
             <h2 class="section-title">Article Categories</h2>
             <a class="btn-primary" href="<?= htmlspecialchars(url('admin/category-edit.php')) ?>?type=article">Add article category</a>
         </div>
-        <?php render_category_list($articleCategories); ?>
+        <?php render_category_list($articleCategories, false); ?>
     </section>
 
     <section class="category-admin-section">
         <div class="category-admin-header">
             <h2 class="section-title">Gallery Categories</h2>
-            <a class="btn-primary" href="<?= htmlspecialchars(url('admin/category-edit.php')) ?>?type=gallery">Add gallery category</a>
+            <div class="category-admin-actions">
+                <a class="btn-secondary" href="<?= htmlspecialchars(url('admin/gallery-photos.php')) ?>">All gallery photos</a>
+                <a class="btn-primary" href="<?= htmlspecialchars(url('admin/category-edit.php')) ?>?type=gallery">Add gallery category</a>
+            </div>
         </div>
-        <?php render_category_list($galleryCategories); ?>
+        <?php render_category_list($galleryCategories, true); ?>
     </section>
 </section>
 

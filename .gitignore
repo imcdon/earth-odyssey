@@ -27,3 +27,4 @@ Thumbs.db
 # Local dumps / work folders (not for deploy)
 /assets/img/drive-download-*/
 /media/
+/database/exports/

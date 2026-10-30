@@ -123,6 +123,9 @@ require __DIR__ . '/../includes/header.php';
         <div class="form-actions">
             <button type="submit" class="btn-primary">Save category</button>
             <a class="btn-secondary" href="<?= htmlspecialchars(url('admin/categories.php')) ?>">Cancel</a>
+            <?php if ($id && ($form['type'] ?? '') === 'gallery'): ?>
+                <a class="btn-secondary" href="<?= htmlspecialchars(url('admin/gallery-photos.php')) ?>?id=<?= (int) $id ?>">Manage photos</a>
+            <?php endif; ?>
         </div>
     </form>
 </section>
