@@ -5,9 +5,9 @@
 require_once __DIR__ . '/categories.php';
 require_once __DIR__ . '/assets.php';
 
-const GALLERY_PHOTO_MAX_BYTES = 12582912; // 12 MB
+const GALLERY_PHOTO_MAX_BYTES = 12582912; // 12 MB per resized file (base or variant)
 const GALLERY_PHOTO_MAX_DIM = 8000;
-const GALLERY_PHOTO_UPLOAD_BATCH = 30;
+const GALLERY_PHOTO_UPLOAD_BATCH = 120; // base + variants for ~30 photos
 
 function gallery_photos_dir(string $slug): ?string
 {
@@ -85,23 +85,54 @@ function gallery_photo_delete(string $slug, string $basename): ?string
  * Save browser-prepared WebP uploads (base + optional -480/-960/-1600 variants).
  * Expects $_FILES['photos'] multi-upload; filenames must be {stem}.webp or {stem}-{width}.webp.
  *
- * @return list<string> warnings
+ * @return array{warnings: list<string>, saved: int, bases: int}
  */
 function gallery_photo_save_uploads(string $slug, array $files): array
 {
     $warnings = [];
     $dir = gallery_photos_ensure_dir($slug);
     if ($dir === null) {
-        return ['Could not create the gallery folder. Check permissions on assets/img/galleries/.'];
+        return [
+            'warnings' => ['Could not create the gallery folder. Check permissions on assets/img/galleries/.'],
+            'saved' => 0,
+            'bases' => 0,
+        ];
     }
 
     $uploads = $files['photos'] ?? null;
-    if (!$uploads || !is_array($uploads['name'] ?? null)) {
-        return $warnings;
+    if (!$uploads || !isset($uploads['name'])) {
+        if (
+            (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 0
+            && $_FILES === []
+        ) {
+            return [
+                'warnings' => ['Upload was too large for the server (post_max_size is ' . ini_get('post_max_size') . '). Try fewer photos.'],
+                'saved' => 0,
+                'bases' => 0,
+            ];
+        }
+        $maxFiles = (int) ini_get('max_file_uploads');
+        return [
+            'warnings' => ['No image files arrived. This server allows only ' . max(1, $maxFiles) . ' files per request — submit fewer photos, or upload again in smaller batches.'],
+            'saved' => 0,
+            'bases' => 0,
+        ];
+    }
+
+    // Normalize single-file shape to a list.
+    if (!is_array($uploads['name'])) {
+        $uploads = [
+            'name' => [$uploads['name']],
+            'type' => [$uploads['type'] ?? ''],
+            'tmp_name' => [$uploads['tmp_name'] ?? ''],
+            'error' => [$uploads['error'] ?? UPLOAD_ERR_NO_FILE],
+            'size' => [$uploads['size'] ?? 0],
+        ];
     }
 
     $finfo = new finfo(FILEINFO_MIME_TYPE);
     $accepted = 0;
+    $bases = 0;
 
     foreach (array_keys($uploads['name']) as $i) {
         $err = $uploads['error'][$i] ?? UPLOAD_ERR_NO_FILE;
@@ -119,7 +150,11 @@ function gallery_photo_save_uploads(string $slug, array $files): array
 
         $tmp = (string) ($uploads['tmp_name'][$i] ?? '');
         if ($err !== UPLOAD_ERR_OK || !is_uploaded_file($tmp)) {
-            $warnings[] = '"' . $safeLabel . '" failed to upload.';
+            $code = (int) $err;
+            $why = $code === UPLOAD_ERR_INI_SIZE || $code === UPLOAD_ERR_FORM_SIZE
+                ? 'too large for PHP upload limits'
+                : 'failed to upload (error ' . $code . ')';
+            $warnings[] = '"' . $safeLabel . '" ' . $why . '.';
             continue;
         }
 
@@ -154,13 +189,20 @@ function gallery_photo_save_uploads(string $slug, array $files): array
         }
         @chmod($dest, 0644);
         $accepted++;
+        if (!gallery_photo_is_variant_name($destName)) {
+            $bases++;
+        }
     }
 
     if ($accepted === 0 && $warnings === []) {
         $warnings[] = 'No photos were uploaded.';
     }
 
-    return $warnings;
+    return [
+        'warnings' => $warnings,
+        'saved' => $accepted,
+        'bases' => $bases,
+    ];
 }
 
 /**

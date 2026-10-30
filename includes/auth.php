@@ -68,7 +68,22 @@ function csrf_check(): void
     $sent = $_POST['csrf_token'] ?? '';
     if (!is_string($sent) || !hash_equals(csrf_token(), $sent)) {
         http_response_code(400);
-        echo 'Your session expired. Go back, refresh the page, and try again.';
+        $msg = 'Your session expired. Go back, refresh the page, and try again.';
+        // Oversized uploads empty $_POST (including the CSRF field) — say so when likely.
+        if (
+            $_SERVER['REQUEST_METHOD'] === 'POST'
+            && (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 0
+            && $_POST === []
+            && $_FILES === []
+        ) {
+            $msg = 'Upload was too large for the server (post_max_size is ' . ini_get('post_max_size') . '). Try fewer photos at once.';
+        }
+        if (str_contains((string) ($_SERVER['HTTP_ACCEPT'] ?? ''), 'application/json')) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['ok' => false, 'error' => $msg], JSON_UNESCAPED_SLASHES);
+            exit;
+        }
+        echo $msg;
         exit;
     }
 }
@@ -97,10 +112,21 @@ function login_next(?string $next = null): string
     return url('admin/index.php');
 }
 
+function wants_json_response(): bool
+{
+    return str_contains((string) ($_SERVER['HTTP_ACCEPT'] ?? ''), 'application/json');
+}
+
 function require_login(): array
 {
     $user = current_user();
     if (!$user) {
+        if (wants_json_response()) {
+            http_response_code(401);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['ok' => false, 'error' => 'You are not logged in. Refresh and sign in again.']);
+            exit;
+        }
         $here = (string) ($_SERVER['REQUEST_URI'] ?? '');
         header('Location: ' . url('admin/login.php') . ($here !== '' ? '?next=' . rawurlencode($here) : ''));
         exit;
@@ -114,6 +140,11 @@ function require_role(string $role): array
     $user = require_login();
     if ($user['role'] !== $role) {
         http_response_code(403);
+        if (wants_json_response()) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['ok' => false, 'error' => 'Access denied.']);
+            exit;
+        }
         echo 'Access denied.';
         exit;
     }

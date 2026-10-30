@@ -482,12 +482,43 @@
     margin-bottom: 2.5rem;
 }
 
+.theme-admin .gallery-upload-confirm {
+    margin: 0 0 1rem;
+    padding: 0.85rem 1rem;
+    border-left: 4px solid var(--moss);
+    background: color-mix(in srgb, var(--moss) 12%, var(--paper));
+    font-weight: 600;
+}
+
+.theme-admin .gallery-upload-confirm.is-error {
+    border-left-color: var(--alpine);
+    background: color-mix(in srgb, var(--alpine) 10%, var(--paper));
+}
+
+.theme-admin .gallery-upload-steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.theme-admin .gallery-upload-step {
+    margin: 0 0 0.5rem;
+    padding: 0;
+}
+
+.theme-admin .gallery-upload-step-title {
+    margin: 0 0 0.75rem;
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+}
+
 .theme-admin .gallery-upload-status {
     margin: 0.75rem 0;
     color: var(--ink-soft);
     font-size: 0.9rem;
 }
 
+.theme-admin .gallery-upload-queue,
 .theme-admin .gallery-upload-previews {
     list-style: none;
     margin: 0 0 1.25rem;
@@ -496,14 +527,31 @@
     gap: 0.75rem;
 }
 
+.theme-admin .gallery-upload-queue li,
 .theme-admin .gallery-upload-previews li {
     display: grid;
-    grid-template-columns: 5.5rem 1fr;
-    gap: 0.85rem;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem 0.85rem;
     align-items: center;
     padding: 0.65rem;
     border: 1px solid var(--hairline);
     background: var(--paper-deep);
+}
+
+.theme-admin .gallery-upload-previews li {
+    grid-template-columns: 5.5rem 1fr;
+}
+
+.theme-admin .gallery-upload-queue span,
+.theme-admin .gallery-upload-previews span {
+    display: block;
+    color: var(--ink-soft);
+    font-size: 0.82rem;
+}
+
+.theme-admin .gallery-upload-queue strong,
+.theme-admin .gallery-upload-previews strong {
+    display: block;
 }
 
 .theme-admin .gallery-upload-previews img {
@@ -513,15 +561,8 @@
     display: block;
 }
 
-.theme-admin .gallery-upload-previews strong,
-.theme-admin .gallery-upload-previews span {
-    display: block;
-}
-
 .theme-admin .gallery-upload-previews span {
     margin: 0.2rem 0 0.55rem;
-    color: var(--ink-soft);
-    font-size: 0.82rem;
 }
 
 .theme-admin .gallery-photos-heading {

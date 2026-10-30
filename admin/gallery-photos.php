@@ -20,12 +20,15 @@ if ($category && ($category['type'] ?? '') !== 'gallery') {
 }
 
 if (isset($_GET['saved']) && $category) {
-    $message = 'Photos uploaded.';
+    $savedCount = max(1, (int) $_GET['saved']);
+    $message = $savedCount === 1
+        ? 'Upload complete — 1 photo was added to “' . $category['name'] . '”.'
+        : 'Upload complete — ' . $savedCount . ' photos were added to “' . $category['name'] . '”.';
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $category) {
     csrf_check();
-    $action = (string) ($_POST['action'] ?? 'upload');
+    $action = (string) ($_POST['gallery_action'] ?? $_POST['action'] ?? 'upload');
 
     if ($action === 'delete') {
         $basename = (string) ($_POST['basename'] ?? '');
@@ -37,22 +40,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $category) {
         }
     } elseif ($action === 'upload') {
         $before = count(get_gallery_photos($category['slug']));
-        $warnings = gallery_photo_save_uploads($category['slug'], $_FILES);
+        $result = gallery_photo_save_uploads($category['slug'], $_FILES);
+        $warnings = $result['warnings'];
         $warnings = array_merge(
             $warnings,
             gallery_photo_save_meta($category['slug'], (array) ($_POST['photo_meta'] ?? []))
         );
         $after = count(get_gallery_photos($category['slug']));
         $added = max(0, $after - $before);
+        // Variant-only batches save files but don't increase album count.
+        $savedOk = $result['saved'] > 0 || $added > 0;
         $wantsJson = str_contains((string) ($_SERVER['HTTP_ACCEPT'] ?? ''), 'application/json');
 
-        if ($added > 0) {
+        if ($savedOk) {
             if ($wantsJson) {
                 header('Content-Type: application/json; charset=utf-8');
-                echo json_encode(['ok' => true, 'added' => $added, 'warnings' => $warnings], JSON_UNESCAPED_SLASHES);
+                echo json_encode([
+                    'ok' => true,
+                    'added' => $added,
+                    'saved' => $result['saved'],
+                    'bases' => $result['bases'],
+                    'category' => $category['name'],
+                    'warnings' => $warnings,
+                ], JSON_UNESCAPED_SLASHES);
                 exit;
             }
-            $message = $added === 1 ? '1 photo uploaded.' : $added . ' photos uploaded.';
+            $message = $added === 1 ? '1 photo uploaded.' : ($added > 1 ? $added . ' photos uploaded.' : 'Files saved.');
         } else {
             $fail = $warnings[0] ?? 'No photos were uploaded.';
             if ($wantsJson) {
@@ -124,32 +137,54 @@ require __DIR__ . '/../includes/header.php';
             action="<?= htmlspecialchars(url('admin/gallery-photos.php')) ?>?id=<?= (int) $category['id'] ?>"
             enctype="multipart/form-data"
             data-gallery-upload
+            data-upload-url="<?= htmlspecialchars(url('admin/gallery-upload-api.php')) ?>"
             data-max-edge="2400"
             data-variant-widths="480,960,1600"
         >
             <?= csrf_field() ?>
             <input type="hidden" name="category_id" value="<?= (int) $category['id'] ?>">
-            <input type="hidden" name="action" value="upload">
+            <input type="hidden" name="gallery_action" value="upload">
 
             <p class="range-help">
-                Photos are resized in your browser to WebP (max 2400px) with 480 / 960 / 1600 variants,
-                then saved to <code>/assets/img/galleries/<?= htmlspecialchars($category['slug']) ?>/</code>.
+                1) Choose photos · 2) Run the resizer · 3) Submit to this album.
+                Large camera originals (20–80&nbsp;MB) are downsampled one at a time in your browser,
+                then saved as WebP (max 2400px) with 480 / 960 / 1600 variants under
+                <code>/assets/img/galleries/<?= htmlspecialchars($category['slug']) ?>/</code>.
             </p>
 
-            <label for="gallery-photos">Add photos</label>
-            <input
-                type="file"
-                id="gallery-photos"
-                accept="image/jpeg,image/png,image/webp,image/*"
-                multiple
-                data-photo-input
-            >
+            <div class="gallery-upload-confirm" data-upload-confirm hidden role="status" aria-live="polite"></div>
 
-            <p class="gallery-upload-status" data-photo-status>Choose photos to resize and upload.</p>
-            <ul class="gallery-upload-previews" data-photo-previews></ul>
+            <ol class="gallery-upload-steps">
+                <li class="gallery-upload-step is-active" data-step="choose">
+                    <h2 class="gallery-upload-step-title">1. Choose photos</h2>
+                    <label for="gallery-photos">Select images</label>
+                    <input
+                        type="file"
+                        id="gallery-photos"
+                        accept="image/jpeg,image/png,image/webp,image/*"
+                        multiple
+                        data-photo-input
+                    >
+                    <p class="gallery-upload-status" data-choose-status>No photos selected yet.</p>
+                    <ul class="gallery-upload-queue" data-photo-queue></ul>
+                    <div class="form-actions">
+                        <button type="button" class="btn-primary" data-resize-btn disabled>Send to resizer</button>
+                    </div>
+                </li>
 
+                <li class="gallery-upload-step" data-step="resize" hidden>
+                    <h2 class="gallery-upload-step-title">2. Resizer</h2>
+                    <p class="gallery-upload-status" data-resize-status>Waiting for photos…</p>
+                    <ul class="gallery-upload-previews" data-photo-previews></ul>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" data-back-choose>Choose different photos</button>
+                        <button type="submit" class="btn-primary" data-upload-submit disabled>Submit photos</button>
+                    </div>
+                </li>
+            </ol>
+
+            <p class="gallery-upload-status" data-photo-status hidden></p>
             <div class="form-actions">
-                <button type="submit" class="btn-primary" data-upload-submit disabled>Upload photos</button>
                 <a class="btn-secondary" href="<?= htmlspecialchars(url('admin/gallery-photos.php')) ?>">All galleries</a>
             </div>
         </form>
@@ -191,7 +226,7 @@ require __DIR__ . '/../includes/header.php';
                             >
                                 <?= csrf_field() ?>
                                 <input type="hidden" name="category_id" value="<?= (int) $category['id'] ?>">
-                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="gallery_action" value="delete">
                                 <input type="hidden" name="basename" value="<?= htmlspecialchars($basename) ?>">
                                 <button type="submit" class="btn-secondary">Delete</button>
                             </form>
