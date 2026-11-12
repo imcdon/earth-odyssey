@@ -3,7 +3,7 @@
  * review.php - Editor queue for pending articles.
  */
 require __DIR__ . '/../includes/config.php';
-require __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/auth.php';
 require __DIR__ . '/../includes/articles.php';
 
 require_role('editor');

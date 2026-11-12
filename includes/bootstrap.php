@@ -116,12 +116,12 @@ function eo_fail(): void
     echo '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">';
     echo '<meta name="viewport" content="width=device-width, initial-scale=1">';
     echo '<title>Something went wrong</title><style>';
-    echo 'html,body{margin:0;min-height:100%;background:#f4efe6;color:#1c1a17;';
+    echo 'html,body{margin:0;min-height:100%;background:#080809;color:#ececef;';
     echo 'font-family:Georgia,"Times New Roman",serif}';
     echo 'main{max-width:28rem;margin:0 auto;padding:4rem 1.5rem;text-align:center}';
     echo 'h1{font-size:1.75rem;font-weight:400;margin:0 0 .75rem}';
     echo 'p{margin:0 0 1.5rem;line-height:1.5}';
-    echo 'a{color:#3e5638}';
+    echo 'a{color:#2f9bff}';
     echo '</style></head><body><main>';
     echo '<h1>Something went wrong.</h1>';
     echo '<p>Please try again in a moment.</p>';

@@ -3,11 +3,11 @@
  * edit.php - Create or edit an article (draft / submit for review / publish).
  */
 require __DIR__ . '/../includes/config.php';
-require __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/auth.php';
 require __DIR__ . '/../includes/categories.php';
 require __DIR__ . '/../includes/articles.php';
 
-$user = require_login();
+$user = require_staff();
 $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 $article = $id ? get_article_by_id($id) : null;
 $error = '';

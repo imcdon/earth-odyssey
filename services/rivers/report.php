@@ -4,11 +4,11 @@
  * Everything comes from the snapshot saved with the report, so opening it never calls USGS or Open-Meteo.
  */
 require __DIR__ . '/../../includes/config.php';
-require __DIR__ . '/../../includes/auth.php';
+require_once __DIR__ . '/../../includes/auth.php';
 require __DIR__ . '/../../includes/river-reports.php';
 require __DIR__ . '/../../includes/markdown.php';
 
-$user = require_login();
+$user = require_permission('fishing_reports');
 $report = river_report_get((int) ($_GET['id'] ?? 0));
 if (!$report || !river_report_can_edit($user, $report)) {
     http_response_code(404);

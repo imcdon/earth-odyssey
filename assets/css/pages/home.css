@@ -78,9 +78,9 @@
     background:
         linear-gradient(
             to bottom,
-            rgba(21, 19, 15, 0.32) 0%,
-            rgba(21, 19, 15, 0.22) 55%,
-            rgba(21, 19, 15, 0) 100%
+            rgba(0, 0, 0, 0.32) 0%,
+            rgba(0, 0, 0, 0.22) 55%,
+            rgba(0, 0, 0, 0) 100%
         ),
         var(--grain);
     background-size: auto, 180px 180px;
@@ -97,7 +97,7 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-    color: var(--paper);
+    color: var(--foam);
     pointer-events: none;
 }
 
@@ -275,9 +275,9 @@
     align-items: center;
     justify-content: center;
     padding: 0.55rem 1.05rem;
-    background: rgba(244, 239, 230, 0.14);
-    color: var(--paper);
-    border: 1px solid rgba(244, 239, 230, 0.55);
+    background: color-mix(in srgb, var(--ink) 14%, transparent);
+    color: var(--ink);
+    border: 1px solid color-mix(in srgb, var(--ink) 55%, transparent);
     font-family: var(--font-ui);
     font-size: 0.72rem;
     font-weight: 700;
@@ -288,8 +288,9 @@
 
 .theme-home .home-hero-pills a:hover,
 .theme-home .home-hero-pills a:focus-visible {
-    background: var(--paper);
-    color: var(--ink);
+    background: var(--alpine);
+    color: var(--foam);
+    border-color: var(--alpine);
     text-decoration: none;
 }
 
@@ -316,14 +317,14 @@
     aspect-ratio: 2 / 3;
     min-height: 28rem;
     overflow: hidden;
-    color: var(--paper);
+    color: var(--foam);
     text-decoration: none;
     background: var(--night);
 }
 
 .theme-home .home-feature:hover,
 .theme-home .home-feature:focus-visible {
-    color: var(--paper);
+    color: var(--foam);
     text-decoration: none;
 }
 
@@ -346,7 +347,7 @@
     position: absolute;
     inset: 0;
     background:
-        linear-gradient(to top, rgba(21, 19, 15, 0.82) 0%, rgba(21, 19, 15, 0.12) 58%),
+        linear-gradient(to top, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.12) 58%),
         var(--grain);
     background-size: auto, 180px 180px;
     mix-blend-mode: multiply;
@@ -369,7 +370,7 @@
     font-weight: 700;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: rgba(244, 239, 230, 0.78);
+    color: color-mix(in srgb, var(--ink) 78%, transparent);
 }
 
 .theme-home .home-feature-title {
@@ -533,7 +534,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, rgba(21, 19, 15, 0.35) 0%, transparent 50%);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.35) 0%, transparent 50%);
 }
 
 .home-destination::after {
@@ -660,14 +661,14 @@
     align-items: flex-end;
     background-size: cover;
     background-position: center;
-    color: var(--paper);
+    color: var(--foam);
 }
 
 .theme-home .home-mission::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, rgba(21, 19, 15, 0.78) 0%, rgba(21, 19, 15, 0.2) 55%);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.2) 55%);
 }
 
 .theme-home .home-mission::after {
@@ -690,7 +691,7 @@
 }
 
 .theme-home .home-mission .kicker {
-    color: rgba(244, 239, 230, 0.8);
+    color: color-mix(in srgb, var(--ink) 80%, transparent);
 }
 
 .theme-home .home-mission-title {
@@ -716,9 +717,9 @@
 }
 
 .theme-home .home-mission .btn-primary:hover {
-    background: var(--paper);
-    border-color: var(--paper);
-    color: var(--ink);
+    background: transparent;
+    border-color: var(--foam);
+    color: var(--foam);
 }
 
 @media (max-width: 900px) {

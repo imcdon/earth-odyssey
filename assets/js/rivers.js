@@ -5,6 +5,17 @@
 (function () {
     'use strict';
 
+    /* Prefer the previous page when the visitor came from this site; otherwise use the map href. */
+    document.querySelectorAll('[data-river-back]').forEach(function (link) {
+        link.addEventListener('click', function (e) {
+            if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+            var sameOrigin = document.referrer && document.referrer.indexOf(location.origin) === 0;
+            if (!sameOrigin) return;
+            e.preventDefault();
+            history.back();
+        });
+    });
+
     var root = document.querySelector('[data-river-page]');
     if (!root) return;
 
@@ -31,14 +42,14 @@
     /* Mirrors river_convert() in includes/rivers.php. */
     function convert(code, v, units) {
         if (v == null) return null;
-        if (code === '00010') return units === 'us' ? v * 9 / 5 + 32 : v;
+        if (code === '00010' || code === '00020') return units === 'us' ? v * 9 / 5 + 32 : v;
         if (code === '00060') return units === 'metric' ? v * 0.0283168 : v;
         if (code === '00065') return units === 'metric' ? v * 0.3048 : v;
         return v;
     }
 
     function unitLabel(code, units, fallback) {
-        if (code === '00010') return units === 'us' ? '°F' : '°C';
+        if (code === '00010' || code === '00020') return units === 'us' ? '°F' : '°C';
         if (code === '00060') return units === 'metric' ? 'm³/s' : 'cfs';
         if (code === '00065') return units === 'metric' ? 'm' : 'ft';
         return fallback || '';
@@ -62,6 +73,18 @@
         return new Date(t).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
     }
 
+    function apiPost(action, payload) {
+        return fetch(api + '?action=' + encodeURIComponent(action), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-Token': root.getAttribute('data-csrf') || ''
+            },
+            body: JSON.stringify(Object.assign({ csrf: root.getAttribute('data-csrf') || '' }, payload || {}))
+        }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, status: r.status, body: j }; }); });
+    }
+
     var page = root.getAttribute('data-river-page');
     if (page === 'home') {
         initStateMap();
@@ -70,9 +93,11 @@
     if (page === 'index') initIndex();
     else if (page === 'browse') initBrowse();
     else if (page === 'offline') initOfflinePage();
+    else if (page === 'dashboard') initDashboard();
     else initSite();
     initOffline();
     initStateMap();
+    maybeImportFavorites();
 
     /* ---------- Offline support (services/rivers/sw.js) ---------- */
 
@@ -136,7 +161,7 @@
             root.querySelectorAll('[data-delta]').forEach(function (node) {
                 var code = node.getAttribute('data-code');
                 var v = parseFloat(node.getAttribute('data-delta'));
-                var shown = code === '00010' ? (units === 'us' ? v * 9 / 5 : v) : convert(code, v, units);
+                var shown = (code === '00010' || code === '00020') ? (units === 'us' ? v * 9 / 5 : v) : convert(code, v, units);
                 node.textContent = (shown > 0 ? '+' : '') + fmt(shown) + ' ' + unitLabel(code, units);
             });
             root.querySelectorAll('.river-mover-range').forEach(function (node) {
@@ -261,13 +286,16 @@
         });
     }
 
-    /* ---------- Index: search + favorites ---------- */
+    /* ---------- Index: search + favorites + state map ---------- */
 
     function initIndex() {
         var siteUrl = root.getAttribute('data-site-url');
         function hrefFor(id) { return siteUrl + '?id=' + encodeURIComponent(id); }
 
         initSearch();
+        initMapfillChrome();
+        initStateGaugeMap();
+        initStatePanels();
 
         var favSection = root.querySelector('[data-river-favs]');
         var favs = favorites();
@@ -287,10 +315,469 @@
                 .then(function (data) {
                     Object.keys(data.badges || {}).forEach(function (id) {
                         var b = data.badges[id];
-                        if (items[id]) items[id].appendChild(el('span', { class: 'river-badge is-' + b.level, title: b.title }, b.label));
+                        if (items[id]) {
+                            var inRange = b.level === 'prime' || b.level === 'fishable';
+                            var badge = el('span', {
+                                class: 'river-badge is-' + b.level + (inRange ? ' is-fish' : ' is-alert'),
+                                title: b.title
+                            });
+                            badge.appendChild(el('span', { class: 'river-badge-mark', 'aria-hidden': 'true' }));
+                            badge.appendChild(document.createTextNode(b.label));
+                            items[id].appendChild(badge);
+                        }
                     });
                 })
                 .catch(function () { /* badges are optional */ });
+        }
+    }
+
+    /* Keep the map viewport flush under the real site header (padding can exceed --header-height). */
+    function initMapfillChrome() {
+        if (!document.body.classList.contains('rivers-mapfill')) return;
+        var header = document.querySelector('.site-header');
+        if (!header) return;
+        function sync() {
+            document.body.style.setProperty('--rivers-header-offset', header.getBoundingClientRect().height + 'px');
+        }
+        sync();
+        window.addEventListener('resize', sync);
+        if (window.ResizeObserver) new ResizeObserver(sync).observe(header);
+    }
+
+    /* Sparkline path from native values (same geometry as PHP river_sparkline). */
+    function sparkSvg(values) {
+        var pts = (values || []).filter(function (v) { return typeof v === 'number' && !isNaN(v); });
+        if (pts.length < 2) return '';
+        var min = Math.min.apply(null, pts);
+        var range = (Math.max.apply(null, pts) - min) || 1;
+        var d = '';
+        pts.forEach(function (v, i) {
+            d += (i ? 'L' : 'M') + Math.round(i / (pts.length - 1) * 84) + ' '
+                + Math.round(22 - (v - min) / range * 20);
+        });
+        return '<svg class="river-spark" viewBox="0 0 84 24" aria-hidden="true"><path d="' + d + '"/></svg>';
+    }
+
+    function mapTooltipHtml(site) {
+        var html = '<div class="river-map-tip">';
+        html += '<p class="river-map-tip-name">' + escapeHtml(site.name) + '</p>';
+        html += '<p class="river-map-tip-id">USGS ' + escapeHtml(site.siteNo) + '</p>';
+        if (site.trend) {
+            var t = site.trend;
+            var delta = (t.delta > 0 ? '+' : '') + fmt(t.delta) + ' ' + t.unit;
+            var pct = t.pct != null ? ' (' + (t.pct > 0 ? '+' : '') + fmt(t.pct) + '%)' : '';
+            html += '<p class="river-map-tip-flow">Flow ' + fmt(t.now) + ' ' + escapeHtml(t.unit)
+                + ' · 24h ' + delta + pct + '</p>';
+            html += sparkSvg(t.spark);
+        } else {
+            html += '<p class="river-map-tip-flow">24h flow trend not available yet</p>';
+        }
+        if (site.badge) {
+            var inRangeTip = site.badge.level === 'prime' || site.badge.level === 'fishable';
+            html += '<span class="river-badge is-' + escapeHtml(site.badge.level)
+                + (inRangeTip ? ' is-fish' : ' is-alert') + '" title="'
+                + escapeHtml(site.badge.title) + '"><span class="river-badge-mark" aria-hidden="true"></span>'
+                + escapeHtml(site.badge.label) + '</span>';
+        }
+        html += '</div>';
+        return html;
+    }
+
+    function escapeHtml(s) {
+        return String(s == null ? '' : s)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    var BADGE_STROKE = { prime: '#2f9bff', fishable: '#8a8a94', low: '#9b9ba3', high: '#62b4ff' };
+
+    function initStateGaugeMap() {
+        var section = root.querySelector('[data-river-state-map]');
+        var mapEl = document.getElementById('river-state-map');
+        var status = section && section.querySelector('[data-map-status]');
+        var caption = section && section.querySelector('[data-map-caption]');
+        if (!section || !mapEl || typeof L === 'undefined') {
+            if (status) status.textContent = 'Map could not load.';
+            return;
+        }
+
+        var state = root.getAttribute('data-state');
+        var siteUrl = root.getAttribute('data-site-url');
+        var units = root.getAttribute('data-units') || 'us';
+        if (!/[?&]units=/.test(location.search) && store(UNITS_KEY) === 'metric') {
+            units = 'metric';
+            root.setAttribute('data-units', units);
+        }
+
+        var map = L.map(mapEl, { scrollWheelZoom: false, attributionControl: true });
+        /* Esri World Topo: free raster tiles with clear river/lake linework (no API key). */
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, USGS, NOAA, and others',
+            maxZoom: 16
+        }).addTo(map);
+        map.setView([39.5, -98.35], 4);
+
+        var layer = L.layerGroup().addTo(map);
+        var openTip = null;
+
+        function setStatus(msg, isError) {
+            if (!status) return;
+            status.hidden = !msg;
+            status.textContent = msg || '';
+            status.classList.toggle('is-error', !!isError);
+        }
+
+        function paintUnits() {
+            root.querySelectorAll('[data-units-btn]').forEach(function (b) {
+                b.setAttribute('aria-pressed', b.getAttribute('data-units-btn') === units ? 'true' : 'false');
+            });
+            var q = new URLSearchParams(location.search);
+            q.set('units', units);
+            history.replaceState(null, '', '?' + q.toString());
+        }
+
+        function render(data) {
+            layer.clearLayers();
+            openTip = null;
+            var sites = data.sites || [];
+            if (!sites.length) {
+                setStatus('No gauges with map coordinates for this state yet.', true);
+                if (caption) caption.hidden = true;
+                return;
+            }
+
+            setStatus('');
+            var bounds = [];
+            sites.forEach(function (site) {
+                var stroke = (site.badge && BADGE_STROKE[site.badge.level]) || '#2f9bff';
+                var marker = L.circleMarker([site.lat, site.lon], {
+                    radius: 6,
+                    weight: 2,
+                    color: stroke,
+                    fillColor: '#2f9bff',
+                    fillOpacity: 0.85,
+                    className: 'river-map-pin'
+                });
+                marker.bindTooltip(mapTooltipHtml(site), {
+                    className: 'river-map-tooltip',
+                    direction: 'top',
+                    offset: [0, -8],
+                    opacity: 1,
+                    sticky: false
+                });
+                marker.on('click', function (e) {
+                    var href = siteUrl + '?id=' + encodeURIComponent(site.id);
+                    /* Touch: first tap sticks the tip; second tap opens the gauge. */
+                    if (window.matchMedia('(pointer: coarse)').matches) {
+                        L.DomEvent.stopPropagation(e);
+                        if (openTip === marker && marker.isTooltipOpen()) {
+                            window.location.href = href;
+                            return;
+                        }
+                        if (openTip && openTip !== marker) openTip.closeTooltip();
+                        marker.openTooltip();
+                        openTip = marker;
+                        return;
+                    }
+                    window.location.href = href;
+                });
+                marker.on('tooltipopen', function () { openTip = marker; });
+                marker.on('tooltipclose', function () {
+                    if (openTip === marker) openTip = null;
+                });
+                marker.addTo(layer);
+                bounds.push([site.lat, site.lon]);
+            });
+
+            if (bounds.length === 1) {
+                map.setView(bounds[0], 9);
+            } else {
+                map.fitBounds(bounds, { padding: [28, 28], maxZoom: 10 });
+            }
+
+            if (caption) {
+                var bits = [sites.length + ' gauge' + (sites.length === 1 ? '' : 's') + ' on the map'];
+                if (data.missingCoords > 0) {
+                    bits.push(data.missingCoords + ' without coordinates (still in Browse gauges)');
+                }
+                bits.push('Hover a pin for flow trend; tap or click to open the gauge');
+                caption.textContent = bits.join(' · ');
+                caption.hidden = false;
+            }
+            map.invalidateSize();
+        }
+
+        function load() {
+            setStatus('Loading gauges…');
+            fetch(api + '?action=statemap&state=' + encodeURIComponent(state) + '&units=' + encodeURIComponent(units))
+                .then(function (r) {
+                    if (!r.ok) throw new Error('bad status');
+                    return r.json();
+                })
+                .then(render)
+                .catch(function () {
+                    setStatus('Could not load the map. Browse gauges below still works.', true);
+                    if (caption) caption.hidden = true;
+                });
+        }
+
+        root.querySelectorAll('[data-units-btn]').forEach(function (b) {
+            b.addEventListener('click', function () {
+                units = b.getAttribute('data-units-btn');
+                store(UNITS_KEY, units);
+                root.setAttribute('data-units', units);
+                paintUnits();
+                load();
+                root.dispatchEvent(new CustomEvent('eo-river-units', { detail: { units: units } }));
+            });
+        });
+
+        paintUnits();
+        load();
+
+        map.on('click', function () {
+            if (openTip) openTip.closeTooltip();
+        });
+
+        var resizeTimer = null;
+        function refreshMapSize() {
+            map.invalidateSize();
+        }
+        window.addEventListener('resize', function () {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(refreshMapSize, 150);
+        });
+        if (window.ResizeObserver) {
+            var stage = root.querySelector('.rivers-map-stage');
+            if (stage) {
+                new ResizeObserver(function () { refreshMapSize(); }).observe(stage);
+            }
+        }
+        requestAnimationFrame(refreshMapSize);
+    }
+
+    /* ---------- State ranking panels (under the map) ---------- */
+
+    function initStatePanels() {
+        var section = root.querySelector('[data-river-state-panels]');
+        if (!section) return;
+
+        var state = root.getAttribute('data-state');
+        var siteUrl = root.getAttribute('data-site-url');
+        var units = root.getAttribute('data-units') || 'us';
+        if (!/[?&]units=/.test(location.search) && store(UNITS_KEY) === 'metric') {
+            units = 'metric';
+            root.setAttribute('data-units', units);
+        }
+
+        var cache = null;
+
+        function rowHtml(row) {
+            var html = '<li class="river-panel-row">';
+            html += '<a class="river-panel-name" href="' + siteUrl + '?id=' + encodeURIComponent(row.id) + '">'
+                + escapeHtml(row.name) + '</a>';
+            html += '<span class="river-panel-stat">' + escapeHtml(row.stat || '') + '</span>';
+            html += sparkSvg(row.spark || (row.trend && row.trend.spark) || []);
+            html += '</li>';
+            return html;
+        }
+
+        function paint(data) {
+            cache = data;
+            var panels = (data && data.panels) || {};
+            section.querySelectorAll('[data-panel]').forEach(function (details) {
+                var key = details.getAttribute('data-panel');
+                var panel = panels[key] || { rows: [], empty: 'No data.', title: key };
+                var list = details.querySelector('[data-panel-list]');
+                var status = details.querySelector('[data-panel-status]');
+                var count = details.querySelector('[data-panel-count]');
+                var rows = panel.rows || [];
+                if (count) count.textContent = rows.length ? String(rows.length) : '';
+                if (!rows.length) {
+                    if (status) {
+                        status.hidden = false;
+                        status.textContent = panel.empty || 'No data.';
+                    }
+                    if (list) {
+                        list.hidden = true;
+                        list.innerHTML = '';
+                    }
+                    return;
+                }
+                if (status) status.hidden = true;
+                if (list) {
+                    list.innerHTML = rows.map(rowHtml).join('');
+                    list.hidden = false;
+                }
+            });
+        }
+
+        function load() {
+            section.querySelectorAll('[data-panel-status]').forEach(function (s) {
+                s.hidden = false;
+                s.textContent = 'Loading…';
+            });
+            fetch(api + '?action=statepanels&state=' + encodeURIComponent(state) + '&units=' + encodeURIComponent(units))
+                .then(function (r) {
+                    if (!r.ok) throw new Error('bad status');
+                    return r.json();
+                })
+                .then(paint)
+                .catch(function () {
+                    section.querySelectorAll('[data-panel-status]').forEach(function (s) {
+                        s.hidden = false;
+                        s.textContent = 'Could not load rankings.';
+                    });
+                });
+        }
+
+        root.addEventListener('eo-river-units', function (e) {
+            units = (e.detail && e.detail.units) || units;
+            load();
+        });
+
+        load();
+    }
+
+    function maybeImportFavorites() {
+        if (root.getAttribute('data-logged-in') !== '1') return;
+        if (!root.getAttribute('data-csrf')) return;
+        var flag = 'eo-river-favs-imported';
+        try { if (localStorage.getItem(flag) === '1') return; } catch (e) { return; }
+        var favs = favorites();
+        if (!favs.length) {
+            try { localStorage.setItem(flag, '1'); } catch (e2) {}
+            return;
+        }
+        apiPost('importfavs', { favorites: favs }).then(function () {
+            try { localStorage.setItem(flag, '1'); } catch (e3) {}
+        }).catch(function () {});
+    }
+
+    function initDashboard() {
+        root.querySelectorAll('[data-unsave-site]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var id = btn.getAttribute('data-unsave-site');
+                apiPost('unsave', { site: id }).then(function (res) {
+                    if (!res.ok) return;
+                    var panel = root.querySelector('[data-dash-site="' + id + '"]');
+                    if (panel) panel.remove();
+                });
+            });
+        });
+        var mark = root.querySelector('[data-alerts-mark-read]');
+        if (mark) {
+            mark.addEventListener('click', function () {
+                apiPost('alertsread', {}).then(function () {
+                    root.querySelectorAll('.river-alert-item.is-unread').forEach(function (li) {
+                        li.classList.remove('is-unread');
+                    });
+                });
+            });
+        }
+        root.querySelectorAll('[data-dash-chart]').forEach(function (box) {
+            var siteId = box.getAttribute('data-site');
+            var param = box.getAttribute('data-param') || '00060';
+            var units = root.getAttribute('data-units') || 'us';
+            fetch(api + '?action=series&site=' + encodeURIComponent(siteId) + '&win=1W')
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    if (!data.ok || !window.uPlot || !data.params) {
+                        box.textContent = '';
+                        box.appendChild(el('p', { class: 'river-chart-message' }, 'Chart unavailable.'));
+                        return;
+                    }
+                    var p = data.params[param] || data.params[Object.keys(data.params)[0]];
+                    if (!p || !data.x || !p.cur || p.cur.length < 2) {
+                        box.textContent = '';
+                        box.appendChild(el('p', { class: 'river-chart-message' }, 'Not enough data for a chart.'));
+                        return;
+                    }
+                    var code = param in data.params ? param : Object.keys(data.params)[0];
+                    var ys = p.cur.map(function (v) { return convert(code, v, units); });
+                    box.textContent = '';
+                    // eslint-disable-next-line no-new
+                    new uPlot({
+                        width: Math.max(280, box.clientWidth || 480),
+                        height: 160,
+                        series: [{}, { stroke: '#2f9bff', width: 2, spanGaps: true }],
+                        axes: [
+                            { stroke: '#9b9ba3', grid: { stroke: '#2c2c32' } },
+                            { stroke: '#9b9ba3', grid: { stroke: '#2c2c32' } }
+                        ],
+                        scales: { x: { time: true } }
+                    }, [data.x, ys], box);
+                })
+                .catch(function () {
+                    box.textContent = '';
+                    box.appendChild(el('p', { class: 'river-chart-message' }, 'Chart unavailable.'));
+                });
+        });
+    }
+
+    function initSiteAccountForms() {
+        if (root.getAttribute('data-logged-in') !== '1') return;
+        var siteId = root.getAttribute('data-site');
+
+        root.querySelectorAll('[data-apply-auto]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var code = btn.getAttribute('data-apply-auto');
+                var fieldset = root.querySelector('[data-range-param="' + code + '"]');
+                if (!fieldset) return;
+                fieldset.querySelectorAll('input[data-auto-value]').forEach(function (input) {
+                    input.value = input.getAttribute('data-auto-value') || '';
+                });
+            });
+        });
+
+        var rangeForm = root.querySelector('[data-user-range-form]');
+        if (rangeForm) {
+            rangeForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                var fd = new FormData(rangeForm);
+                var payload = { site: siteId, units: fd.get('units') || 'us', r: {} };
+                fd.forEach(function (val, key) {
+                    var m = /^r\[(\w+)\]\[(\w+)\]$/.exec(key);
+                    if (!m) return;
+                    payload.r[m[1]] = payload.r[m[1]] || {};
+                    payload.r[m[1]][m[2]] = val;
+                });
+                var ok = root.querySelector('[data-range-status]');
+                var err = root.querySelector('[data-range-error]');
+                apiPost('userranges', payload).then(function (res) {
+                    if (ok) { ok.hidden = !!res.ok; ok.textContent = res.ok ? 'Ranges saved.' : ''; }
+                    if (err) { err.hidden = res.ok; err.textContent = res.ok ? '' : (res.body.error || 'Could not save.'); }
+                });
+            });
+        }
+
+        var alertForm = root.querySelector('[data-alert-form]');
+        if (alertForm) {
+            alertForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                var fd = new FormData(alertForm);
+                var payload = { site: siteId };
+                fd.forEach(function (val, key) { payload[key] = val; });
+                ['trigger_enter_prime', 'trigger_leave_fishable', 'trigger_above_high', 'trigger_below_low', 'trigger_unusual', 'channel_in_app', 'channel_email', 'channel_sms'].forEach(function (k) {
+                    if (!(k in payload)) payload[k] = 0;
+                });
+                var ok = root.querySelector('[data-alert-status]');
+                var err = root.querySelector('[data-alert-error]');
+                apiPost('alertsave', payload).then(function (res) {
+                    if (ok) { ok.hidden = !res.ok; ok.textContent = res.ok ? 'Alerts saved.' : ''; }
+                    if (err) { err.hidden = res.ok; err.textContent = res.ok ? '' : (res.body.error || 'Could not save.'); }
+                });
+            });
+        }
+
+        var del = root.querySelector('[data-alert-delete]');
+        if (del && alertForm) {
+            del.addEventListener('click', function () {
+                var param = (alertForm.querySelector('[name=param]') || {}).value || '00060';
+                apiPost('alertdelete', { site: siteId, param: param }).then(function (res) {
+                    if (res.ok) location.reload();
+                });
+            });
         }
     }
 
@@ -299,6 +786,7 @@
     function initSite() {
         var siteId = root.getAttribute('data-site');
         var siteName = root.getAttribute('data-name');
+        var loggedIn = root.getAttribute('data-logged-in') === '1';
         var state = {
             win: root.getAttribute('data-win'),
             param: root.getAttribute('data-param'),
@@ -313,21 +801,37 @@
 
         if (!/[?&]units=/.test(location.search) && store(UNITS_KEY) === 'metric') state.units = 'metric';
 
-        // Favorites toggle
-        var favBtn = root.querySelector('[data-river-fav]');
-        function paintFav() {
-            var on = favorites().some(function (f) { return f.id === siteId; });
-            favBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
-            favBtn.textContent = on ? '★ Saved' : '☆ Save to favorites';
+        var saveBtn = root.querySelector('[data-river-save]');
+        if (saveBtn && loggedIn) {
+            saveBtn.addEventListener('click', function () {
+                var on = saveBtn.getAttribute('aria-pressed') === 'true';
+                apiPost(on ? 'unsave' : 'save', { site: siteId }).then(function (res) {
+                    if (!res.ok) return;
+                    saveBtn.setAttribute('aria-pressed', on ? 'false' : 'true');
+                    saveBtn.textContent = on ? '☆ Save to my rivers' : '★ Saved to my rivers';
+                });
+            });
         }
-        favBtn.addEventListener('click', function () {
-            var list = favorites().filter(function (f) { return f.id !== siteId; });
-            if (favBtn.getAttribute('aria-pressed') !== 'true') list.unshift({ id: siteId, name: siteName });
-            store(FAV_KEY, list.slice(0, 30));
+
+        // Anonymous favorites toggle
+        var favBtn = root.querySelector('[data-river-fav]');
+        if (favBtn) {
+            function paintFav() {
+                var on = favorites().some(function (f) { return f.id === siteId; });
+                favBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+                favBtn.textContent = on ? '★ Saved' : '☆ Save to favorites';
+            }
+            favBtn.addEventListener('click', function () {
+                var list = favorites().filter(function (f) { return f.id !== siteId; });
+                if (favBtn.getAttribute('aria-pressed') !== 'true') list.unshift({ id: siteId, name: siteName });
+                store(FAV_KEY, list.slice(0, 30));
+                paintFav();
+                tellWorker({ type: 'sync', favorites: favorites() });
+            });
             paintFav();
-            tellWorker({ type: 'sync', favorites: favorites() });
-        });
-        paintFav();
+        }
+
+        initSiteAccountForms();
 
         if (root.getAttribute('data-offline') === '1') {
             var bar = el('p', { class: 'river-offline-bar', role: 'status' },
@@ -403,12 +907,12 @@
                 cursor: { drag: { x: false, y: false } },
                 series: [
                     {},
-                    { label: 'This period (' + curYear + ')', stroke: '#9e2a2b', width: 2, value: function (u, v) { return fmt(v) + ' ' + unit; } },
-                    { label: 'Same dates ' + prevYear, stroke: '#5e574c', width: 1.5, dash: [6, 4], value: function (u, v) { return fmt(v) + ' ' + unit; } }
+                    { label: 'This period (' + curYear + ')', stroke: '#2f9bff', width: 2, value: function (u, v) { return fmt(v) + ' ' + unit; } },
+                    { label: 'Same dates ' + prevYear, stroke: '#9b9ba3', width: 1.5, dash: [6, 4], value: function (u, v) { return fmt(v) + ' ' + unit; } }
                 ],
                 axes: [
-                    { stroke: '#5e574c', grid: { stroke: '#e9e1d2' }, ticks: { stroke: '#d5cab6' } },
-                    { stroke: '#5e574c', grid: { stroke: '#e9e1d2' }, ticks: { stroke: '#d5cab6' }, size: 64, label: p.label + ' (' + unit + ')',
+                    { stroke: '#9b9ba3', grid: { stroke: '#2c2c32' }, ticks: { stroke: '#2c2c32' } },
+                    { stroke: '#9b9ba3', grid: { stroke: '#2c2c32' }, ticks: { stroke: '#2c2c32' }, size: 64, label: p.label + ' (' + unit + ')',
                       values: function (u, vals) { return vals.map(fmt); } }
                 ]
             }, data, chartBox);
@@ -427,7 +931,7 @@
                 var unit = unitLabel(code, state.units, p.unit);
                 var s = p.stats;
                 var change = '–';
-                if (code === '00010' && s.change_abs != null) {
+                if ((code === '00010' || code === '00020') && s.change_abs != null) {
                     var delta = state.units === 'us' ? s.change_abs * 9 / 5 : s.change_abs;
                     change = (delta > 0 ? '+' : '') + fmt(delta) + ' ' + unit;
                 } else if (s.change_pct != null) {

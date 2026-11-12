@@ -11,11 +11,14 @@ require __DIR__ . '/../../includes/header.php';
 ?>
 
 <div class="rivers-page" data-river-page="offline" data-api="<?= htmlspecialchars(url('services/rivers/api.php')) ?>">
-    <header class="rivers-head">
+    <header class="rivers-head rivers-head--compact">
         <div class="container">
             <p class="kicker">Stream gauges</p>
             <h1 class="rivers-title">You're offline</h1>
             <p class="rivers-intro">This page wasn't saved on your phone. These rivers are, with their readings and charts from the last time you had signal.</p>
+            <div class="rivers-head-tools">
+                <a class="rivers-map-back" href="<?= htmlspecialchars(url('services/rivers/')) ?>" data-river-back>&larr; Back</a>
+            </div>
         </div>
     </header>
 

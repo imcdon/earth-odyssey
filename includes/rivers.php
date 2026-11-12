@@ -44,7 +44,10 @@ const RIVER_STATE_NAMES = [
     'PR' => 'Puerto Rico',
 ];
 
-const RIVER_PARAM_SHORT = ['00060' => 'Flow', '00065' => 'Height', '00010' => 'Temp', '63680' => 'Turbidity', '00300' => 'Oxygen'];
+const RIVER_PARAM_SHORT = [
+    '00060' => 'Flow', '00065' => 'Height', '00010' => 'Water', '00020' => 'Air',
+    '63680' => 'Turbidity', '00300' => 'Oxygen',
+];
 
 const RIVER_NAME_WORDS = [
     'R' => 'River', 'RV' => 'River', 'C' => 'Creek', 'CR' => 'Creek', 'CK' => 'Creek', 'LK' => 'Lake',
@@ -97,8 +100,8 @@ function river_site_url(string $siteId, array $query = []): string
 function river_convert(string $code, float $value, string $units): array
 {
     return match (true) {
-        $code === '00010' && $units === 'us'     => [$value * 9 / 5 + 32, '°F'],
-        $code === '00010'                        => [$value, '°C'],
+        ($code === '00010' || $code === '00020') && $units === 'us' => [$value * 9 / 5 + 32, '°F'],
+        $code === '00010' || $code === '00020'                     => [$value, '°C'],
         $code === '00060' && $units === 'metric' => [$value * 0.0283168, 'm³/s'],
         $code === '00060'                        => [$value, 'cfs'],
         $code === '00065' && $units === 'metric' => [$value * 0.3048, 'm'],

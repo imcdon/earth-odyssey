@@ -3,7 +3,7 @@
  * gallery-photos.php - Editor: upload and manage photos inside a gallery category.
  */
 require __DIR__ . '/../includes/config.php';
-require __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/auth.php';
 require __DIR__ . '/../includes/gallery-photos.php';
 
 require_role('editor');

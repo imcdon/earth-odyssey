@@ -3,9 +3,9 @@
  * account.php - Change the logged-in user's password.
  */
 require __DIR__ . '/../includes/config.php';
-require __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/auth.php';
 
-$user = require_login();
+$user = require_staff();
 $error = '';
 $message = '';
 

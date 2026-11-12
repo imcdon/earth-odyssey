@@ -1,9 +1,10 @@
 -- seed.sql - Sample users and published articles for Earth Odyssey.
 USE earth_odyssey;
 
-INSERT INTO users (username, password_hash, role) VALUES
-('editor', '!', 'editor'),
-('author', '!', 'author');
+-- Deploy / production: keep only the admin (editor) row. Local seed also includes an author for CMS testing.
+INSERT INTO users (username, password_hash, role, account_status, perm_library, perm_tools, perm_own_ranges, perm_fishing_reports, reviewed_at) VALUES
+('editor', '!', 'editor', 'approved', 1, 1, 1, 1, CURRENT_TIMESTAMP),
+('author', '!', 'author', 'approved', 1, 1, 1, 1, CURRENT_TIMESTAMP);
 
 -- Accounts start with login disabled ('!' is not a valid hash). Set real passwords with:
 --   php database/set-password.php editor

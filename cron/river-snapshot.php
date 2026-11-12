@@ -3,6 +3,7 @@
  * river-snapshot.php - Hourly: save the latest readings, rank the biggest 24-hour and 1-week changes for each
  * state in usgs.config.php, and warm the cache for the most-viewed rivers.
  * cPanel cron (minute 17, away from the top-of-hour rush): 17 * * * * php $HOME/public_html/cron/river-snapshot.php
+ * Follow with river-alerts.php a few minutes later (e.g. minute 20).
  * Local:                                                    C:\xampp\php\php.exe cron\river-snapshot.php
  */
 if (PHP_SAPI !== 'cli') {

@@ -4,8 +4,11 @@
  * cron/river-snapshot.php. Reads MySQL only; never calls USGS.
  */
 require __DIR__ . '/../../includes/config.php';
+require_once __DIR__ . '/../../includes/auth.php';
 require __DIR__ . '/../../includes/river-movers.php';
-require __DIR__ . '/../../includes/river-ranges.php';
+require_once __DIR__ . '/../../includes/river-ranges.php';
+
+require_permission('tools');
 
 $states = river_states();
 $state = strtoupper((string) ($_GET['state'] ?? ''));
@@ -25,6 +28,7 @@ $badges = $state ? river_badges_from_snapshots(river_ranges_for_state($state)) :
 $sections = [
     '00060' => ['title' => 'Flow', 'note' => 'Ranked by percent change. Gauges under ' . RIVER_MOVER_MIN_CFS . ' cfs are left out.'],
     '00010' => ['title' => 'Water temperature', 'note' => 'Ranked by degrees of change.'],
+    '00020' => ['title' => 'Air temperature', 'note' => 'Ranked by degrees of change.'],
     '00065' => ['title' => 'Gage height', 'note' => 'Ranked by change in water level.'],
 ];
 
@@ -56,7 +60,7 @@ function mover_row(array $m, string $code, string $win, string $units, array $ba
 
 function mover_delta_text(string $code, float $delta, string $units): string
 {
-    $shown = $code === '00010' ? ($units === 'us' ? $delta * 9 / 5 : $delta) : river_convert($code, $delta, $units)[0];
+    $shown = ($code === '00010' || $code === '00020') ? ($units === 'us' ? $delta * 9 / 5 : $delta) : river_convert($code, $delta, $units)[0];
     return ($shown > 0 ? '+' : '') . river_format($shown) . ' ' . river_convert($code, 0, $units)[1];
 }
 
@@ -66,23 +70,24 @@ require __DIR__ . '/../../includes/header.php';
 ?>
 
 <div class="rivers-page river-browse" data-river-page="browse" data-units="<?= htmlspecialchars($units) ?>" data-api="<?= htmlspecialchars(url('services/rivers/api.php')) ?>">
-    <header class="rivers-head">
+    <header class="rivers-head rivers-head--compact">
         <div class="container">
             <p class="kicker"><a href="<?= htmlspecialchars(url('services/rivers/') . ($state ? '?state=' . $state : '')) ?>">Stream gauges</a><?= $state ? ' &middot; ' . htmlspecialchars($stateName) : '' ?></p>
             <h1 class="rivers-title">Biggest changes</h1>
             <p class="rivers-intro">Which rivers are rising, dropping, warming, or cooling fastest right now. Rankings update every hour.</p>
-            <?php if ($state): ?>
-            <div class="river-site-actions">
-                <a class="rivers-change-state" href="<?= htmlspecialchars(url('services/rivers/browse.php')) ?>">Change state</a>
-                <div class="river-units" role="group" aria-label="Units">
-                    <button type="button" data-units-btn="us" aria-pressed="<?= $units === 'us' ? 'true' : 'false' ?>">US</button>
-                    <button type="button" data-units-btn="metric" aria-pressed="<?= $units === 'metric' ? 'true' : 'false' ?>">Metric</button>
-                </div>
-                <?php if ($data['computed_at']): ?>
-                    <span class="rivers-count">Updated <?= htmlspecialchars(river_time_ago($data['computed_at'] . ' UTC')) ?></span>
+            <div class="rivers-head-tools">
+                <?php if ($state): ?>
+                    <a class="rivers-change-state" href="<?= htmlspecialchars(url('services/rivers/browse.php')) ?>">Change state</a>
+                    <div class="river-units" role="group" aria-label="Units">
+                        <button type="button" data-units-btn="us" aria-pressed="<?= $units === 'us' ? 'true' : 'false' ?>">US</button>
+                        <button type="button" data-units-btn="metric" aria-pressed="<?= $units === 'metric' ? 'true' : 'false' ?>">Metric</button>
+                    </div>
+                    <?php if ($data['computed_at']): ?>
+                        <span class="rivers-count">Updated <?= htmlspecialchars(river_time_ago($data['computed_at'] . ' UTC')) ?></span>
+                    <?php endif; ?>
                 <?php endif; ?>
+                <a class="rivers-map-back" href="<?= htmlspecialchars(url('services/rivers/') . ($state ? '?state=' . rawurlencode($state) : '')) ?>" data-river-back>&larr; Back</a>
             </div>
-            <?php endif; ?>
         </div>
     </header>
 

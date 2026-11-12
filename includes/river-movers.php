@@ -9,9 +9,9 @@
 require_once __DIR__ . '/rivers.php';
 
 /* How each measurement is ranked: percent change, or absolute change in native units. */
-const RIVER_MOVER_PARAMS = ['00060' => 'pct', '00010' => 'abs', '00065' => 'abs'];
+const RIVER_MOVER_PARAMS = ['00060' => 'pct', '00010' => 'abs', '00020' => 'abs', '00065' => 'abs'];
 /* Smallest change worth ranking: 1% flow, 0.2 °C, 0.1 ft. Filters sensor noise and near-still lakes. */
-const RIVER_MOVER_MIN_CHANGE = ['00060' => 1.0, '00010' => 0.2, '00065' => 0.1];
+const RIVER_MOVER_MIN_CHANGE = ['00060' => 1.0, '00010' => 0.2, '00020' => 0.2, '00065' => 0.1];
 const RIVER_MOVER_WINDOWS = ['24h' => '24 hours', '1w' => '1 week'];
 const RIVER_MOVER_LIMIT = 10;
 const RIVER_MOVER_MIN_CFS = 50;

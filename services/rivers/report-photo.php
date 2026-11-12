@@ -3,7 +3,7 @@
  * river-report-photo.php - Serves a report photo to staff who can see that report (photos live outside the web root).
  */
 require __DIR__ . '/../../includes/config.php';
-require __DIR__ . '/../../includes/auth.php';
+require_once __DIR__ . '/../../includes/auth.php';
 require __DIR__ . '/../../includes/river-reports.php';
 
 $user = current_user();
@@ -12,7 +12,7 @@ $stmt->execute([(int) ($_GET['id'] ?? 0)]);
 $photo = $stmt->fetch();
 
 $path = $photo ? river_report_photo_dir((int) $photo['report_id'], false) . '/' . basename($photo['file']) : '';
-if (!$user || !$photo || !river_report_can_edit($user, $photo) || !is_file($path)) {
+if (!$user || !user_has_permission('fishing_reports', $user) || !$photo || !river_report_can_edit($user, $photo) || !is_file($path)) {
     http_response_code(404);
     exit;
 }

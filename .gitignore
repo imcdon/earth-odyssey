@@ -1,5 +1,6 @@
 includes/db.config.php
 includes/usgs.config.php
+includes/notify.config.php
 
 # Runtime data (cache, uploads, logs)
 /storage/

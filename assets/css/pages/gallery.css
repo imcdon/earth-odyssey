@@ -3,7 +3,7 @@
  */
 
 .theme-gallery {
-    --gallery-gold: #c4a35a;
+    --gallery-gold: var(--alpine);
     background: var(--night);
 }
 
@@ -26,7 +26,7 @@
 
 .galleries-experience {
     background: var(--night);
-    color: var(--paper);
+    color: var(--foam);
     /* Contain panel margins so they don't collapse into main and flash paper. */
     padding-bottom: 3rem;
     overflow: hidden;
@@ -96,8 +96,8 @@
     inset: 0;
     z-index: 1;
     background:
-        linear-gradient(180deg, rgba(21, 19, 15, 0.3) 0%, transparent 40%, rgba(21, 19, 15, 0.78) 100%),
-        linear-gradient(90deg, rgba(21, 19, 15, 0.4) 0%, transparent 55%);
+        linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, transparent 40%, rgba(0, 0, 0, 0.78) 100%),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.4) 0%, transparent 55%);
     pointer-events: none;
 }
 
@@ -116,7 +116,7 @@
     line-height: 0.95;
     letter-spacing: 0.02em;
     text-transform: uppercase;
-    color: var(--paper);
+    color: var(--foam);
     text-shadow: 0 2px 28px rgba(0, 0, 0, 0.4);
 }
 
@@ -125,7 +125,7 @@
     font-family: var(--font-read);
     font-size: clamp(1.15rem, 2.4vw, 1.45rem);
     line-height: 1.35;
-    color: color-mix(in srgb, var(--paper) 90%, transparent);
+    color: color-mix(in srgb, var(--foam) 90%, transparent);
 }
 
 .galleries-hero-search {
@@ -242,7 +242,7 @@
     display: block;
     min-height: min(78vh, 40rem);
     overflow: hidden;
-    color: var(--paper);
+    color: var(--foam);
     text-decoration: none;
     border: 2px solid #000;
 }
@@ -253,14 +253,14 @@
 
 .galleries-panel:hover,
 .galleries-panel:focus-visible {
-    color: var(--paper);
+    color: var(--foam);
     text-decoration: none;
 }
 
 .galleries-panel-media {
     position: absolute;
     inset: 0;
-    background: #2a2620;
+    background: var(--paper-deep);
 }
 
 .galleries-panel-slide,
@@ -285,14 +285,14 @@
 .galleries-panel-placeholder {
     opacity: 1;
     transform: none;
-    background: color-mix(in srgb, var(--ink-soft) 35%, #2a2620);
+    background: color-mix(in srgb, var(--ink-soft) 35%, var(--paper-deep));
 }
 
 .galleries-panel-veil {
     position: absolute;
     inset: 0;
     z-index: 2;
-    background: linear-gradient(180deg, transparent 35%, rgba(21, 19, 15, 0.78) 100%);
+    background: linear-gradient(180deg, transparent 35%, rgba(0, 0, 0, 0.78) 100%);
     pointer-events: none;
 }
 
@@ -321,7 +321,7 @@
     font-family: var(--font-read);
     font-size: clamp(0.95rem, 1.6vw, 1.1rem);
     line-height: 1.4;
-    color: color-mix(in srgb, var(--paper) 86%, transparent);
+    color: color-mix(in srgb, var(--foam) 86%, transparent);
     text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
 }
 
@@ -332,7 +332,7 @@
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: color-mix(in srgb, var(--paper) 75%, transparent);
+    color: color-mix(in srgb, var(--foam) 75%, transparent);
 }
 
 .galleries-panel-thumbs {
@@ -352,14 +352,14 @@
         height: 66px;
         object-fit: cover;
         display: block;
-        border: 1px solid color-mix(in srgb, var(--paper) 35%, transparent);
+        border: 1px solid color-mix(in srgb, var(--foam) 35%, transparent);
         box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
     }
 }
 
 .galleries-empty {
     padding: 3rem 1.5rem 5rem;
-    color: color-mix(in srgb, var(--paper) 70%, transparent);
+    color: color-mix(in srgb, var(--foam) 70%, transparent);
 }
 
 /* —— Full-screen category viewer —— */
@@ -386,7 +386,7 @@ body.gallery-viewer-active main {
     display: grid;
     grid-template-rows: auto 1fr auto;
     background: #000;
-    color: #f4efe6;
+    color: var(--ink);
 }
 
 .gallery-viewer-top,
@@ -408,14 +408,14 @@ body.gallery-viewer-active main {
 }
 
 .gallery-viewer-back {
-    color: color-mix(in srgb, #f4efe6 75%, transparent);
+    color: color-mix(in srgb, var(--ink) 75%, transparent);
     font-size: 1.15rem;
     line-height: 1;
     text-decoration: none;
 }
 
 .gallery-viewer-back:hover {
-    color: #f4efe6;
+    color: var(--ink);
 }
 
 .gallery-viewer-category {
@@ -435,7 +435,7 @@ body.gallery-viewer-active main {
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: color-mix(in srgb, #f4efe6 65%, transparent);
+    color: color-mix(in srgb, var(--ink) 65%, transparent);
     text-align: right;
 }
 
@@ -466,7 +466,7 @@ body.gallery-viewer-active main {
     z-index: 2;
     background: transparent;
     border: 0;
-    color: color-mix(in srgb, #f4efe6 70%, transparent);
+    color: color-mix(in srgb, var(--ink) 70%, transparent);
     font-family: var(--font-display);
     font-size: 1.65rem;
     line-height: 1;
@@ -475,7 +475,7 @@ body.gallery-viewer-active main {
 }
 
 .gallery-viewer-nav:hover {
-    color: #f4efe6;
+    color: var(--ink);
 }
 
 .gallery-viewer-prev {
@@ -499,7 +499,7 @@ body.gallery-viewer-active main {
     font-family: var(--font-read);
     font-size: 0.92rem;
     line-height: 1.4;
-    color: color-mix(in srgb, #f4efe6 72%, transparent);
+    color: color-mix(in srgb, var(--ink) 72%, transparent);
 }
 
 .theme-gallery .coming-soon-hero {

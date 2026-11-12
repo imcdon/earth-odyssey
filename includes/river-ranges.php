@@ -2,13 +2,13 @@
 /*
  * river-ranges.php - Fishability ranges per river and the badge they produce.
  * Ranges are stored in USGS units (cfs, ft). A blank limit means no limit on that side.
- * Badge: inside the ideal band = Prime; inside the fishable band = Fishable; below/above it = Too low / Blown out.
+ * Badge: inside the fishable band (prime or fishable) = green Fish; below = Low alert; above = High alert.
  */
 require_once __DIR__ . '/rivers.php';
 
 const RIVER_RANGE_PARAMS = ['00060' => 'Flow', '00065' => 'Gage height'];
 const RIVER_RANGE_FIELDS = ['fish_low', 'ideal_low', 'ideal_high', 'fish_high'];
-const RIVER_BADGES = ['prime' => 'Prime', 'fishable' => 'Fishable', 'low' => 'Too low', 'high' => 'Blown out'];
+const RIVER_BADGES = ['prime' => 'Fish', 'fishable' => 'Fish', 'low' => 'Low', 'high' => 'High'];
 const RIVER_BADGE_MAX_AGE = 21600;
 const RIVER_ADMIN_TZ = 'America/New_York';
 
@@ -137,7 +137,11 @@ function river_badge_html(?array $b, string $units): string
     if (!$b) {
         return '';
     }
-    return '<span class="river-badge is-' . $b['level'] . '" title="' . htmlspecialchars(river_badge_title($b, $units)) . '">'
+    $inRange = in_array($b['level'], ['prime', 'fishable'], true);
+    $kind = $inRange ? 'fish' : 'alert';
+    return '<span class="river-badge is-' . htmlspecialchars($b['level']) . ' is-' . $kind . '" title="'
+        . htmlspecialchars(river_badge_title($b, $units)) . '">'
+        . '<span class="river-badge-mark" aria-hidden="true"></span>'
         . htmlspecialchars($b['label']) . '</span>';
 }
 

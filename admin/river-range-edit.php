@@ -4,10 +4,10 @@
  * Values can be entered in US or metric units; they are stored in cfs and feet.
  */
 require __DIR__ . '/../includes/config.php';
-require __DIR__ . '/../includes/auth.php';
-require __DIR__ . '/../includes/river-ranges.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/river-ranges.php';
 
-$user = require_login();
+$user = require_staff();
 $siteId = (string) ($_GET['site'] ?? '');
 $site = usgs_valid_site_id($siteId) ? river_site($siteId) : null;
 if (!$site) {

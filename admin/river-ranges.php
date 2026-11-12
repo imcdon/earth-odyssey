@@ -4,10 +4,10 @@
  * Editors and authors can set ranges.
  */
 require __DIR__ . '/../includes/config.php';
-require __DIR__ . '/../includes/auth.php';
-require __DIR__ . '/../includes/river-ranges.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/river-ranges.php';
 
-$user = require_login();
+$user = require_staff();
 $q = mb_substr(trim((string) ($_GET['q'] ?? '')), 0, 80);
 $results = $q !== '' ? river_search($q, 20) : [];
 $rivers = river_ranges_all();
@@ -32,7 +32,7 @@ function range_cell(?array $range): string
 <section class="container admin-page">
     <h1 class="section-title">Fishability ranges</h1>
     <p class="section-intro"><a href="<?= htmlspecialchars(url('admin/index.php')) ?>">&larr; Back to admin</a></p>
-    <p>Each river's badge compares its latest flow (or gage height, if it has no flow reading) with the range you set here: <span class="river-badge is-prime">Prime</span> <span class="river-badge is-fishable">Fishable</span> <span class="river-badge is-low">Too low</span> <span class="river-badge is-high">Blown out</span>. Rivers without a range show no badge.</p>
+    <p>Each river's badge compares its latest flow (or gage height, if it has no flow reading) with the range you set here: <span class="river-badge is-prime is-fish"><span class="river-badge-mark" aria-hidden="true"></span>Fish</span> when inside the fishable band, <span class="river-badge is-low is-alert"><span class="river-badge-mark" aria-hidden="true"></span>Low</span> or <span class="river-badge is-high is-alert"><span class="river-badge-mark" aria-hidden="true"></span>High</span> when outside it. Rivers without a range show no badge.</p>
 
     <form class="range-search" method="get" action="">
         <label for="q">Add a river</label>

@@ -3,8 +3,11 @@
  * report-print.php - Print / Save as PDF from the report form. Does not save. No login.
  */
 require __DIR__ . '/../../includes/config.php';
+require_once __DIR__ . '/../../includes/auth.php';
 require __DIR__ . '/../../includes/river-reports.php';
 require __DIR__ . '/../../includes/markdown.php';
+
+require_permission('fishing_reports');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ' . url('services/rivers/report-edit.php'));

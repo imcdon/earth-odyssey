@@ -8,6 +8,11 @@ $pickerQuery = $pickerQuery ?? [];
 $counts = river_state_counts();
 $mapFile = dirname(__DIR__, 2) . '/assets/img/rivers/us-states.svg';
 $mapHtml = '';
+$pickerHref = static function (string $code) use ($pickerAction, $pickerQuery): string {
+    $q = http_build_query(['state' => $code] + $pickerQuery);
+    $join = str_contains($pickerAction, '?') ? '&' : '?';
+    return $pickerAction . $join . $q;
+};
 
 if (is_file($mapFile)) {
     $raw = (string) file_get_contents($mapFile);
@@ -26,6 +31,7 @@ if (is_file($mapFile)) {
         $svg->setAttribute('class', trim(($svg->getAttribute('class') ?: '') . ' river-map-svg'));
         $svg->setAttribute('role', 'group');
         $svg->setAttribute('aria-label', 'Map of the United States. Highlighted states have gauges.');
+        $svg->setAttribute('preserveAspectRatio', 'xMidYMid meet');
 
         $nodes = [];
         foreach ($dom->getElementsByTagName('*') as $el) {
@@ -73,7 +79,7 @@ if (is_file($mapFile)) {
                 continue;
             }
 
-            $href = $pickerAction . '?' . http_build_query(['state' => $code] + $pickerQuery);
+            $href = $pickerHref($code);
             $a = $dom->createElementNS($svgNs, 'a');
             $a->setAttribute('href', $href);
             $a->setAttributeNS($xlinkNs, 'xlink:href', $href);
@@ -89,11 +95,14 @@ if (is_file($mapFile)) {
     }
 }
 ?>
-<section class="container river-states" aria-labelledby="pick-state-title">
+<?php $pickerCompact = !empty($pickerCompact); ?>
+<section class="container river-states<?= $pickerCompact ? ' river-states--fill' : '' ?>"<?= $pickerCompact ? '' : ' aria-labelledby="pick-state-title"' ?>>
+    <?php if (!$pickerCompact): ?>
     <h2 class="rivers-section-title" id="pick-state-title">Pick your state</h2>
+    <?php endif; ?>
     <?php if ($mapHtml !== ''): ?>
         <div class="river-map" data-river-map>
-            <?= $mapHtml ?>
+            <div class="river-map-frame"><?= $mapHtml ?></div>
             <p class="river-map-caption" aria-live="polite" data-map-caption>Highlighted states have gauges. Hover or tap one to open it.</p>
         </div>
     <?php else: ?>
@@ -101,7 +110,7 @@ if (is_file($mapFile)) {
             <?php foreach ($counts as $code => $count): ?>
                 <li>
                     <?php if ($count): ?>
-                        <a class="river-state" href="<?= htmlspecialchars($pickerAction . '?' . http_build_query(['state' => $code] + $pickerQuery)) ?>">
+                        <a class="river-state" href="<?= htmlspecialchars($pickerHref($code)) ?>">
                             <span class="river-state-name"><?= htmlspecialchars(RIVER_STATE_NAMES[$code] ?? $code) ?></span>
                             <span class="river-state-count"><?= $count ?> gauges</span>
                         </a>

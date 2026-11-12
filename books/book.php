@@ -3,7 +3,10 @@
  * book.php - Single book: cover, metadata, attribution, read / Gutenberg / EPUB.
  */
 require __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/auth.php';
 require __DIR__ . '/../includes/books.php';
+
+require_permission('library');
 
 $slug = strtolower(trim((string) ($_GET['slug'] ?? '')));
 $gutenbergId = preg_replace('/\D+/', '', (string) ($_GET['gutenberg'] ?? $_GET['id'] ?? ''));

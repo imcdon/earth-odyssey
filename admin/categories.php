@@ -3,7 +3,7 @@
  * categories.php - Editor: manage article and gallery categories.
  */
 require __DIR__ . '/../includes/config.php';
-require __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/auth.php';
 require __DIR__ . '/../includes/categories.php';
 
 require_role('editor');

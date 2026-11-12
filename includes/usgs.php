@@ -12,6 +12,7 @@ const USGS_PARAMS = [
     '00060' => ['label' => 'Discharge', 'unit' => 'cfs'],
     '00065' => ['label' => 'Gage height', 'unit' => 'ft'],
     '00010' => ['label' => 'Water temperature', 'unit' => 'degC'],
+    '00020' => ['label' => 'Air temperature', 'unit' => 'degC'],
     '63680' => ['label' => 'Turbidity', 'unit' => 'FNU'],
     '00300' => ['label' => 'Dissolved oxygen', 'unit' => 'mg/L'],
 ];

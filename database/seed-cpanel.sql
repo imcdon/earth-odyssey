@@ -2,11 +2,11 @@
 -- Import AFTER schema-cpanel.sql, with your cPanel database selected in the left sidebar.
 -- Do NOT use seed.sql on cPanel (it runs USE earth_odyssey).
 
-INSERT INTO users (username, password_hash, role) VALUES
-('editor', '!', 'editor'),
-('author', '!', 'author');
+-- Production starts with the admin account only. Public signups stay pending until you approve them.
+INSERT INTO users (username, password_hash, role, account_status, perm_library, perm_tools, perm_own_ranges, perm_fishing_reports, reviewed_at) VALUES
+('editor', '!', 'editor', 'approved', 1, 1, 1, 1, CURRENT_TIMESTAMP);
 
--- Accounts start with login disabled ('!' is not a valid hash). Set real passwords with
+-- Account starts with login disabled ('!' is not a valid hash). Set a real password with
 -- database/set-password.php (cPanel Terminal) or paste a password_hash() value in phpMyAdmin.
 
 INSERT INTO categories (type, slug, name, image_path, sort_order, is_featured) VALUES
@@ -38,7 +38,7 @@ INSERT INTO articles (slug, title, blurb, body, status, author_id, editor_id, pu
 
 A light rain shell weighs little and saves the day when the forecast wrong-foots you. Leave the heavy camp gear at home — you are not staying overnight.',
     'published',
-    2,
+    1,
     1,
     NOW(),
     1,
@@ -53,7 +53,7 @@ A light rain shell weighs little and saves the day when the forecast wrong-foots
 
 We are building a home for articles, photo galleries, and free outdoor tools. This is the first post — more guides, galleries, and services are on the way.',
     'published',
-    2,
+    1,
     1,
     NOW(),
     2,
@@ -74,7 +74,7 @@ We are building a home for articles, photo galleries, and free outdoor tools. Th
 
 If skies look uncertain, have a turn-around time and stick to it. The best trip is the one you come home from.',
     'published',
-    2,
+    1,
     1,
     NOW(),
     5,

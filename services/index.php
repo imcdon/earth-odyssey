@@ -3,6 +3,11 @@
  * index.php - Services / tools hub (calm, scannable).
  */
 require __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/auth.php';
+
+$toolsUser = require_permission('tools');
+$riversDashUrl = url('services/rivers/');
+$riversSignInUrl = url('services/account/login.php') . '?next=' . rawurlencode($riversDashUrl);
 
 $page_theme = 'services';
 $page_title = 'Services | ' . $site_name;
@@ -68,7 +73,16 @@ require __DIR__ . '/../includes/header.php';
                                 <?php endif; ?>
                                 <p class="service-card-desc"><?= htmlspecialchars($tool['description']) ?></p>
                                 <?php if ($isOpen): ?>
-                                    <a class="btn-primary" href="<?= htmlspecialchars($toolUrl) ?>">Open tool</a>
+                                    <div class="service-card-actions">
+                                        <a class="btn-primary" href="<?= htmlspecialchars($toolUrl) ?>">Open tool</a>
+                                        <?php if (($tool['url'] ?? '') === '/services/rivers/'): ?>
+                                            <?php if ($toolsUser): ?>
+                                                <a class="btn-secondary" href="<?= htmlspecialchars($riversDashUrl) ?>">See dashboard</a>
+                                            <?php else: ?>
+                                                <a class="btn-secondary" href="<?= htmlspecialchars($riversSignInUrl) ?>">Sign in to see dashboard</a>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                    </div>
                                 <?php else: ?>
                                     <span class="btn-secondary" aria-disabled="true">Coming soon</span>
                                 <?php endif; ?>

@@ -3,11 +3,15 @@
  * login.php - Admin login page.
  */
 require __DIR__ . '/../includes/config.php';
-require __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/auth.php';
 
 start_session();
-if (current_user()) {
-    header('Location: ' . login_next());
+if ($u = current_user()) {
+    if (is_staff($u)) {
+        header('Location: ' . login_next(url('admin/index.php')));
+    } else {
+        header('Location: ' . url('services/rivers/'));
+    }
     exit;
 }
 
@@ -17,10 +21,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
     if (login_user($username, $password)) {
-        header('Location: ' . login_next());
-        exit;
+        $u = current_user(true);
+        if ($u && !is_staff($u)) {
+            // Public members belong on the angler login, not staff admin.
+            logout_user();
+            $error = 'Use the stream gauges Sign in page for angler accounts.';
+        } else {
+            $next = (string) ($_POST['next'] ?? $_GET['next'] ?? '');
+            header('Location: ' . ($next !== '' ? login_next($next) : url('admin/index.php')));
+            exit;
+        }
+    } else {
+        $error = auth_login_error() ?: 'Invalid username or password.';
     }
-    $error = 'Invalid username or password.';
 }
 
 $page_theme = 'admin';

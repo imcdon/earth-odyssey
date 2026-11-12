@@ -3,8 +3,11 @@
  * index.php - Books hub: featured public-domain shelf, subject filters, catalog search.
  */
 require __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/auth.php';
 require __DIR__ . '/../includes/books.php';
 require __DIR__ . '/../includes/search.php';
+
+require_permission('library');
 
 $page_theme = 'books';
 $page_title = 'Books | ' . $site_name;

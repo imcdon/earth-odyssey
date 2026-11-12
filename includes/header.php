@@ -28,7 +28,7 @@ try {
     <?php if ($page_theme === 'rivers'): ?>
     <link rel="manifest" href="<?= htmlspecialchars(url('services/rivers/manifest.php')) ?>">
     <link rel="apple-touch-icon" href="<?= htmlspecialchars(url('assets/img/app/apple-touch-icon.png')) ?>">
-    <meta name="theme-color" content="#1f3f2b">
+    <meta name="theme-color" content="#080809">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="EO Rivers">
     <?php endif; ?>
@@ -36,6 +36,7 @@ try {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Newsreader:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?= htmlspecialchars(css_bundle_url()) ?>">
+    <?= $extra_head_html ?? '' ?>
 </head>
 <body class="theme-<?= htmlspecialchars($page_theme) ?><?= !empty($body_class) ? ' ' . htmlspecialchars((string) $body_class) : '' ?>">
     <header class="site-header">
@@ -63,24 +64,40 @@ try {
                             ><?= htmlspecialchars($label) ?></a>
                         </li>
                     <?php endforeach; ?>
+                    <li class="nav-list-divider" aria-hidden="true"></li>
                     <?php if ($header_user): ?>
-                        <li class="nav-list-divider" aria-hidden="true"></li>
+                        <?php if (!account_is_approved($header_user)): ?>
+                            <li>
+                                <a
+                                    href="<?= htmlspecialchars(url('services/account/pending.php')) ?>"
+                                    class="<?= nav_is_active('services/account/pending.php') ? 'is-active' : '' ?>"
+                                >Awaiting approval</a>
+                            </li>
+                        <?php elseif (user_has_permission('tools', $header_user)): ?>
+                            <li>
+                                <a
+                                    href="<?= htmlspecialchars(url('services/rivers/')) ?>"
+                                    class="<?= nav_is_active('services/rivers/') && !isset($_GET['explore']) ? 'is-active' : '' ?>"
+                                >Dashboard</a>
+                            </li>
+                        <?php endif; ?>
+                        <?php if (is_staff($header_user)): ?>
+                            <li>
+                                <a
+                                    href="<?= htmlspecialchars(url('admin/index.php')) ?>"
+                                    class="<?= nav_is_active('admin/index.php') || (nav_is_active('admin/') && !nav_is_active('admin/login.php')) ? 'is-active' : '' ?>"
+                                >Admin</a>
+                            </li>
+                        <?php endif; ?>
                         <li>
-                            <a
-                                href="<?= htmlspecialchars(url('admin/index.php')) ?>"
-                                class="<?= nav_is_active('admin/index.php') || (nav_is_active('admin/') && !nav_is_active('admin/login.php')) ? 'is-active' : '' ?>"
-                            >Admin</a>
-                        </li>
-                        <li>
-                            <a href="<?= htmlspecialchars(url('admin/logout.php')) ?>">Log out</a>
+                            <a href="<?= htmlspecialchars(url('services/account/logout.php')) ?>">Sign out</a>
                         </li>
                     <?php else: ?>
-                        <li class="nav-list-divider" aria-hidden="true"></li>
                         <li>
                             <a
-                                href="<?= htmlspecialchars(url('admin/login.php')) ?>"
-                                class="<?= nav_is_active('/admin/login.php') ? 'is-active' : '' ?>"
-                            >Login</a>
+                                href="<?= htmlspecialchars(url('services/account/login.php') . '?next=' . rawurlencode((string) ($_SERVER['REQUEST_URI'] ?? url('services/rivers/')))) ?>"
+                                class="<?= nav_is_active('services/account/login.php') || nav_is_active('services/account/register.php') ? 'is-active' : '' ?>"
+                            >Sign in</a>
                         </li>
                     <?php endif; ?>
                 </ul>

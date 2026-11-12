@@ -11,6 +11,85 @@
     font-size: 1.65rem;
 }
 
+.theme-admin .admin-dash-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.theme-admin .admin-dash-head .section-title {
+    margin-bottom: 0.35rem;
+}
+
+.theme-admin .admin-dash-head .section-intro {
+    margin-bottom: 0;
+}
+
+.theme-admin .admin-dash-head-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: flex-start;
+}
+
+.theme-admin .admin-dash-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+    gap: 1.15rem;
+}
+
+.theme-admin .admin-dash-panel {
+    border: 1px solid var(--hairline);
+    background: var(--paper-deep);
+    padding: 1.15rem 1.2rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.theme-admin .admin-dash-panel .kicker {
+    margin: 0;
+}
+
+.theme-admin .admin-dash-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.2rem, 2vw, 1.45rem);
+    line-height: 1.2;
+}
+
+.theme-admin .admin-dash-copy,
+.theme-admin .admin-dash-empty,
+.theme-admin .admin-dash-more {
+    margin: 0;
+    color: var(--ink-soft);
+    font-family: var(--font-read);
+    font-size: 0.95rem;
+}
+
+.theme-admin .admin-dash-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.theme-admin .admin-dash-list {
+    margin-top: 0.35rem;
+}
+
+.theme-admin .admin-dash-more a {
+    color: var(--alpine);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.theme-admin .admin-dash-more a:hover {
+    text-decoration: underline;
+}
+
 .theme-admin .admin-actions {
     display: flex;
     flex-wrap: wrap;
@@ -130,6 +209,45 @@
     border-left: 4px solid var(--alpine);
     background: var(--paper);
     font-weight: 600;
+}
+
+.theme-admin .admin-account-meta {
+    display: block;
+    margin-top: 0.2rem;
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    font-weight: 400;
+    letter-spacing: normal;
+    text-transform: none;
+}
+
+.theme-admin .admin-account-list li {
+    gap: 1rem;
+}
+
+.theme-admin .admin-account-form {
+    max-width: 36rem;
+    margin-top: 0.75rem;
+}
+
+.theme-admin .admin-perm-fieldset {
+    margin: 1rem 0;
+    padding: 0.85rem 1rem 1rem;
+    border: 1px solid var(--hairline);
+}
+
+.theme-admin .admin-perm-fieldset legend {
+    padding: 0 0.35rem;
+    font-family: var(--font-ui);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+
+.theme-admin .admin-perm-fieldset .btn-secondary {
+    margin: 0.35rem 0 0.65rem;
 }
 
 /* —— Fishability ranges —— */
@@ -306,7 +424,7 @@
 
 .theme-admin .api-tabs a[aria-current] {
     background: var(--ink);
-    color: var(--paper);
+    color: var(--night);
 }
 
 .theme-admin .api-cards {
@@ -346,7 +464,7 @@
 }
 
 .theme-admin .api-card-value.is-warn {
-    color: #9a6f12;
+    color: var(--ink-soft);
 }
 
 .theme-admin .api-card-note,
@@ -436,11 +554,11 @@
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--paper);
+    color: var(--foam);
 }
 
 .theme-admin .api-status.is-ok { background: var(--moss); }
-.theme-admin .api-status.is-warn { background: #c99a2e; color: var(--ink); }
+.theme-admin .api-status.is-warn { background: var(--moss); color: var(--foam); }
 .theme-admin .api-status.is-bad { background: var(--alpine); }
 
 .theme-admin .api-job-facts {

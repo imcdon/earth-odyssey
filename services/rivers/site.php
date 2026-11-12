@@ -4,8 +4,11 @@
  * URL state: ?id=USGS-15266300&win=1W&p=00060&units=us
  */
 require __DIR__ . '/../../includes/config.php';
-require __DIR__ . '/../../includes/river-ranges.php';
-require __DIR__ . '/../../includes/auth.php';
+require_once __DIR__ . '/../../includes/river-ranges.php';
+require_once __DIR__ . '/../../includes/auth.php';
+require_once __DIR__ . '/../../includes/river-user.php';
+require_once __DIR__ . '/../../includes/river-alerts.php';
+require_once __DIR__ . '/../../includes/river-auto-ranges.php';
 
 $id = (string) ($_GET['id'] ?? '');
 $site = usgs_valid_site_id($id) ? river_site($id) : null;
@@ -16,9 +19,12 @@ if (!$site) {
     http_response_code(404);
     $page_title = 'Gauge not found | ' . $site_name;
     require __DIR__ . '/../../includes/header.php';
-    echo '<section class="container rivers-missing"><h1 class="section-title">Gauge not found</h1>'
-        . '<p>This gauge isn\'t in our list. It may have stopped reporting.</p>'
-        . '<p><a class="btn-secondary" href="' . htmlspecialchars(url('services/rivers/')) . '">Search gauges</a></p></section>';
+    echo '<div class="rivers-page"><header class="rivers-head rivers-head--compact"><div class="container">'
+        . '<p class="kicker"><a href="' . htmlspecialchars(url('services/rivers/')) . '">Stream gauges</a></p>'
+        . '<h1 class="rivers-title">Gauge not found</h1>'
+        . '<p class="rivers-intro">This gauge isn\'t in our list. It may have stopped reporting.</p>'
+        . '<div class="rivers-head-tools"><a class="btn-secondary" href="' . htmlspecialchars(url('services/rivers/')) . '">Search gauges</a></div>'
+        . '</div></header></div>';
     require __DIR__ . '/../../includes/footer.php';
     exit;
 }
@@ -36,15 +42,44 @@ if (!in_array($param, $site['param_list'], true)) {
 if (empty($_SERVER['HTTP_X_EO_OFFLINE_REFRESH'])) {
     river_record_view($site['site_id']);
 }
-// Only look up staff when a session cookie exists, so ordinary visitors never get a session.
-$staff = isset($_COOKIE[session_name()]) ? current_user() : null;
+$user = require_permission('tools');
+$staff = is_staff($user);
+$canOwnRanges = user_has_permission('own_ranges', $user);
 $latest = usgs_latest_for_site($site['site_id']);
-$ranges = river_ranges_for_sites([$site['site_id']])[$site['site_id']] ?? [];
-$badge = $ranges ? river_badge($ranges, array_map(fn($r) => ['v' => $r['value'], 't' => strtotime($r['time'])], $latest['readings'])) : null;
+$adminRanges = river_ranges_for_sites([$site['site_id']])[$site['site_id']] ?? [];
+$effective = river_effective_ranges_for_user($user ? (int) $user['id'] : null, [$site['site_id']])[$site['site_id']] ?? [];
+$badge = $effective
+    ? river_badge($effective, array_map(fn($r) => ['v' => $r['value'], 't' => strtotime($r['time'])], $latest['readings']))
+    : null;
+$userRanges = $user ? (river_user_ranges_for_sites((int) $user['id'], [$site['site_id']])[$site['site_id']] ?? []) : [];
+$autoRanges = river_auto_ranges_for_sites([$site['site_id']])[$site['site_id']] ?? [];
+// Build suggestions on first visit if the weekly cron hasn't covered this gauge yet.
+if ($user && !$autoRanges) {
+    river_auto_compute_site($site['site_id']);
+    $autoRanges = river_auto_ranges_for_sites([$site['site_id']])[$site['site_id']] ?? [];
+}
+$saved = $user ? river_user_has_site((int) $user['id'], $site['site_id']) : false;
+$alertSub = $user ? river_alert_subscription((int) $user['id'], $site['site_id'], in_array('00060', $site['param_list'], true) ? '00060' : ($site['param_list'][0] ?? '00060')) : null;
 $usgsNumber = preg_replace('/^[A-Z]+-/', '', $site['site_id']);
+$badgeSource = $badge ? ($effective[$badge['param']]['_source'] ?? 'site') : null;
 
 $page_title = $site['display_name'] . ' | River Gauges | ' . $site_name;
 require __DIR__ . '/../../includes/header.php';
+
+$rangeParams = [];
+foreach (['00060' => 'Flow', '00065' => 'Gage height', '00010' => 'Water temperature'] as $code => $label) {
+    if (in_array($code, $site['param_list'], true) || isset($userRanges[$code]) || isset($autoRanges[$code]) || isset($adminRanges[$code])) {
+        $rangeParams[$code] = $label;
+    }
+}
+$rangeFields = ['fish_low' => 'Too low below', 'ideal_low' => 'Prime from', 'ideal_high' => 'Prime up to', 'fish_high' => 'Blown out above'];
+$fmtRange = static function (?float $v, string $code, string $units): string {
+    if ($v === null) {
+        return '';
+    }
+    $shown = river_convert($code, $v, $units)[0];
+    return abs($shown) >= 100 ? number_format($shown, 0, '.', '') : rtrim(rtrim(number_format($shown, 2, '.', ''), '0'), '.');
+};
 ?>
 <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('assets/vendor/uplot/uPlot.min.css')) ?>">
 
@@ -58,26 +93,33 @@ require __DIR__ . '/../../includes/header.php';
     data-param="<?= htmlspecialchars($param) ?>"
     data-units="<?= htmlspecialchars($units) ?>"
     data-rendered="<?= gmdate('c') ?>"
+    data-logged-in="<?= $user ? '1' : '0' ?>"
+    data-csrf="<?= htmlspecialchars($user ? csrf_token() : '') ?>"
+    data-saved="<?= $saved ? '1' : '0' ?>"
 >
-    <header class="rivers-head river-site-head">
+    <header class="rivers-head rivers-head--compact river-site-head">
         <div class="container">
-            <p class="kicker"><a href="<?= htmlspecialchars(url('services/rivers/')) ?>">Stream gauges</a> &middot; <a href="<?= htmlspecialchars(url('services/rivers/browse.php') . '?state=' . $site['state']) ?>"><?= htmlspecialchars(RIVER_STATE_NAMES[$site['state']] ?? $site['state']) ?></a></p>
+            <p class="kicker"><a href="<?= htmlspecialchars(url('services/rivers/')) ?>">Stream gauges</a> &middot; <a href="<?= htmlspecialchars(url('services/rivers/') . '?explore=1&state=' . $site['state']) ?>"><?= htmlspecialchars(RIVER_STATE_NAMES[$site['state']] ?? $site['state']) ?></a></p>
             <h1 class="rivers-title"><?= htmlspecialchars($site['display_name']) ?><?= $badge ? ' ' . river_badge_html($badge, $units) : '' ?></h1>
             <p class="river-site-meta">
                 <?= htmlspecialchars((string) $site['county']) ?>
                 &middot; USGS <?= htmlspecialchars($usgsNumber) ?>
                 &middot; <a href="https://waterdata.usgs.gov/monitoring-location/<?= htmlspecialchars(rawurlencode($usgsNumber)) ?>/" rel="noopener">USGS page</a>
+                <?php if ($badgeSource): ?> &middot; Badge: <?= htmlspecialchars(['user' => 'Yours', 'site' => 'Site', 'auto' => 'Suggested'][$badgeSource] ?? $badgeSource) ?><?php endif; ?>
             </p>
-            <div class="river-site-actions">
-                <button type="button" class="btn-secondary river-fav" aria-pressed="false" data-river-fav>&#9734; Save to favorites</button>
-                <a class="btn-primary" href="<?= htmlspecialchars(url('services/rivers/report-edit.php') . '?site=' . rawurlencode($site['site_id'])) ?>">Start a report</a>
+            <div class="rivers-head-tools river-site-actions">
+                <button type="button" class="btn-secondary" data-river-save aria-pressed="<?= $saved ? 'true' : 'false' ?>"><?= $saved ? '★ Saved to my rivers' : '☆ Save to my rivers' ?></button>
+                <?php if (user_has_permission('fishing_reports', $user)): ?>
+                    <a class="btn-primary" href="<?= htmlspecialchars(url('services/rivers/report-edit.php') . '?site=' . rawurlencode($site['site_id'])) ?>">Start a report</a>
+                <?php endif; ?>
                 <?php if ($staff): ?>
-                    <a class="btn-secondary" href="<?= htmlspecialchars(url('admin/river-range-edit.php') . '?site=' . rawurlencode($site['site_id'])) ?>"><?= $ranges ? 'Edit range' : 'Set range' ?></a>
+                    <a class="btn-secondary" href="<?= htmlspecialchars(url('admin/river-range-edit.php') . '?site=' . rawurlencode($site['site_id'])) ?>"><?= $adminRanges ? 'Edit site range' : 'Set site range' ?></a>
                 <?php endif; ?>
                 <div class="river-units" role="group" aria-label="Units">
                     <button type="button" data-units-btn="us" aria-pressed="<?= $units === 'us' ? 'true' : 'false' ?>">US</button>
                     <button type="button" data-units-btn="metric" aria-pressed="<?= $units === 'metric' ? 'true' : 'false' ?>">Metric</button>
                 </div>
+                <a class="rivers-map-back" href="<?= htmlspecialchars(url('services/rivers/') . '?explore=1&state=' . rawurlencode($site['state'])) ?>" data-river-back>&larr; Back</a>
             </div>
         </div>
     </header>
@@ -149,6 +191,96 @@ require __DIR__ . '/../../includes/header.php';
             </table>
         </div>
         <p class="river-stats-note" data-river-note></p>
+    </section>
+
+    <?php if ($canOwnRanges): ?>
+    <section class="container river-user-tools" aria-labelledby="my-ranges-title">
+        <h2 class="rivers-section-title" id="my-ranges-title">My fishability ranges</h2>
+        <p class="rivers-intro">Your bands drive the badge on your dashboard and alerts. Suggested values come from seasonal percentiles of daily means.</p>
+        <p class="form-success" data-range-status hidden></p>
+        <p class="form-error" data-range-error hidden></p>
+        <form class="admin-form river-user-range-form" data-user-range-form>
+            <input type="hidden" name="units" value="<?= htmlspecialchars($units) ?>">
+            <?php foreach ($rangeParams as $code => $label): ?>
+                <?php
+                $mine = $userRanges[$code] ?? null;
+                $auto = $autoRanges[$code] ?? null;
+                $stats = is_array($auto['stats'] ?? null) ? $auto['stats'] : (is_string($auto['stats'] ?? null) ? (json_decode($auto['stats'], true) ?: []) : []);
+                ?>
+                <fieldset data-range-param="<?= htmlspecialchars($code) ?>">
+                    <legend><?= htmlspecialchars($label) ?></legend>
+                    <?php if ($auto): ?>
+                        <p class="report-help">
+                            Suggested (n=<?= (int) $auto['n_sample'] ?><?= isset($stats['median']) ? ', typical ' . htmlspecialchars($fmtRange((float) $stats['median'], $code, $units)) . ' ' . htmlspecialchars(river_convert($code, 0, $units)[1]) : '' ?>).
+                            <button type="button" class="btn-ghost" data-apply-auto="<?= htmlspecialchars($code) ?>">Apply suggested</button>
+                        </p>
+                    <?php else: ?>
+                        <p class="report-help">No suggestion yet for this measurement — not enough seasonal daily history in the last few weeks of the year (need about a week of comparable days across years).</p>
+                    <?php endif; ?>
+                    <div class="river-range-grid">
+                        <?php foreach ($rangeFields as $field => $flabel): ?>
+                            <label>
+                                <?= htmlspecialchars($flabel) ?>
+                                <input
+                                    type="text"
+                                    inputmode="decimal"
+                                    name="r[<?= htmlspecialchars($code) ?>][<?= htmlspecialchars($field) ?>]"
+                                    value="<?= htmlspecialchars($fmtRange(isset($mine[$field]) && $mine[$field] !== null ? (float) $mine[$field] : null, $code, $units)) ?>"
+                                    data-auto-value="<?= htmlspecialchars($fmtRange(isset($auto[$field]) && $auto[$field] !== null ? (float) $auto[$field] : null, $code, $units)) ?>"
+                                >
+                            </label>
+                        <?php endforeach; ?>
+                    </div>
+                </fieldset>
+            <?php endforeach; ?>
+            <button type="submit" class="btn-primary">Save my ranges</button>
+        </form>
+    </section>
+    <?php endif; ?>
+
+    <section class="container river-user-tools" aria-labelledby="my-alerts-title">
+        <h2 class="rivers-section-title" id="my-alerts-title">Alerts</h2>
+        <p class="rivers-intro">Get notified when this gauge crosses your fishability bands. SMS needs a phone number on your <a href="<?= htmlspecialchars(url('services/account/')) ?>">account</a>.</p>
+        <p class="form-success" data-alert-status hidden></p>
+        <p class="form-error" data-alert-error hidden></p>
+        <form class="admin-form river-alert-form" data-alert-form>
+            <?php
+            $alertParam = $alertSub['param'] ?? (in_array('00060', $site['param_list'], true) ? '00060' : ($site['param_list'][0] ?? '00060'));
+            $on = static fn(string $k, $default = 1) => (int) ($alertSub[$k] ?? $default);
+            ?>
+            <label for="alert-param">Watch</label>
+            <select id="alert-param" name="param">
+                <?php foreach ($rangeParams as $code => $label): ?>
+                    <option value="<?= htmlspecialchars($code) ?>"<?= $alertParam === $code ? ' selected' : '' ?>><?= htmlspecialchars($label) ?></option>
+                <?php endforeach; ?>
+            </select>
+
+            <fieldset>
+                <legend>When</legend>
+                <label class="checkbox-label"><input type="checkbox" name="trigger_enter_prime" value="1"<?= $on('trigger_enter_prime') ? ' checked' : '' ?>> Enters Prime</label>
+                <label class="checkbox-label"><input type="checkbox" name="trigger_leave_fishable" value="1"<?= $on('trigger_leave_fishable') ? ' checked' : '' ?>> Leaves fishable range</label>
+                <label class="checkbox-label"><input type="checkbox" name="trigger_below_low" value="1"<?= $on('trigger_below_low') ? ' checked' : '' ?>> Too low</label>
+                <label class="checkbox-label"><input type="checkbox" name="trigger_above_high" value="1"<?= $on('trigger_above_high') ? ' checked' : '' ?>> Blown out / too high</label>
+                <label class="checkbox-label"><input type="checkbox" name="trigger_unusual" value="1"<?= $on('trigger_unusual', 0) ? ' checked' : '' ?>> Unusual for this time of year</label>
+            </fieldset>
+
+            <fieldset>
+                <legend>How</legend>
+                <label class="checkbox-label"><input type="checkbox" name="channel_in_app" value="1"<?= $on('channel_in_app') ? ' checked' : '' ?>> In-app</label>
+                <label class="checkbox-label"><input type="checkbox" name="channel_email" value="1"<?= $on('channel_email') ? ' checked' : '' ?>> Email</label>
+                <label class="checkbox-label"><input type="checkbox" name="channel_sms" value="1"<?= $on('channel_sms', 0) ? ' checked' : '' ?>> SMS</label>
+            </fieldset>
+
+            <label for="cooldown_minutes">Cooldownest between alerts (minutes)</label>
+            <input type="number" id="cooldown_minutes" name="cooldown_minutes" min="60" max="10080" value="<?= (int) ($alertSub['cooldown_minutes'] ?? 360) ?>">
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Save alerts</button>
+                <?php if ($alertSub): ?>
+                    <button type="button" class="btn-secondary" data-alert-delete>Remove alerts</button>
+                <?php endif; ?>
+            </div>
+        </form>
     </section>
 
     <p class="container rivers-credit">Data: <a href="https://waterdata.usgs.gov/" rel="noopener">USGS Water Data</a>. Provisional data may be revised. Daily windows use daily means; 3D and 1W use 15-minute readings.</p>

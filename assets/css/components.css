@@ -30,14 +30,14 @@
 
 .btn-primary {
     background: var(--alpine);
-    color: var(--paper);
+    color: var(--foam);
     border-color: var(--alpine);
 }
 
 .btn-primary:hover {
     background: var(--alpine-hover);
     border-color: var(--alpine-hover);
-    color: var(--paper);
+    color: var(--foam);
     text-decoration: none;
 }
 
@@ -49,7 +49,7 @@
 
 .btn-secondary:hover {
     background: var(--ink);
-    color: var(--paper);
+    color: var(--night);
     text-decoration: none;
 }
 
@@ -102,8 +102,10 @@
 
 /* Fishability badge (river pages, gauge lists, admin) */
 .river-badge {
-    display: inline-block;
-    padding: 0.12rem 0.45rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.12rem 0.5rem;
     font-family: var(--font-ui);
     font-size: 0.66rem;
     font-weight: 700;
@@ -112,14 +114,47 @@
     text-transform: uppercase;
     white-space: nowrap;
     vertical-align: middle;
-    color: var(--paper);
+    color: var(--foam);
     background: var(--ink-soft);
 }
 
-.river-badge.is-prime { background: var(--moss); }
-.river-badge.is-fishable { background: #c99a2e; color: var(--ink); }
+.river-badge-mark {
+    display: inline-block;
+    width: 0.7rem;
+    height: 0.7rem;
+    flex: 0 0 auto;
+    background: currentColor;
+}
+
+/* In fishable range: green fish */
+.river-badge.is-prime,
+.river-badge.is-fishable,
+.river-badge.is-fish {
+    background: #1f8a4c;
+    color: #f4fff8;
+}
+
+.river-badge.is-fish .river-badge-mark,
+.river-badge.is-prime .river-badge-mark,
+.river-badge.is-fishable .river-badge-mark {
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23000' d='M1 8c2.5-3.5 5.5-5 9-5 1.8 0 3.2.4 4.5 1.2L16 2v5.5L14.5 9 16 10.5V16l-1.5-2.2C12.2 14.6 10.8 15 9 15 5.5 15 2.5 13.5 1 10c.7 0 1.3-.2 1.8-.5C2.2 9.2 1.6 8.6 1 8zm9.2-2.2a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4z'/%3E%3C/svg%3E") center / contain no-repeat;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23000' d='M1 8c2.5-3.5 5.5-5 9-5 1.8 0 3.2.4 4.5 1.2L16 2v5.5L14.5 9 16 10.5V16l-1.5-2.2C12.2 14.6 10.8 15 9 15 5.5 15 2.5 13.5 1 10c.7 0 1.3-.2 1.8-.5C2.2 9.2 1.6 8.6 1 8zm9.2-2.2a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* Outside range: alert Low / High */
 .river-badge.is-low,
-.river-badge.is-high { background: var(--alpine); }
+.river-badge.is-high,
+.river-badge.is-alert {
+    background: #c43c2c;
+    color: #fff5f3;
+}
+
+.river-badge.is-alert .river-badge-mark,
+.river-badge.is-low .river-badge-mark,
+.river-badge.is-high .river-badge-mark {
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23000' d='M8 1 1 14h14L8 1zm0 4.2.9 5.1H7.1L8 5.2zM7.2 12.2h1.6V14H7.2v-1.8z'/%3E%3C/svg%3E") center / contain no-repeat;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23000' d='M8 1 1 14h14L8 1zm0 4.2.9 5.1H7.1L8 5.2zM7.2 12.2h1.6V14H7.2v-1.8z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
 
 h1 .river-badge {
     font-size: 0.8rem;
@@ -130,9 +165,11 @@ h1 .river-badge {
 }
 
 .status-published { color: var(--moss); }
+.status-approved { color: var(--moss); }
 .status-pending { color: var(--alpine); }
 .status-draft { color: var(--ink-soft); }
 .status-rejected { color: var(--alpine); }
+.status-denied { color: #c43c2c; }
 
 /* —— Forms —— */
 
@@ -255,7 +292,7 @@ h1 .river-badge {
 
 .pagination-current {
     background: var(--ink);
-    color: var(--paper);
+    color: var(--night);
     border-color: var(--ink);
 }
 
@@ -532,7 +569,7 @@ h1 .river-badge {
     justify-content: center;
     background-size: cover;
     background-position: center;
-    color: var(--paper);
+    color: var(--foam);
 }
 
 .coming-soon-hero::before {
@@ -569,7 +606,7 @@ h1 .river-badge {
     font-weight: 700;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: color-mix(in srgb, var(--paper) 80%, transparent);
+    color: color-mix(in srgb, var(--foam) 80%, transparent);
 }
 
 .coming-soon-title {
@@ -595,25 +632,25 @@ h1 .river-badge {
 }
 
 .coming-soon-home.btn-primary {
-    background: var(--paper);
-    color: var(--ink);
-    border-color: var(--paper);
+    background: var(--alpine);
+    color: var(--foam);
+    border-color: var(--alpine);
 }
 
 .coming-soon-home.btn-primary:hover {
     background: transparent;
-    color: var(--paper);
-    border-color: var(--paper);
+    color: var(--foam);
+    border-color: var(--foam);
 }
 
 .coming-soon-cta.btn-secondary {
-    color: var(--paper);
-    border-color: var(--paper);
+    color: var(--foam);
+    border-color: var(--foam);
 }
 
 .coming-soon-cta.btn-secondary:hover {
-    background: var(--paper);
-    color: var(--ink);
+    background: var(--foam);
+    color: var(--night);
 }
 
 /* —— Search —— */
@@ -631,10 +668,10 @@ h1 .river-badge {
 }
 
 .search-highlight {
-    background: color-mix(in srgb, var(--moss) 22%, transparent);
+    background: color-mix(in srgb, var(--alpine) 22%, transparent);
     color: inherit;
     text-decoration: underline;
-    text-decoration-color: var(--moss);
+    text-decoration-color: var(--alpine);
     text-underline-offset: 0.12em;
 }
 

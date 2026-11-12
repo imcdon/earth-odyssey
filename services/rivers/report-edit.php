@@ -1,14 +1,14 @@
 <?php
 /*
  * report-edit.php - Create or edit a fishing report. ?site=USGS-... pre-fills the first gauge (from a river page).
- * Anyone can fill the form; saving (and opening a saved report) requires login.
+ * Requires an approved account with fishing_reports permission.
  * Photos are shrunk in the browser (assets/js/river-report.js) before upload; the server only validates and stores them.
  */
 require __DIR__ . '/../../includes/config.php';
-require __DIR__ . '/../../includes/auth.php';
+require_once __DIR__ . '/../../includes/auth.php';
 require __DIR__ . '/../../includes/river-reports.php';
 
-$user = isset($_COOKIE[session_name()]) ? current_user() : null;
+$user = require_permission('fishing_reports');
 $id = (int) ($_GET['id'] ?? 0);
 $report = $id ? river_report_get($id) : null;
 if ($id && !$report) {
@@ -16,8 +16,7 @@ if ($id && !$report) {
     echo 'Report not found.';
     exit;
 }
-if ($report && (!$user || !river_report_can_edit($user, $report))) {
-    require_login();
+if ($report && !river_report_can_edit($user, $report)) {
     http_response_code(403);
     echo 'Access denied.';
     exit;
@@ -25,7 +24,6 @@ if ($report && (!$user || !river_report_can_edit($user, $report))) {
 
 $errors = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $user = require_login();
     if ($report && !river_report_can_edit($user, $report)) {
         http_response_code(403);
         echo 'Access denied.';
@@ -106,15 +104,22 @@ $page_title = ($report ? 'Edit' : 'New') . ' Fishing Report | ' . $site_name;
 require __DIR__ . '/../../includes/header.php';
 ?>
 
+<header class="rivers-head rivers-head--compact">
+    <div class="container">
+        <p class="kicker"><a href="<?= htmlspecialchars(url('services/rivers/')) ?>">Stream gauges</a> &middot; <a href="<?= htmlspecialchars(url('services/rivers/reports.php')) ?>">Fishing reports</a></p>
+        <h1 class="rivers-title"><?= $report ? 'Edit fishing report' : 'New fishing report' ?></h1>
+        <p class="rivers-intro">Print a PDF anytime. Sign in only when you want to keep the report on this site.</p>
+        <div class="rivers-head-tools">
+            <a class="btn-secondary" href="<?= htmlspecialchars(url('services/rivers/reports.php')) ?>">All reports</a>
+            <?php if ($report): ?>
+                <a class="btn-secondary" href="<?= htmlspecialchars(url('services/rivers/report.php') . '?id=' . (int) $report['id']) ?>">Saved print view</a>
+            <?php endif; ?>
+            <a class="rivers-map-back" href="<?= htmlspecialchars(url('services/rivers/')) ?>" data-river-back>&larr; Back</a>
+        </div>
+    </div>
+</header>
+
 <section class="container admin-page report-editor">
-    <h1 class="section-title"><?= $report ? 'Edit fishing report' : 'New fishing report' ?></h1>
-    <p class="section-intro">
-        <a href="<?= htmlspecialchars(url('services/rivers/reports.php')) ?>">&larr; All reports</a>
-        <?php if ($report): ?>
-            &middot; <a href="<?= htmlspecialchars(url('services/rivers/report.php') . '?id=' . (int) $report['id']) ?>">Saved print view</a>
-        <?php endif; ?>
-    </p>
-    <p class="report-help">Print a PDF anytime. Sign in only when you want to keep the report on this site.</p>
 
     <?php foreach ($errors as $e): ?>
         <p class="form-error"><?= htmlspecialchars($e) ?></p>
@@ -322,5 +327,6 @@ require __DIR__ . '/../../includes/header.php';
     </form>
 </section>
 
+<script src="<?= htmlspecialchars(asset_url('assets/js/rivers.js')) ?>" defer></script>
 <script src="<?= htmlspecialchars(asset_url('assets/js/river-report.js')) ?>" defer></script>
 <?php require __DIR__ . '/../../includes/footer.php'; ?>

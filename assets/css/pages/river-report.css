@@ -5,12 +5,12 @@
 /* —— Editor —— */
 
 .theme-rivers .admin-page {
-    margin-top: 2.5rem;
+    margin-top: 1.25rem;
     margin-bottom: 2rem;
 }
 
 .theme-rivers .admin-page .section-title {
-    font-size: 1.65rem;
+    font-size: clamp(1.2rem, 2.4vw, 1.65rem);
 }
 
 .theme-rivers .admin-actions {
@@ -543,7 +543,7 @@
     }
 
     .theme-report {
-        background: #fff;
+        background: var(--paper);
     }
 
     .theme-report .report-summary > div {

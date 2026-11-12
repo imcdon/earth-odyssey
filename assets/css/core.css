@@ -1,18 +1,21 @@
 /*
- * core.css - Field-journal palette, type, reset, utilities.
+ * core.css - Dark greyscale palette with electric blue highlights; angular (radius 0).
  */
 
 :root {
-    --paper: #f4efe6;
-    --paper-deep: #e9e1d2;
-    --ink: #1c1a17;
-    --ink-soft: #5e574c;
-    --hairline: #d5cab6;
-    --alpine: #9e2a2b;
-    --alpine-hover: #7f2021;
-    --moss: #3e5638;
-    --night: #15130f;
-    --night-soft: rgba(21, 19, 15, 0.72);
+    color-scheme: dark;
+
+    --paper: #080809;
+    --paper-deep: #121214;
+    --ink: #ececef;
+    --ink-soft: #9b9ba3;
+    --hairline: #2c2c32;
+    --alpine: #2f9bff;
+    --alpine-hover: #62b4ff;
+    --moss: #8a8a94;
+    --night: #000000;
+    --night-soft: rgba(0, 0, 0, 0.78);
+    --foam: #ffffff;
 
     --font-display: 'Libre Caslon Text', 'Times New Roman', Georgia, serif;
     --font-read: 'Newsreader', Georgia, serif;
@@ -161,8 +164,8 @@ select:focus-visible {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    opacity: 0.28;
-    mix-blend-mode: multiply;
+    opacity: 0.18;
+    mix-blend-mode: soft-light;
     background-image: var(--grain);
     background-size: 180px 180px;
 }

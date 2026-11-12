@@ -3,7 +3,10 @@
  * read.php - In-site paper/serif reader for hosted Gutenberg HTML.
  */
 require __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/auth.php';
 require __DIR__ . '/../includes/books.php';
+
+require_permission('library');
 
 $slug = strtolower(trim((string) ($_GET['slug'] ?? '')));
 $book = $slug !== '' ? get_book_by_slug($slug) : null;
