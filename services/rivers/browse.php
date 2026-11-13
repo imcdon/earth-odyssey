@@ -4,11 +4,8 @@
  * cron/river-snapshot.php. Reads MySQL only; never calls USGS.
  */
 require __DIR__ . '/../../includes/config.php';
-require_once __DIR__ . '/../../includes/auth.php';
 require __DIR__ . '/../../includes/river-movers.php';
 require_once __DIR__ . '/../../includes/river-ranges.php';
-
-require_permission('tools');
 
 $states = river_states();
 $state = strtoupper((string) ($_GET['state'] ?? ''));

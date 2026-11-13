@@ -8,9 +8,14 @@ require __DIR__ . '/../../includes/config.php';
 require_once __DIR__ . '/../../includes/auth.php';
 require __DIR__ . '/../../includes/rivers.php';
 
-$viewer = require_permission('tools');
+$viewer = isset($_COOKIE[session_name()]) ? current_user() : null;
 $explore = isset($_GET['explore']) || isset($_GET['state']);
-if (!$explore) {
+if (
+    $viewer
+    && !$explore
+    && account_is_approved($viewer)
+    && user_has_permission('tools', $viewer)
+) {
     require __DIR__ . '/dashboard.php';
     exit;
 }

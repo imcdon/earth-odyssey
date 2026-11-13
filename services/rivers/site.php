@@ -42,9 +42,10 @@ if (!in_array($param, $site['param_list'], true)) {
 if (empty($_SERVER['HTTP_X_EO_OFFLINE_REFRESH'])) {
     river_record_view($site['site_id']);
 }
-$user = require_permission('tools');
-$staff = is_staff($user);
-$canOwnRanges = user_has_permission('own_ranges', $user);
+$user = isset($_COOKIE[session_name()]) ? current_user() : null;
+$canUseTools = $user && account_is_approved($user) && user_has_permission('tools', $user);
+$staff = $user && is_staff($user);
+$canOwnRanges = $canUseTools && user_has_permission('own_ranges', $user);
 $latest = usgs_latest_for_site($site['site_id']);
 $adminRanges = river_ranges_for_sites([$site['site_id']])[$site['site_id']] ?? [];
 $effective = river_effective_ranges_for_user($user ? (int) $user['id'] : null, [$site['site_id']])[$site['site_id']] ?? [];
@@ -54,7 +55,7 @@ $badge = $effective
 $userRanges = $user ? (river_user_ranges_for_sites((int) $user['id'], [$site['site_id']])[$site['site_id']] ?? []) : [];
 $autoRanges = river_auto_ranges_for_sites([$site['site_id']])[$site['site_id']] ?? [];
 // Build suggestions on first visit if the weekly cron hasn't covered this gauge yet.
-if ($user && !$autoRanges) {
+if ($canUseTools && !$autoRanges) {
     river_auto_compute_site($site['site_id']);
     $autoRanges = river_auto_ranges_for_sites([$site['site_id']])[$site['site_id']] ?? [];
 }
@@ -93,8 +94,8 @@ $fmtRange = static function (?float $v, string $code, string $units): string {
     data-param="<?= htmlspecialchars($param) ?>"
     data-units="<?= htmlspecialchars($units) ?>"
     data-rendered="<?= gmdate('c') ?>"
-    data-logged-in="<?= $user ? '1' : '0' ?>"
-    data-csrf="<?= htmlspecialchars($user ? csrf_token() : '') ?>"
+    data-logged-in="<?= $canUseTools ? '1' : '0' ?>"
+    data-csrf="<?= htmlspecialchars($canUseTools ? csrf_token() : '') ?>"
     data-saved="<?= $saved ? '1' : '0' ?>"
 >
     <header class="rivers-head rivers-head--compact river-site-head">
@@ -108,8 +109,13 @@ $fmtRange = static function (?float $v, string $code, string $units): string {
                 <?php if ($badgeSource): ?> &middot; Badge: <?= htmlspecialchars(['user' => 'Yours', 'site' => 'Site', 'auto' => 'Suggested'][$badgeSource] ?? $badgeSource) ?><?php endif; ?>
             </p>
             <div class="rivers-head-tools river-site-actions">
-                <button type="button" class="btn-secondary" data-river-save aria-pressed="<?= $saved ? 'true' : 'false' ?>"><?= $saved ? '★ Saved to my rivers' : '☆ Save to my rivers' ?></button>
-                <?php if (user_has_permission('fishing_reports', $user)): ?>
+                <?php if ($canUseTools): ?>
+                    <button type="button" class="btn-secondary" data-river-save aria-pressed="<?= $saved ? 'true' : 'false' ?>"><?= $saved ? '★ Saved to my rivers' : '☆ Save to my rivers' ?></button>
+                <?php else: ?>
+                    <button type="button" class="btn-secondary river-fav" aria-pressed="false" data-river-fav>&#9734; Save to favorites</button>
+                    <a class="btn-secondary" href="<?= htmlspecialchars(url('services/account/login.php') . '?next=' . rawurlencode($_SERVER['REQUEST_URI'] ?? '')) ?>">Sign in for saved rivers</a>
+                <?php endif; ?>
+                <?php if ($user && user_has_permission('fishing_reports', $user)): ?>
                     <a class="btn-primary" href="<?= htmlspecialchars(url('services/rivers/report-edit.php') . '?site=' . rawurlencode($site['site_id'])) ?>">Start a report</a>
                 <?php endif; ?>
                 <?php if ($staff): ?>
@@ -238,6 +244,7 @@ $fmtRange = static function (?float $v, string $code, string $units): string {
     </section>
     <?php endif; ?>
 
+    <?php if ($canUseTools): ?>
     <section class="container river-user-tools" aria-labelledby="my-alerts-title">
         <h2 class="rivers-section-title" id="my-alerts-title">Alerts</h2>
         <p class="rivers-intro">Get notified when this gauge crosses your fishability bands. SMS needs a phone number on your <a href="<?= htmlspecialchars(url('services/account/')) ?>">account</a>.</p>
@@ -282,6 +289,7 @@ $fmtRange = static function (?float $v, string $code, string $units): string {
             </div>
         </form>
     </section>
+    <?php endif; ?>
 
     <p class="container rivers-credit">Data: <a href="https://waterdata.usgs.gov/" rel="noopener">USGS Water Data</a>. Provisional data may be revised. Daily windows use daily means; 3D and 1W use 15-minute readings.</p>
 </div>

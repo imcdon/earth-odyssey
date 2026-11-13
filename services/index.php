@@ -5,8 +5,12 @@
 require __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/auth.php';
 
-$toolsUser = require_permission('tools');
+$toolsUser = isset($_COOKIE[session_name()]) ? current_user() : null;
+$riversToolsUser = $toolsUser
+    && account_is_approved($toolsUser)
+    && user_has_permission('tools', $toolsUser);
 $riversDashUrl = url('services/rivers/');
+$riversExploreUrl = url('services/rivers/') . '?explore=1';
 $riversSignInUrl = url('services/account/login.php') . '?next=' . rawurlencode($riversDashUrl);
 
 $page_theme = 'services';
@@ -76,7 +80,7 @@ require __DIR__ . '/../includes/header.php';
                                     <div class="service-card-actions">
                                         <a class="btn-primary" href="<?= htmlspecialchars($toolUrl) ?>">Open tool</a>
                                         <?php if (($tool['url'] ?? '') === '/services/rivers/'): ?>
-                                            <?php if ($toolsUser): ?>
+                                            <?php if ($riversToolsUser): ?>
                                                 <a class="btn-secondary" href="<?= htmlspecialchars($riversDashUrl) ?>">See dashboard</a>
                                             <?php else: ?>
                                                 <a class="btn-secondary" href="<?= htmlspecialchars($riversSignInUrl) ?>">Sign in to see dashboard</a>
